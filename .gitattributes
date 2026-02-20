@@ -8,3 +8,6 @@
 *.md text eol=lf
 *.yml text eol=lf
 *.yaml text eol=lf
+*.log text eol=lf
+*.env text eol=lf
+*.iml text eol=lf
