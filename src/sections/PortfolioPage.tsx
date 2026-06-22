@@ -1103,7 +1103,7 @@ const CertificationsSection = () => {
 // Contact Section
 const ContactSection = () => {
   const { t } = useLanguage();
-  const cvFilePath = './bucket/abdallah.kassan.pdf';
+  const cvFilePath = `${import.meta.env.BASE_URL}bucket/abdallah.kassan.pdf`;
   
   const contactInfo = [
     { icon: Mail, label: 'Email', value: 'abdallah.kassan.job@outlook.fr', href: 'mailto:abdallah.kassan.job@outlook.fr' },
