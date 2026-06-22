@@ -598,7 +598,7 @@ const ExperienceSection = () => {
   const experiences = [
     {
       company: 'Fastpoint',
-      role: language === 'en' ? 'Cloud Software Engineer (AWS / Linux / Web)' : 'Ingénieur Logiciel Cloud (AWS / Linux / Web)',
+      role: language === 'en' ? 'DevOps Engineer (AWS / Linux / Web)' : 'ingénieur DevOps (AWS / Linux / Web)',
       type: 'CDI',
       location: 'Caen, France',
       period: '09/2024 - Present',
@@ -760,7 +760,7 @@ const ProjectsSection = () => {
     },
     {
       title: language === 'en' ? 'CI/CD and Release Automation' : 'Automatisation CI/CD et Releases',
-      subtitle: language === 'en' ? 'GitLab Pipelines for Cloud Software' : 'Pipelines GitLab pour logiciels cloud',
+      subtitle: language === 'en' ? 'GitLab Pipelines for DevOps' : 'Pipelines GitLab pour DevOps',
       period: '2024 - 2025',
       description: language === 'en'
         ? 'Implemented and maintained CI/CD pipelines to standardize builds, deployments, and release quality for production services.'

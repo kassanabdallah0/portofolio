@@ -21,27 +21,27 @@ const translations = {
 
     // Hero
     'hero.available': 'Open to CDI Opportunities in France',
-    'hero.title': 'Cloud Software Engineer',
-    'hero.subtitle': 'AWS Cloud | Linux | Backend & Full-Stack',
+    'hero.title': 'DevOps Engineer',
+    'hero.subtitle': 'AWS | Linux | Backend & Full-Stack',
     'hero.description':
-      'Cloud Software Engineer focused on recent production software projects at Fastpoint: cloud services, backend delivery, reliability, and secure operations.',
+      'DevOps Engineer focused on recent production software projects at Fastpoint: cloud services, backend delivery, reliability, and secure operations.',
     'hero.viewProjects': 'View Projects',
     'hero.getInTouch': 'Get in Touch',
 
     // Job Seeking Banner
     'jobSeeking.title': 'Seeking a CDI Position',
-    'jobSeeking.subtitle': 'Cloud Software Engineering Focus',
+    'jobSeeking.subtitle': 'DevOps Focus',
     'jobSeeking.description':
-      'I am currently looking for a permanent position (CDI) as a Cloud Software Engineer, with strong ownership of cloud architecture, backend services, CI/CD, monitoring, and secure production operations.',
+      'I am currently looking for a permanent position (CDI) as a DevOps Engineer, with strong ownership of cloud architecture, backend services, CI/CD, monitoring, and secure production operations.',
     'jobSeeking.location': 'Based in Caen, France',
     'jobSeeking.mobility': 'Open to relocation',
 
     // About
     'about.badge': 'About Me',
     'about.title': 'Delivering Reliable',
-    'about.subtitle': 'Cloud Software Systems',
+    'about.subtitle': 'DevOps Systems',
     'about.p1':
-      'I have 2 years of professional experience and 7 delivered projects, mainly focused on cloud software engineering at Fastpoint: API/backend development, AWS integration, Linux operations, and production reliability.',
+      'I have 2 years of professional experience and 7 delivered projects, mainly focused on DevOps at Fastpoint: API/backend development, AWS integration, Linux operations, and production reliability.',
     'about.p2':
       'My recent work combines software delivery and cloud operations: CI/CD automation, observability with ELK and CloudWatch, security hardening, and cost/performance optimization.',
     'about.stats.years': 'Years Expérience',
@@ -53,10 +53,10 @@ const translations = {
 
     // Skills
     'skills.badge': 'Technical Skills',
-    'skills.title': 'Cloud Software',
+    'skills.title': 'DevOps',
     'skills.subtitle': 'Skills Matrix',
     'skills.description':
-      'Core capabilities first, then the broader technical stack used to deliver production-ready cloud software.',
+      'Core capabilities first, then the broader technical stack used to deliver production-ready DevOps solutions.',
     'skills.keyTitle': 'Key Skills',
     'skills.keyDescription': 'Top strengths recruiters can scan quickly.',
     'skills.otherTitle': 'Other Skills',
@@ -67,14 +67,14 @@ const translations = {
     'experience.title': 'Professional',
     'experience.subtitle': 'Journey',
     'experience.description':
-      'Recent experience centered on Cloud Software Engineering: software delivery, cloud infrastructure, and production operations.',
+      'Recent experience centered on DevOps: software delivery, cloud infrastructure, and production operations.',
     'experience.present': 'Present',
     'experience.achievements': 'Key Achievements',
     'experience.technologies': 'Technologies',
 
     // Projects
     'projects.badge': 'Recent Projects',
-    'projects.title': 'Cloud Software',
+    'projects.title': 'DevOps',
     'projects.subtitle': 'Projects at Fastpoint',
     'projects.description':
       'Recent software and cloud projects delivered in production: reporting automation, platform reliability, secure operations, and edge integration.',
@@ -95,7 +95,7 @@ const translations = {
     'contact.title': "Let's",
     'contact.subtitle': 'Connect',
     'contact.description':
-      'Open to Cloud Software Engineer opportunities in software delivery, cloud infrastructure, and platform reliability. Based in Caen, France and available across the country.',
+      'Open to DevOps Engineer opportunities in software delivery, cloud infrastructure, and platform reliability. Based in Caen, France and available across the country.',
     'contact.downloadCV': 'Download CV',
 
     // Footer
@@ -120,18 +120,18 @@ const translations = {
 
     // Hero
     'hero.available': 'Ouvert aux opportunités CDI en France',
-    'hero.title': 'Ingénieur Logiciel Cloud',
-    'hero.subtitle': 'Cloud AWS | Linux | Backend et Full-Stack',
+    'hero.title': 'ingénieur DevOps',
+    'hero.subtitle': 'AWS | Linux | Backend et Full-Stack',
     'hero.description':
-      'Ingénieur Logiciel Cloud oriente vers des projets logiciels recents en production chez Fastpoint : services cloud, backend, fiabilité et sécurisation des operations.',
+      'ingénieur DevOps orienté vers des projets logiciels récents en production chez Fastpoint : services cloud, backend, fiabilité et sécurisation des opérations.',
     'hero.viewProjects': 'Voir les projets',
     'hero.getInTouch': 'Me contacter',
 
     // Job Seeking Banner
     'jobSeeking.title': "A la recherche d'un poste en CDI",
-    'jobSeeking.subtitle': 'Orientation Ingénieur Logiciel Cloud',
+    'jobSeeking.subtitle': 'Orientation ingénieur DevOps',
     'jobSeeking.description':
-      "Je recherche actuellement un poste en CDI en tant qu'Ingénieur Logiciel Cloud, avec une forte responsabilité sur l'architecture cloud, les services backend, le CI/CD, la supervision et la sécurisation de la production.",
+      "Je recherche actuellement un poste en CDI en tant qu'ingénieur DevOps, avec une forte responsabilité sur l'architecture cloud, les services backend, le CI/CD, la supervision et la sécurisation de la production.",
     'jobSeeking.location': 'Basé à Caen, France',
     'jobSeeking.mobility': 'Ouvert a la mobilité',
 
@@ -153,9 +153,9 @@ const translations = {
     // Skills
     'skills.badge': 'Compétences Techniques',
     'skills.title': 'Compétences',
-    'skills.subtitle': 'Logiciel Cloud',
+    'skills.subtitle': 'DevOps',
     'skills.description':
-      "D'abord les compétences clés, puis le reste du stack technique utilisé pour livrer des logiciels cloud en production.",
+      "D'abord les compétences clés, puis le reste du stack technique utilisé pour livrer des solutions DevOps en production.",
     'skills.keyTitle': 'Compétences clés',
     'skills.keyDescription': 'Points forts visibles en quelques secondes.',
     'skills.otherTitle': 'Autres compétences',
@@ -194,7 +194,7 @@ const translations = {
     'contact.title': 'Restons en',
     'contact.subtitle': 'Contact',
     'contact.description':
-      "Ouvert aux opportunités d'Ingénieur Logiciel Cloud en livraison software, infrastructure cloud et fiabilité plateforme. Basé à Caen, France et mobile sur tout le territoire.",
+      "Ouvert aux opportunités d'ingénieur DevOps en livraison software, infrastructure cloud et fiabilité plateforme. Basé à Caen, France et mobile sur tout le territoire.",
     'contact.downloadCV': 'Télécharger CV',
 
     // Footer

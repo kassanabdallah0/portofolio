@@ -1,4 +1,4 @@
-# Kassan Abdallah - Cloud Software Engineer Portfolio
+# Kassan Abdallah - DevOps Engineer Portfolio
 
 Modern bilingual portfolio built with React, TypeScript, Vite, and Tailwind CSS.
 
