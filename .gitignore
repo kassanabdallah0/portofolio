@@ -5,6 +5,8 @@ build/
 .DS_Store
 .env
 coverage/
+playwright-report/
+test-results/
 .idea/
 .vscode/
 *.iml

@@ -1,12 +1,69 @@
 <!doctype html>
-<html lang="en">
+<html lang="fr">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Kassan Abdallah | Software Engineer Portfolio</title>
+    <meta
+      name="description"
+      content="Abdallah Kassan, développeur Full Stack junior : React/TypeScript, Python, Node.js et AWS. Projets web et vision embarquée. Recherche CDI, mobilité France entière."
+    />
+    <meta name="theme-color" content="#19644f" />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:title"
+      content="Abdallah Kassan — Développeur Full Stack"
+    />
+    <meta
+      property="og:description"
+      content="React/TypeScript · Python · Node.js. Applications web, services AWS et vision embarquée. Recherche CDI en France."
+    />
+    <meta
+      property="og:url"
+      content="https://kassanabdallah0.github.io/portofolio/"
+    />
+    <meta property="og:locale" content="fr_FR" />
+    <meta name="twitter:card" content="summary" />
+    <link
+      rel="canonical"
+      href="https://kassanabdallah0.github.io/portofolio/"
+    />
+    <link rel="icon" type="image/svg+xml" href="%BASE_URL%favicon.svg" />
+    <title>
+      Développeur Full Stack — React, Python, Node.js | Abdallah Kassan
+    </title>
+    <script>
+      try {
+        const saved = localStorage.getItem('theme');
+        document.documentElement.dataset.theme =
+          saved === 'dark' || saved === 'light'
+            ? saved
+            : matchMedia('(prefers-color-scheme: dark)').matches
+              ? 'dark'
+              : 'light';
+      } catch {
+        /* The application also handles unavailable storage. */
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>
+    <noscript
+      ><main>
+        <h1>Abdallah Kassan — Développeur Full Stack</h1>
+        <p>
+          React/TypeScript, Python, Node.js, AWS et vision embarquée. Recherche
+          CDI en France, mobilité nationale.
+        </p>
+        <p>
+          <a href="mailto:abdallah.kassan.job@outlook.fr">Me contacter</a> ·
+          <a href="%BASE_URL%bucket/abdallah.kassan.pdf">Télécharger mon CV</a>
+        </p>
+        <p>
+          Activez JavaScript pour consulter les études de cas et le parcours
+          complet.
+        </p>
+      </main></noscript
+    >
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

@@ -1,0 +1,43 @@
+Abdallah KASSAN
+Développeur Full Stack — React, Python, Node.js
+Caen | Mobilité France entière | Recherche CDI
++33 7 88 09 35 91 | abdallah.kassan.job@outlook.fr
+linkedin.com/in/kassan-abdallah | gitlab.com/abdallah.kassan
+
+PROFIL
+Ingénieur UTT avec deux ans d’expérience chez Fastpoint, du développement React/TypeScript aux API Node.js et Python/Flask sur AWS et Linux. Réalisations en supervision web, reporting automatisé et déploiement de vision temps réel sur NVIDIA Jetson.
+
+EXPÉRIENCE PROFESSIONNELLE
+
+Fastpoint — Ingénieur Full Stack
+Sept. 2024 – aujourd’hui | CDI · Caen
+- Développé les interfaces React/TypeScript de SecuriSPOT et le portail React MediaSpot : configuration sur image caméra, suivi des alarmes et consultation de contenus via API REST.
+- Automatisé les rapports d’usage MediaSpot en Node.js/TypeScript sur AWS Lambda : PDF mensuels archivés dans S3 et envoyés par email via SES.
+- Migré les statistiques Wi-Fi d’Elasticsearch vers CloudWatch Logs Insights ; corrigé les dates invalides dans les graphiques de supervision.
+- Intégré YOLO/TensorRT au backend Python/Flask sur Jetson Orin : 29,3 images/s en moyenne observées sur le pipeline de comptage du 10 au 12 août 2026.
+- Industrialisé les livraisons GitLab CI/CD : frontend et backend mis à jour indépendamment, sans reconstruire l’image Docker de base, avec contrôles et retour arrière.
+
+KEOS Telecom — Développeur web Full Stack
+Juil. – déc. 2023 | Stage · Paris
+- Développé une application métier interne en PHP/MySQL pour les opérations télécom.
+- Livré des évolutions fonctionnelles et corrigé des anomalies applicatives et des requêtes SQL.
+- Documenté le fonctionnement de l’application pour en faciliter la maintenance.
+
+HMRexpert — Développeur logiciel et traitement d’image
+Fév. – juil. 2022 | Stage · Bourgogne-Franche-Comté
+- Développé une interface Qt et des modules de traitement d’image OpenCV sous Linux.
+- Intégré et testé les traitements ; rédigé leur documentation technique.
+
+COMPÉTENCES TECHNIQUES
+Frontend : React, TypeScript, JavaScript.
+Backend : Node.js, Python, Flask, API REST ; PHP/MySQL.
+Cloud AWS : Lambda, S3, DynamoDB, API Gateway, CloudWatch.
+Livraison : Docker, Git, GitLab CI/CD, Linux.
+Vision et edge : OpenCV, YOLO/Ultralytics, TensorRT, NVIDIA Jetson.
+
+FORMATION
+Diplôme d’ingénieur — Université de Technologie de Troyes (UTT)
+Systèmes de Réseaux Convergents | 2021 – 2024
+
+LANGUES
+Français : professionnel | Anglais : professionnel | Arabe : langue maternelle
