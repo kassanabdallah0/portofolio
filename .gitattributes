@@ -11,3 +11,6 @@
 *.log text eol=lf
 *.env text eol=lf
 *.iml text eol=lf
+*.pdf binary
+*.docx binary
+*.png binary

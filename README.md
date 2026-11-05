@@ -1,99 +1,93 @@
-# Abdallah Kassan — Full Stack Developer
+# Abdallah Kassan — Neural Core
 
-Bilingual French/English portfolio for junior Full Stack / Software Engineer opportunities in France. React/TypeScript, Python and Node.js are the core positioning; AWS and edge computer vision are complementary experience.
+French portfolio for a software engineer working across web applications, cloud services and embedded computer vision. Next.js static export, TypeScript, Tailwind CSS, Motion, React Three Fiber, Three.js and Lucide.
 
 **Website:** https://kassanabdallah0.github.io/portofolio/
 
-## Pages and features
+## Local development
 
-- Home: positioning, selected projects, location and CV download.
-- Projects: category filters, accent-insensitive search, empty state and five detailed case studies.
-- Experience: Fastpoint, KEOS Telecom and HMRexpert, with corrected dates and scoped contributions.
-- Skills: technologies linked to examples of their use.
-- About: education, languages, junior positioning and nationwide mobility.
-- Resume: PDF preview and downloads in PDF, ATS Word and plain text (French).
-- Contact: email/phone/profile links, copy-email feedback and a validated email-draft form.
-- Privacy information and an unknown-route page.
-- Responsive navigation, keyboard focus management, reduced-motion support and persistent language/theme preferences. Storage restrictions do not prevent rendering.
-
-Case studies cover SecuriSPOT, MediaSpot reporting, Jetson vision integration, Wi-Fi statistics migration and application delivery. Diagrams are original, simplified illustrations, not production screenshots.
-
-## Development
-
-Node **20.19.4** is pinned in `.nvmrc`; Vite requires Node 20.19 or later.
+Node **20.19.4** is pinned in `.nvmrc`.
 
 ```bash
-nvm install
 nvm use
 npm ci
 npm run dev
 ```
 
-Open the repository subpath printed by Vite, normally `http://localhost:5173/portofolio/`.
+Open `http://127.0.0.1:3000/portofolio/`. To verify exactly what GitHub Pages will serve:
 
 ```bash
-npm run lint
 npm run build
 npm run preview
 ```
 
-Only React, React DOM and Lucide are runtime dependencies. Styling is plain CSS, with system fonts and no external font request. Unused generated UI components and the inspection plugin were removed.
+The static preview is `http://127.0.0.1:4173/portofolio/`.
 
-## Browser checks
+## Experience
+
+- Cinematic neural-core hero with a lazy-loaded React Three Fiber scene. Mouse movement influences the rotation; a pause control is available. Rendering pauses offscreen and in background tabs.
+- Static SVG fallback on phones, reduced-motion settings, missing WebGL and rendering failures. Core content is prerendered and readable without JavaScript.
+- French about, expertise, project, technology, career and contact sections with restrained Motion reveals and pointer interactions.
+- Four filterable case studies: Jetson vision, SecuriSPOT Manager, MediaSpot and Jetson delivery. Native dialogs support focus containment, Escape, deep links and browser history.
+- Responsive navigation with section tracking, skip link, focus styles and reduced-motion support.
+- Real email/social links, clipboard feedback and an updated, concise two-page PDF CV.
+- Self-hosted fonts; no analytics, tracking cookies, external font requests or contact backend. Email links open the visitor’s mail application.
+- Static metadata, canonical URL, social preview, sitemap, robots file and a custom 404 page.
+
+## Editing
+
+| File                               | Purpose                                                          |
+| ---------------------------------- | ---------------------------------------------------------------- |
+| `src/data/portfolio.ts`            | Public profile, project studies, expertise, stack and career     |
+| `src/components/Portfolio.tsx`     | Navigation, sections, filtering, project dialogs and contact     |
+| `src/components/CoreVisual.tsx`    | Progressive 3D loading, fallbacks and animation controls         |
+| `src/components/NeuralScene.tsx`   | Lightweight neural geometry and pointer response                 |
+| `src/components/ProjectVisual.tsx` | Original illustrative SVG project diagrams                       |
+| `src/app/globals.css`              | Design tokens, layouts, responsive and reduced-motion styles     |
+| `src/app/layout.tsx`               | French metadata and locally hosted fonts                         |
+| `scripts/generate_cv.py`           | Concise public CV source (PDF, plain text and basic Word export) |
+| `scripts/generate_social.mjs`      | Reproducible social preview rendered from HTML/SVG               |
+| `tests/portfolio.spec.ts`          | Desktop/mobile functional and accessibility checks               |
+
+The exhaustive October 2026 CV supplied by the owner informed the public copy. It is not committed or published. Public source files and illustrations contain no private product code, internal screenshots, infrastructure addresses or logs.
+
+Performance improvements are clearly scoped **field estimates/observations**, not independent benchmarks. Case studies distinguish the owner’s contribution from team work and pre-existing systems. C/C++ is described as foundational knowledge; the site does not claim professional firmware or autonomous-robotics experience. Professional source repositories are private, so GitHub links are explicitly profile links rather than invented project repositories.
+
+### CV and social card
+
+The generated public files are committed; the deployment does not need to regenerate them. The previous PDF, Word and plain-text URLs are preserved with updated content.
+
+```bash
+# Optional; requires Python 3 and reportlab
+python3 scripts/generate_cv.py
+
+# Optional; requires a Playwright Chromium installation
+node scripts/generate_social.mjs
+```
+
+For an existing Chrome installation, set `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/google-chrome`. The repository-root `bucket/abdallah.kassan.pdf` is kept synchronized with the published PDF.
+
+## Verification
 
 ```bash
 npx playwright install chromium
 npm run check
 ```
 
-For an existing Chrome installation on Linux:
+`pdftotext` (Poppler) is required for the CV content assertion. On Linux with Chrome already installed:
 
 ```bash
 PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/google-chrome npm run check
 ```
 
-Playwright checks desktop and mobile navigation, direct case-study URLs, browser history, filters/search, theme/language persistence, real CV file contents, form validation and draft feedback, clipboard failure, blocked storage, unknown routes, and automated WCAG A/AA checks with axe in both themes. The desktop-only skip of the mobile-menu test is intentional. Automated checks do not replace manual accessibility review.
+Checks cover metadata, anchor targets, project filters, modal focus/Escape/history, legacy links, mobile navigation, clipboard success/failure, served PDF bytes and contents, reduced motion, no-WebGL fallback, desktop 3D/pause, overflow at 320–1440 px, no-JavaScript content and axe WCAG A/AA scans of the page and modal. Desktop mobile-menu and mobile WebGL tests are intentionally skipped. Automated accessibility checks complement visual and keyboard review.
 
-`npm run test:ui` opens the interactive runner. `npm run format` formats the source. Test reports and traces are ignored by Git.
+The narrowly scoped `minimatch` override patches a security advisory in TypeScript ESLint’s development-only file matching. Revisit it when the upstream parser updates its dependency.
 
-## Editing content
+## GitHub Pages deployment
 
-| File                             | Purpose                                                        |
-| -------------------------------- | -------------------------------------------------------------- |
-| `src/data/portfolio.ts`          | Profile, bilingual project case studies, skills and experience |
-| `src/pages/Pages.tsx`            | Page layouts and translated interface copy                     |
-| `src/components/Site.tsx`        | Navigation, footer, shared buttons and page headings           |
-| `src/components/ProjectCard.tsx` | Project cards and architecture illustrations                   |
-| `src/context/preferences.tsx`    | Language and theme state                                       |
-| `src/lib/router.ts`              | GitHub Pages compatible hash routes and old section aliases    |
-| `src/index.css`                  | Colors, typography, layout, responsive and print styles        |
-| `public/bucket/`                 | Published CV files                                             |
-| `tests/portfolio.spec.ts`        | Browser regression checks                                      |
+`next.config.ts` sets `output: 'export'`, `basePath: '/portofolio'` and `trailingSlash: true`. Build artifacts are emitted to **`out/`**. `.github/workflows/deploy.yml` runs lint, production build and browser checks before deployment from `main`. GitHub Pages uses **GitHub Actions** as its source. No Next.js server is required.
 
-The legacy PDF URL `/portofolio/bucket/abdallah.kassan.pdf` is preserved. Its former empty file was replaced with the verified September 2026 CV. The repository-root `bucket/` copy is synchronized for existing source links; Vite publishes the `public/` copy.
+The homepage is prerendered; project detail views use hash URLs such as `#projet/jetson-vision`. Prior `#/projects/...`, `#/contact`, `#/cv`, `#/about`, `#/skills` and `#/experience` links remain compatible. Case studies are not separate indexable pages.
 
-## Content accuracy
-
-The content follows the verified CV and project audit dated September 23, 2026. KEOS ends in **December 2023**. Unsupported performance/cost improvements and unsupported expertise/certification claims from the old page were removed.
-
-The Jetson result is **29.3 FPS**, the arithmetic mean of **10,599 reported detector rates** from **August 10–12, 2026**, for the counting pipeline. It is not display throughput, a PPE dual-model benchmark, an accuracy score or a before/after speedup. Do not broaden this claim when editing.
-
-Professional source repositories, internal logs, network addresses, configuration files and private evidence are not included. Case studies describe contributions to team projects, not sole authorship of the products.
-
-## Contact behavior
-
-There is **no email backend**. The form validates the input and opens a percent-encoded `mailto:` draft in the visitor's mail application. The visitor must send the message there. The interface does not report a successful delivery and provides a direct email address if no mail handler is configured. No form data is stored by the portfolio.
-
-The site has no analytics or advertising integration. Language and theme are stored locally when browser policies allow it.
-
-## Deployment
-
-`.github/workflows/deploy.yml` runs lint, build and browser tests on pushes and pull requests. Only a successful **main** build deploys to GitHub Pages. The repository's Pages source must be configured to **GitHub Actions**.
-
-The Vite base is `/portofolio/`. URLs such as `#/projects/jetson-vision` reload without server rewrites. Legacy section links such as `#projects` remain usable. Hash navigation is intentional for GitHub Pages; individual case studies are not separately prerendered/indexable HTML documents. The homepage includes social metadata, a favicon and a useful no-JavaScript fallback.
-
-To host under a different URL, update `vite.config.ts`, the canonical/social URLs in `index.html` and the Playwright base URL.
-
-## Contact
-
-[LinkedIn](https://www.linkedin.com/in/kassan-abdallah) · [GitHub](https://github.com/kassanabdallah0) · [GitLab](https://gitlab.com/abdallah.kassan)
+For another hosting path, update the Next base path, asset URLs in content/metadata, robots/sitemap, static preview and Playwright base URL together.

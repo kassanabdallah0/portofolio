@@ -10,3 +10,7 @@ test-results/
 .idea/
 .vscode/
 *.iml
+
+.next/
+out/
+*.tsbuildinfo
