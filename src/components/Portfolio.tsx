@@ -23,15 +23,19 @@ import {
 } from 'lucide-react';
 import {
   expertise,
+  approach,
+  impact,
   navigation,
   profile,
   projects,
   technologies,
+  technologyMarks,
   timeline,
 } from '@/data/portfolio';
 import type { Project } from '@/data/portfolio';
 import CoreVisual, { NeuralFallback } from './CoreVisual';
 import ProjectVisual from './ProjectVisual';
+import ResumeCard from './ResumeCard';
 
 function Reveal({
   children,
@@ -318,6 +322,10 @@ function ProjectDialog({
             <p className="project-category">{project.label}</p>
             <h2 id="project-dialog-title">{project.title}</h2>
             <p className="dialog-subtitle">{project.subtitle}</p>
+            <div className="project-role">
+              <span>MON RÔLE</span>
+              <p>{project.role}</p>
+            </div>
             <ProjectVisual type={project.visual} />
             <div className="tag-list">
               {project.tags.map((tag) => (
@@ -326,6 +334,10 @@ function ProjectDialog({
             </div>
             <h3>Le contexte</h3>
             <p>{project.context}</p>
+            <div className="decision-block">
+              <span className="eyebrow">LE CHOIX TECHNIQUE</span>
+              <p>{project.decision}</p>
+            </div>
             <h3>Ma contribution</h3>
             <ul className="contribution-list">
               {project.contribution.map((item) => (
@@ -405,69 +417,87 @@ function Contact() {
       </div>
       <div className="container contact-content">
         <SectionLabel number="06">CONTACT</SectionLabel>
-        <Reveal>
-          <p className="availability">
-            <span className="status-dot" />
-            Disponible pour de nouvelles opportunités
-          </p>
-          <h2>
-            Construisons des systèmes
-            <br />
-            <span>plus intelligents.</span>
-          </h2>
-          <p className="contact-description">
-            Un projet en intelligence artificielle, systèmes embarqués
-            <br className="desktop-break" /> ou ingénierie logicielle ?
-            Échangeons.
-          </p>
-          <div className="email-row">
-            <a href={`mailto:${profile.email}`} className="email-link">
-              {profile.email}
-              <ArrowUpRight />
-            </a>
-            <button
-              type="button"
-              className="icon-button copy-button"
-              onClick={copyEmail}
-              aria-label="Copier l’adresse email"
-            >
-              {copied.startsWith('Adresse copiée') ? (
-                <Check size={17} />
-              ) : (
-                <Copy size={17} />
-              )}
-            </button>
-          </div>
-          <p className="copy-feedback" role="status">
-            {copied}
-          </p>
-          <div className="contact-actions">
-            <a className="button button-secondary" href={profile.cv} download>
-              <Download size={16} />
-              Télécharger mon CV
-            </a>
-            <a
-              className="social-link"
-              href={profile.github}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Github size={18} />
-              GitHub
-              <ArrowUpRight size={13} />
-            </a>
-            <a
-              className="social-link"
-              href={profile.linkedin}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Linkedin size={18} />
-              LinkedIn
-              <ArrowUpRight size={13} />
-            </a>
-          </div>
-        </Reveal>
+        <div className="contact-layout">
+          <Reveal>
+            <p className="availability">
+              <span className="status-dot" />
+              Disponible pour de nouvelles opportunités
+            </p>
+            <h2>
+              Construisons des systèmes
+              <br />
+              <span>plus intelligents.</span>
+            </h2>
+            <p className="contact-description">
+              Une application métier, une plateforme cloud ou un système de
+              vision embarquée ? Parlons de ce que nous pouvons construire
+              ensemble.
+            </p>
+            <div className="email-row">
+              <a href={`mailto:${profile.email}`} className="email-link">
+                {profile.email}
+                <ArrowUpRight />
+              </a>
+              <button
+                type="button"
+                className="icon-button copy-button"
+                onClick={copyEmail}
+                aria-label="Copier l’adresse email"
+              >
+                {copied.startsWith('Adresse copiée') ? (
+                  <Check size={17} />
+                ) : (
+                  <Copy size={17} />
+                )}
+              </button>
+            </div>
+            <p className="copy-feedback" role="status">
+              {copied}
+            </p>
+            <div className="contact-actions">
+              <a
+                className="social-link"
+                href={profile.github}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Github size={18} />
+                GitHub
+                <ArrowUpRight size={13} />
+              </a>
+              <a
+                className="social-link"
+                href={profile.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Linkedin size={18} />
+                LinkedIn
+                <ArrowUpRight size={13} />
+              </a>
+              <a
+                className="social-link"
+                href={profile.gitlab}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Code2 size={18} />
+                GitLab
+                <ArrowUpRight size={13} />
+              </a>
+            </div>
+            <div className="contact-practical">
+              <span>
+                <MapPin size={14} />
+                Caen · Mobilité en France
+              </span>
+              <a href="tel:+33788093591">+33 7 88 09 35 91</a>
+            </div>
+          </Reveal>
+          <Reveal className="resume-reveal" delay={0.1}>
+            <ResumeCard />
+          </Reveal>
+        </div>
       </div>
     </section>
   );
@@ -536,7 +566,7 @@ export default function Portfolio() {
             <div className="hero-copy">
               <p className="eyebrow hero-eyebrow">
                 <span className="eyebrow-line" />
-                LOGICIEL · INTELLIGENCE · EMBARQUÉ
+                ABDALLAH KASSAN / INGÉNIEUR UTT
               </p>
               <motion.h1 initial={{ opacity: 1 }} animate={{ opacity: 1 }}>
                 <span>Ingénieur Logiciel.</span>
@@ -546,10 +576,14 @@ export default function Portfolio() {
                 </span>
                 <span className="accent-text">IA Embarquée.</span>
               </motion.h1>
+              <p className="hero-specialties">
+                Full Stack <span>/</span> Backend <span>/</span> Cloud{' '}
+                <span>/</span> Edge AI
+              </p>
               <p className="hero-description">
-                Je conçois des systèmes logiciels intelligents, de l’algorithme
-                à l’embarqué, en combinant intelligence artificielle,
-                performance et ingénierie.
+                Des interfaces React aux services AWS, jusqu’à la vision sur
+                NVIDIA Jetson : je conçois, livre et maintiens des logiciels qui
+                fonctionnent sur le terrain.
               </p>
               <div className="hero-actions">
                 <MagneticLink href="#projets" className="button button-primary">
@@ -582,26 +616,41 @@ export default function Portfolio() {
           </div>
         </section>
 
-        <div className="technology-ribbon">
+        <section className="impact-section" aria-labelledby="impact-title">
           <div className="container">
-            <span className="ribbon-intro">
-              DE L’INTERFACE
-              <br />
-              AU TERRAIN.
-            </span>
-            <span>
-              React <i>/</i> TypeScript
-            </span>
-            <span>
-              Python <i>/</i> OpenCV
-            </span>
-            <span>NVIDIA Jetson</span>
-            <span>TensorRT</span>
-            <span>
-              AWS <i>/</i> Docker
-            </span>
+            <div className="impact-heading">
+              <h2 id="impact-title">L’ingénierie, à l’épreuve du réel.</h2>
+              <span className="eyebrow">RÉALISATIONS CHEZ FASTPOINT</span>
+            </div>
+            <div className="impact-grid">
+              {impact.map((item) => (
+                <button
+                  key={item.project}
+                  className="impact-item"
+                  type="button"
+                  onClick={() => {
+                    window.location.hash = `projet/${item.project}`;
+                  }}
+                  aria-label={`Découvrir : ${item.label}`}
+                >
+                  <span className="impact-value">
+                    {item.value}
+                    <span>{item.unit}</span>
+                  </span>
+                  <span className="impact-label">
+                    {item.label}
+                    <ArrowUpRight size={14} />
+                  </span>
+                  <span className="impact-detail">{item.detail}</span>
+                </button>
+              ))}
+            </div>
+            <p className="impact-footnote">
+              ¹ Estimations et observations terrain. Périmètres et conditions
+              précisés dans chaque étude de cas.
+            </p>
           </div>
-        </div>
+        </section>
 
         <section id="a-propos" className="section section-anchor about-section">
           <div className="container">
@@ -615,18 +664,21 @@ export default function Portfolio() {
                 </h2>
                 <p className="about-intro">
                   Je suis <strong>Abdallah Kassan</strong>, ingénieur diplômé de
-                  l’UTT. Mon terrain de jeu : la rencontre entre le logiciel et
-                  le monde réel.
+                  l’Université de Technologie de Troyes. Depuis septembre 2024,
+                  je développe des produits logiciels chez Fastpoint, à Caen.
                 </p>
                 <p>
-                  Chez Fastpoint, je développe des applications web, des
-                  services cloud et des systèmes de vision embarquée. Du besoin
-                  utilisateur au diagnostic en production, j’aime comprendre
-                  chaque maillon pour construire un ensemble qui fonctionne.
+                  Mon travail relie les interfaces React/TypeScript, les API
+                  Python et Node.js, le cloud AWS et la vision embarquée sur
+                  NVIDIA Jetson. Je prends en charge le produit du besoin
+                  utilisateur jusqu’aux tests, au déploiement et à la
+                  maintenance.
                 </p>
                 <p>
-                  Une interface claire. Une architecture solide. Une
-                  intelligence qui trouve sa place sur le terrain.
+                  Ce qui m’intéresse : rendre un système utile, compréhensible
+                  et fiable. Une zone de détection que le client configure seul,
+                  un bus supervisé à distance, une mise à jour qui peut revenir
+                  en arrière.
                 </p>
                 <div className="about-signature">
                   <span className="signature-mark">ak.</span>
@@ -641,6 +693,17 @@ export default function Portfolio() {
                   UNE APPROCHE SYSTÈME, DE BOUT EN BOUT
                 </p>
               </Reveal>
+            </div>
+            <div className="approach-grid">
+              {approach.map((item) => (
+                <div className="approach-item" key={item.number}>
+                  <span>{item.number}</span>
+                  <div>
+                    <h3>{item.title}</h3>
+                    <p>{item.description}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </section>
@@ -708,9 +771,9 @@ export default function Portfolio() {
                 <span className="muted-heading">systèmes fonctionnels.</span>
               </h2>
               <p>
-                Des défis concrets. Des choix techniques.
+                Six réalisations, de l’interface à l’exploitation.
                 <br />
-                Des logiciels utilisés sur le terrain.
+                Mon rôle, mes choix et leurs effets sur le terrain.
               </p>
             </Reveal>
             <div
@@ -723,6 +786,7 @@ export default function Portfolio() {
                 ['vision', 'Vision & IA'],
                 ['logiciel', 'Logiciel'],
                 ['cloud', 'Cloud & systèmes'],
+                ['operations', 'Données & exploitation'],
               ].map(([value, label]) => (
                 <button
                   key={value}
@@ -738,7 +802,9 @@ export default function Portfolio() {
             <p className="sr-only" role="status">
               {filtered.length} projets affichés
             </p>
-            <div className="projects-grid">
+            <div
+              className={`projects-grid ${filter === 'all' ? 'curated-grid' : ''}`}
+            >
               {filtered.map((project) => (
                 <Reveal key={project.slug} className="project-card">
                   <button
@@ -762,6 +828,13 @@ export default function Portfolio() {
                     <p className="project-subtitle">{project.subtitle}</p>
                     <h3>{project.title}</h3>
                     <p className="project-description">{project.description}</p>
+                    <div className="project-metric">
+                      <strong>{project.metric.value}</strong>
+                      <div>
+                        <span>{project.metric.label}</span>
+                        <p>{project.metric.note}</p>
+                      </div>
+                    </div>
                     <div className="tag-list">
                       {project.tags.map((tag) => (
                         <span key={tag}>{tag}</span>
@@ -782,7 +855,8 @@ export default function Portfolio() {
             </div>
             <div className="projects-note">
               <p>
-                Projets professionnels réalisés chez Fastpoint.
+                Projets professionnels réalisés chez Fastpoint ·
+                2024–aujourd’hui.
                 <br />
                 Contributions, résultats et périmètre détaillés dans chaque
                 étude de cas.
@@ -813,9 +887,9 @@ export default function Portfolio() {
                 <span className="muted-heading">l’intelligence.</span>
               </h2>
               <p>
-                Choisir la bonne technologie.
+                Des technologies mises en œuvre en production.
                 <br />
-                Comprendre ce qu’elle permet.
+                Chaque outil au service d’un besoin concret.
               </p>
             </Reveal>
             <div className="tech-grid">
@@ -827,10 +901,10 @@ export default function Portfolio() {
                 >
                   <p className="eyebrow">{category.label}</p>
                   <ul>
-                    {category.items.map((item, j) => (
+                    {category.items.map((item) => (
                       <li key={item}>
                         <span className="tech-symbol" aria-hidden="true">
-                          {['⌘', '◈', '⟐', '⊞', '⌁'][j]}
+                          {technologyMarks[item]}
                         </span>
                         {item}
                         <span className="tech-hover-line" />
@@ -864,8 +938,12 @@ export default function Portfolio() {
                   <br />
                   les idées à la réalité.
                 </p>
-                <a href={profile.cv} download className="text-link">
-                  Mon parcours en PDF
+                <a
+                  href={profile.cv}
+                  download={profile.cvFilename}
+                  className="text-link"
+                >
+                  Mon CV de référence
                   <Download size={16} />
                 </a>
                 <div className="education-note">
@@ -877,6 +955,18 @@ export default function Portfolio() {
                       Coursera.
                     </p>
                   </div>
+                </div>
+                <div className="language-note">
+                  <span className="eyebrow">LANGUES DE TRAVAIL</span>
+                  <p>
+                    Français <span>Professionnel</span>
+                  </p>
+                  <p>
+                    Anglais <span>Professionnel</span>
+                  </p>
+                  <p>
+                    Arabe <span>Langue maternelle</span>
+                  </p>
                 </div>
               </Reveal>
               <div className="timeline">
@@ -894,6 +984,18 @@ export default function Portfolio() {
                     <p className="timeline-organization">{item.organization}</p>
                     <p className="timeline-location">{item.location}</p>
                     <p className="timeline-description">{item.description}</p>
+                    {item.current && (
+                      <div className="experience-evidence">
+                        <span>React / TypeScript</span>
+                        <span>Python / Node.js</span>
+                        <span>AWS / Jetson</span>
+                        <p>
+                          Releases adaptées aux installations COLAS, IDEA et
+                          SNCF. Diagnostic à distance, tests automatisés et
+                          maintien en production.
+                        </p>
+                      </div>
+                    )}
                   </Reveal>
                 ))}
               </div>

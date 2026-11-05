@@ -28,38 +28,38 @@ The static preview is `http://127.0.0.1:4173/portofolio/`.
 - Cinematic neural-core hero with a lazy-loaded React Three Fiber scene. Mouse movement influences the rotation; a pause control is available. Rendering pauses offscreen and in background tabs.
 - Static SVG fallback on phones, reduced-motion settings, missing WebGL and rendering failures. Core content is prerendered and readable without JavaScript.
 - French about, expertise, project, technology, career and contact sections with restrained Motion reveals and pointer interactions.
-- Four filterable case studies: Jetson vision, SecuriSPOT Manager, MediaSpot and Jetson delivery. Native dialogs support focus containment, Escape, deep links and browser history.
+- Six filterable case studies: Jetson vision, SecuriSPOT Manager, MediaSpot, Jetson delivery, the COLAS interactive PPE scan, and ELK operations. Each includes the engineer’s role, an architectural decision, contributions and scoped outcomes. Native dialogs support focus containment, Escape, deep links and browser history.
 - Responsive navigation with section tracking, skip link, focus styles and reduced-motion support.
-- Real email/social links, clipboard feedback and an updated, concise two-page PDF CV.
+- Real email/social links, clipboard feedback and the exact original four-page reference CV, with a real first-page preview and explicit PDF download.
 - Self-hosted fonts; no analytics, tracking cookies, external font requests or contact backend. Email links open the visitor’s mail application.
 - Static metadata, canonical URL, social preview, sitemap, robots file and a custom 404 page.
 
 ## Editing
 
-| File                               | Purpose                                                          |
-| ---------------------------------- | ---------------------------------------------------------------- |
-| `src/data/portfolio.ts`            | Public profile, project studies, expertise, stack and career     |
-| `src/components/Portfolio.tsx`     | Navigation, sections, filtering, project dialogs and contact     |
-| `src/components/CoreVisual.tsx`    | Progressive 3D loading, fallbacks and animation controls         |
-| `src/components/NeuralScene.tsx`   | Lightweight neural geometry and pointer response                 |
-| `src/components/ProjectVisual.tsx` | Original illustrative SVG project diagrams                       |
-| `src/app/globals.css`              | Design tokens, layouts, responsive and reduced-motion styles     |
-| `src/app/layout.tsx`               | French metadata and locally hosted fonts                         |
-| `scripts/generate_cv.py`           | Concise public CV source (PDF, plain text and basic Word export) |
-| `scripts/generate_social.mjs`      | Reproducible social preview rendered from HTML/SVG               |
-| `tests/portfolio.spec.ts`          | Desktop/mobile functional and accessibility checks               |
+| File                               | Purpose                                                                                  |
+| ---------------------------------- | ---------------------------------------------------------------------------------------- |
+| `src/data/portfolio.ts`            | Public profile, project studies, expertise, stack and career                             |
+| `src/components/Portfolio.tsx`     | Navigation, sections, filtering, project dialogs and contact                             |
+| `src/components/CoreVisual.tsx`    | Progressive 3D loading, fallbacks and animation controls                                 |
+| `src/components/NeuralScene.tsx`   | Lightweight neural geometry and pointer response                                         |
+| `src/components/ProjectVisual.tsx` | Original illustrative SVG project diagrams                                               |
+| `src/app/globals.css`              | Core styles; `refinements.css` adds evidence-led layouts, readable type and the CV panel |
+| `src/app/layout.tsx`               | French metadata and locally hosted fonts                                                 |
+| `scripts/sync_reference_cv.py`     | Copies the original reference PDF unchanged, refreshes legacy exports and its thumbnail  |
+| `scripts/generate_social.mjs`      | Reproducible social preview rendered from HTML/SVG                                       |
+| `tests/portfolio.spec.ts`          | Desktop/mobile functional and accessibility checks                                       |
 
-The exhaustive October 2026 CV supplied by the owner informed the public copy. It is not committed or published. Public source files and illustrations contain no private product code, internal screenshots, infrastructure addresses or logs.
+The October 2026 reference CV is published unchanged at the owner’s explicit request. It also informs the public project studies and impact figures. Public source files and illustrations contain no private product code, internal screenshots, infrastructure addresses or logs.
 
 Performance improvements are clearly scoped **field estimates/observations**, not independent benchmarks. Case studies distinguish the owner’s contribution from team work and pre-existing systems. C/C++ is described as foundational knowledge; the site does not claim professional firmware or autonomous-robotics experience. Professional source repositories are private, so GitHub links are explicitly profile links rather than invented project repositories.
 
 ### CV and social card
 
-The generated public files are committed; the deployment does not need to regenerate them. The previous PDF, Word and plain-text URLs are preserved with updated content.
+The original `CV_Reference_Abdallah_Kassan_2026.pdf` is committed and downloaded without rewriting, shortening or reformatting. Its SHA-256 is `7851b83eba479b97baf2261e6f085a27cda8ce12199de4dd1882b000e404d8b5`. The previous PDF URL returns the same bytes; legacy Word/plain-text URLs contain extracted reference content. The site’s PDF preview is a rasterization of the original first page. Deployment does not regenerate these files.
 
 ```bash
-# Optional; requires Python 3 and reportlab
-python3 scripts/generate_cv.py
+# Only when explicitly replacing the original; requires Python 3 and Poppler
+python3 scripts/sync_reference_cv.py /path/to/reference.pdf
 
 # Optional; requires a Playwright Chromium installation
 node scripts/generate_social.mjs
@@ -80,7 +80,7 @@ npm run check
 PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/google-chrome npm run check
 ```
 
-Checks cover metadata, anchor targets, project filters, modal focus/Escape/history, legacy links, mobile navigation, clipboard success/failure, served PDF bytes and contents, reduced motion, no-WebGL fallback, desktop 3D/pause, overflow at 320–1440 px, no-JavaScript content and axe WCAG A/AA scans of the page and modal. Desktop mobile-menu and mobile WebGL tests are intentionally skipped. Automated accessibility checks complement visual and keyboard review.
+Checks cover metadata, anchor targets, project filters, modal focus/Escape/history, legacy links, mobile navigation, clipboard success/failure, the original PDF’s SHA-256, four-page count and legacy download, new case-study scopes, impact links, PDF preview, reduced motion, no-WebGL fallback, desktop 3D/pause, overflow at 320–1440 px, no-JavaScript content and axe WCAG A/AA scans of the page and modal. Desktop mobile-menu and mobile WebGL tests are intentionally skipped. Automated accessibility checks complement visual and keyboard review.
 
 The narrowly scoped `minimatch` override patches a security advisory in TypeScript ESLint’s development-only file matching. Revisit it when the upstream parser updates its dependency.
 

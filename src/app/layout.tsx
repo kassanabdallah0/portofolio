@@ -3,12 +3,13 @@ import '@fontsource-variable/space-grotesk';
 import '@fontsource-variable/inter';
 import '@fontsource-variable/jetbrains-mono';
 import './globals.css';
+import './refinements.css';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://kassanabdallah0.github.io'),
   title: 'Abdallah Kassan — Ingénieur logiciel & IA embarquée',
   description:
-    'Ingénieur UTT à Caen. Je conçois des systèmes logiciels intelligents, des interfaces React au cloud AWS et à la vision embarquée sur NVIDIA Jetson. Découvrez mes projets.',
+    'Abdallah Kassan, ingénieur logiciel UTT à Caen. Full Stack, backend, AWS et Edge AI : six réalisations Fastpoint, de React et Node.js à la vision NVIDIA Jetson. CV de référence disponible.',
   alternates: { canonical: '/portofolio/' },
   openGraph: {
     title: 'Abdallah Kassan — Ingénieur logiciel & IA embarquée',
