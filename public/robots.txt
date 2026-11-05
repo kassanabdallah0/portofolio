@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://kassanabdallah0.github.io/portofolio/sitemap.xml

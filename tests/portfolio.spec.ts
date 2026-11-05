@@ -1,226 +1,292 @@
 import { test, expect } from '@playwright/test';
-import type { Page } from '@playwright/test';
-import { createRequire } from 'node:module';
-const require = createRequire(import.meta.url);
-const axePath = require.resolve('axe-core/axe.min.js');
-const routes = [
-  '',
-  'projects',
-  'experience',
-  'skills',
-  'about',
-  'contact',
-  'cv',
-  'privacy',
-];
-const projects = [
-  'securispot',
-  'mediaspot',
-  'jetson-vision',
-  'wifi-observability',
-  'edge-delivery',
-];
+import { readFileSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
+import { resolve } from 'node:path';
 
-async function checkLayout(page: Page) {
-  expect(
-    await page.evaluate(
-      () => document.documentElement.scrollWidth <= window.innerWidth + 1,
-    ),
-  ).toBe(true);
-  await expect(page.locator('h1')).toHaveCount(1);
-}
+const axe = readFileSync(resolve('node_modules/axe-core/axe.min.js'), 'utf8');
 
-test('every page and case study supports direct visits, reload and keyboard navigation', async ({
+test('French content, metadata and navigation targets are present', async ({
   page,
 }) => {
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
-  for (const route of [
-    ...routes,
-    ...projects.map((slug) => `projects/${slug}`),
-  ]) {
-    await page.goto(`#/${route}`);
-    await expect(page.locator('main h1')).toBeVisible();
-    await checkLayout(page);
-    await expect(page).not.toHaveTitle(/^404/);
-  }
-  await page.reload();
-  await expect(page.locator('h1')).toHaveText('Livraison applicative');
-  await page.getByRole('link', { name: 'Tous les projets' }).click();
-  await expect(page.locator('main')).toBeFocused();
-  await page.goBack();
-  await expect(page.locator('h1')).toHaveText('Livraison applicative');
+  await page.goto('./');
+  await expect(page).toHaveTitle(/Abdallah Kassan.*IA embarquée/);
+  await expect(page.locator('html')).toHaveAttribute('lang', 'fr');
+  await expect(page.getByRole('heading', { level: 1 })).toContainText(
+    'Ingénieur Logiciel.',
+  );
+  await expect(page.getByRole('heading', { level: 1 })).toContainText(
+    'IA Embarquée.',
+  );
+  const ids = await page
+    .locator('a[href^="#"]')
+    .evaluateAll((links) =>
+      links.map((link) => link.getAttribute('href')!.slice(1)).filter(Boolean),
+    );
+  for (const id of new Set(ids))
+    expect(await page.locator(`[id="${id}"]`).count(), `Anchor #${id}`).toBe(1);
   expect(errors).toEqual([]);
 });
 
-test('project filters, accent-insensitive search and empty state work together', async ({
+test('project filters change the visible selection and can reset', async ({
   page,
 }) => {
-  await page.goto('#/projects');
-  await expect(page.locator('.project-card')).toHaveCount(5);
-  await page
-    .getByRole('button', { name: 'Vision & edge', exact: true })
-    .click();
-  await expect(page.locator('.project-card')).toHaveCount(1);
-  await expect(page.locator('.project-card')).toContainText(
-    'Vision sur Jetson',
-  );
-  await page.getByRole('searchbox').fill('not-a-project');
+  await page.goto('./#projets');
   await expect(
-    page.getByRole('heading', { name: 'Aucun projet trouvé' }),
+    page.getByRole('button', { name: /Voir le projet/ }),
+  ).toHaveCount(4);
+  await page.getByRole('button', { name: 'Vision & IA', exact: true }).click();
+  await expect(
+    page.getByRole('button', { name: /Voir le projet/ }),
+  ).toHaveCount(1);
+  await expect(
+    page.getByRole('heading', { name: 'La vision au plus près du terrain.' }),
   ).toBeVisible();
-  await page.getByRole('button', { name: 'Réinitialiser' }).click();
-  await page.getByRole('searchbox').fill('securispot');
-  await expect(page.locator('.project-card')).toHaveCount(1);
-  await page.getByRole('searchbox').fill('TensorRT');
-  await expect(page.locator('.project-card')).toHaveCount(1);
-});
-
-test('language and theme persist and all English pages are usable', async ({
-  page,
-}) => {
-  await page.goto('#/');
-  await page.getByRole('button', { name: 'Switch to English' }).click();
-  await expect(page.locator('html')).toHaveAttribute('lang', 'en');
-  const initial = await page.locator('html').getAttribute('data-theme');
   await page
-    .getByRole('button', { name: /Switch to (dark|light) mode/ })
+    .getByRole('button', { name: 'Cloud & systèmes', exact: true })
     .click();
-  const changed = initial === 'light' ? 'dark' : 'light';
-  await page.reload();
-  await expect(page.locator('html')).toHaveAttribute('data-theme', changed);
-  await expect(page.locator('html')).toHaveAttribute('lang', 'en');
-  for (const route of [
-    ...routes,
-    ...projects.map((slug) => `projects/${slug}`),
-  ]) {
-    await page.goto(`#/${route}`);
-    await checkLayout(page);
-    await expect(page.locator('html')).toHaveAttribute('lang', 'en');
-  }
-});
-
-test('CV downloads are real files and the old URL is preserved', async ({
-  page,
-  request,
-}) => {
-  await page.goto('#/cv');
-  const downloadPromise = page.waitForEvent('download');
-  await page.getByRole('link', { name: 'Télécharger mon CV' }).click();
-  const download = await downloadPromise;
-  expect(download.suggestedFilename()).toBe('CV_Abdallah_Kassan.pdf');
-  const pdf = await request.get('bucket/abdallah.kassan.pdf');
-  expect(pdf.ok()).toBe(true);
-  expect((await pdf.body()).subarray(0, 4).toString()).toBe('%PDF');
-  const docx = await request.get('bucket/CV_Abdallah_Kassan_ATS.docx');
-  expect((await docx.body()).subarray(0, 2).toString()).toBe('PK');
-  const text = await request.get('bucket/CV_Abdallah_Kassan_ATS.txt');
-  expect(await text.text()).toContain('Juil. – déc. 2023');
-});
-
-test('contact validates fields, prepares a draft and handles clipboard failure honestly', async ({
-  page,
-}) => {
-  await page.goto('#/contact');
-  await page.getByRole('button', { name: 'Ouvrir ma messagerie' }).click();
-  await expect(page.locator('input[name="name"]')).toBeFocused();
-  await expect(page.locator('.form-status')).toHaveCount(0);
-  await page.getByLabel('Nom *', { exact: true }).fill('Test recrutement');
-  await page.getByLabel('Email *', { exact: true }).fill('test@example.org');
+  await expect(
+    page.getByRole('button', { name: /Voir le projet/ }),
+  ).toHaveCount(2);
   await page
-    .getByLabel('Message *', { exact: true })
-    .fill('Présentation d’un poste Full Stack à Lyon.');
-  await page.getByRole('button', { name: 'Ouvrir ma messagerie' }).click();
-  await expect(page.locator('.form-status')).toContainText(
-    'Aucun message n’a été envoyé',
-  );
-  await page.evaluate(() =>
-    Object.defineProperty(navigator, 'clipboard', {
-      configurable: true,
-      value: { writeText: () => Promise.reject(new Error('denied')) },
-    }),
-  );
-  await page.getByRole('button', { name: 'Copier l’adresse' }).click();
-  await expect(page.locator('.copy-status')).toContainText(
-    'Copie indisponible',
-  );
-  await page.evaluate(() =>
-    Object.defineProperty(navigator, 'clipboard', {
-      configurable: true,
-      value: { writeText: () => Promise.resolve() },
-    }),
-  );
-  await page.getByRole('button', { name: 'Copier l’adresse' }).click();
-  await expect(page.locator('.copy-status')).toHaveText('Adresse copiée.');
+    .getByRole('button', { name: 'Tous les projets', exact: true })
+    .click();
+  await expect(
+    page.getByRole('button', { name: /Voir le projet/ }),
+  ).toHaveCount(4);
 });
 
-test('unknown routes and unavailable local storage do not break the site', async ({
+test('case study dialog supports keyboard, focus restoration and browser history', async ({
   page,
 }) => {
-  await page.addInitScript(() => {
-    Storage.prototype.getItem = () => {
-      throw new Error('Storage blocked');
-    };
-    Storage.prototype.setItem = () => {
-      throw new Error('Storage blocked');
-    };
+  await page.goto('./#projets');
+  const trigger = page.getByRole('button', {
+    name: 'Explorer l’étude de cas : SecuriSPOT · Vision industrielle',
   });
-  await page.goto('#/projects/unknown');
+  await trigger.click();
+  const dialog = page.getByRole('dialog');
+  await expect(dialog).toBeVisible();
+  await expect(dialog).toContainText('sans benchmark instrumenté');
   await expect(
-    page.getByRole('heading', { name: 'Cette page n’existe pas.' }),
-  ).toBeVisible();
-  await page.getByRole('link', { name: 'Retour à l’accueil' }).click();
-  await expect(page.locator('h1')).toContainText('Full Stack');
-  await page.getByRole('button', { name: 'Switch to English' }).click();
-  await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+    dialog.getByRole('link', { name: 'Mon profil GitHub' }),
+  ).toHaveAttribute('href', 'https://github.com/kassanabdallah0');
+  await page.keyboard.press('Escape');
+  await expect(dialog).not.toBeVisible();
+  await expect(trigger).toBeFocused();
+  await trigger.click();
+  await page.goBack();
+  await expect(dialog).not.toBeVisible();
+  await page.goForward();
+  await expect(dialog).toBeVisible();
+  await dialog.getByRole('button', { name: 'Fermer l’étude de cas' }).click();
+  await expect(dialog).not.toBeVisible();
 });
 
-test('mobile menu supports navigation and Escape', async ({
+test('deep links and old portfolio links open the correct content', async ({
+  page,
+}) => {
+  await page.goto('./#projet/mediaspot');
+  await expect(page.getByRole('dialog')).toContainText(
+    '70 PC embarqués supprimés',
+  );
+  await page.reload();
+  await expect(page.getByRole('dialog')).toBeVisible();
+  await page.goto('./#/projects/edge-delivery');
+  await expect(page.getByRole('dialog')).toContainText('Mise à jour du code');
+  await page.goto('./#/contact');
+  await expect(page).toHaveURL(/#contact$/);
+  await expect(page.getByRole('dialog')).not.toBeVisible();
+});
+
+test('mobile menu closes on navigation and Escape', async ({
   page,
   isMobile,
 }) => {
-  test.skip(!isMobile);
-  await page.goto('#/');
-  const menu = page.getByRole('button', { name: 'Ouvrir le menu' });
-  await menu.click();
-  await expect(
-    page.getByRole('button', { name: 'Fermer le menu' }),
-  ).toHaveAttribute('aria-expanded', 'true');
-  await page
-    .locator('#mobile-navigation')
-    .getByRole('link', { name: 'Compétences' })
-    .click();
-  await expect(page.locator('h1')).toContainText('technologies');
-  await expect(menu).toHaveAttribute('aria-expanded', 'false');
-  await menu.click();
-  await page.locator('#mobile-navigation a').first().focus();
+  test.skip(!isMobile, 'Mobile navigation only');
+  await page.goto('./');
+  await page.getByRole('button', { name: 'Ouvrir le menu' }).click();
+  const nav = page.getByRole('navigation', { name: 'Navigation principale' });
+  await expect(nav).toBeVisible();
+  await nav.getByRole('link', { name: 'Projets', exact: true }).click();
+  await expect(page).toHaveURL(/#projets$/);
+  await expect(nav).not.toBeVisible();
+  await page.getByRole('button', { name: 'Ouvrir le menu' }).click();
   await page.keyboard.press('Escape');
-  await expect(menu).toBeFocused();
+  await expect(
+    page.getByRole('button', { name: 'Ouvrir le menu' }),
+  ).toBeFocused();
 });
 
-test('core pages pass automated WCAG AA checks in both themes', async ({
+test('email, social links and clipboard feedback work', async ({
+  page,
+  context,
+}) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  await page.goto('./#contact');
+  await expect(
+    page.getByRole('link', { name: 'abdallah.kassan.job@outlook.fr' }),
+  ).toHaveAttribute('href', 'mailto:abdallah.kassan.job@outlook.fr');
+  await expect(
+    page.getByRole('link', { name: 'LinkedIn', exact: true }),
+  ).toHaveAttribute('href', 'https://www.linkedin.com/in/kassan-abdallah');
+  await page.getByRole('button', { name: 'Copier l’adresse email' }).click();
+  await expect(
+    page.getByRole('status').filter({ hasText: 'Adresse copiée' }),
+  ).toBeVisible();
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
+    'abdallah.kassan.job@outlook.fr',
+  );
+});
+
+test('clipboard restrictions give an honest fallback', async ({ page }) => {
+  await page.addInitScript(() =>
+    Object.defineProperty(navigator, 'clipboard', {
+      value: { writeText: () => Promise.reject(new Error('Blocked')) },
+    }),
+  );
+  await page.goto('./#contact');
+  await page.getByRole('button', { name: 'Copier l’adresse email' }).click();
+  await expect(
+    page.getByRole('status').filter({ hasText: 'Copie indisponible' }),
+  ).toBeVisible();
+});
+
+test('CV download is a real PDF with current content', async ({
+  page,
+  request,
+}) => {
+  await page.goto('./#contact');
+  const link = page.getByRole('link', {
+    name: 'Télécharger mon CV',
+    exact: true,
+  });
+  await expect(link).toHaveAttribute('download', '');
+  const response = await request.get((await link.getAttribute('href'))!);
+  expect(response.ok()).toBeTruthy();
+  expect((await response.body()).subarray(0, 5).toString()).toBe('%PDF-');
+  expect(await response.body()).toEqual(
+    readFileSync('public/bucket/abdallah.kassan.pdf'),
+  );
+  const cv = execFileSync(
+    'pdftotext',
+    ['public/bucket/abdallah.kassan.pdf', '-'],
+    { encoding: 'utf8' },
+  );
+  expect(cv).toContain('ABDALLAH KASSAN');
+  expect(cv).toContain('Septembre 2024');
+  expect(cv).toContain('TensorRT');
+  expect(cv).toContain('estimations');
+});
+
+test('reduced motion uses the static illustration and disables smooth scrolling', async ({
   page,
 }) => {
-  test.setTimeout(90000);
-  for (const theme of ['light', 'dark']) {
-    for (const route of [...routes, 'projects/jetson-vision']) {
-      await page.goto(`#/${route}`);
-      await page.evaluate((value) => {
-        document.documentElement.dataset.theme = value;
-      }, theme);
-      await page.addScriptTag({ path: axePath });
-      const violations = await page.evaluate(async () => {
-        const axe = (window as unknown as { axe: typeof import('axe-core') })
-          .axe;
-        const results = await axe.run(document, {
-          runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21aa'] },
-        });
-        return results.violations.map((v) => ({
-          id: v.id,
-          nodes: v.nodes.map((n) => n.target),
-        }));
-      });
-      expect(violations, `${theme} /${route}`).toEqual([]);
-    }
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('./');
+  await expect(page.locator('.neural-fallback').first()).toBeVisible();
+  expect(await page.locator('.core-visual canvas').count()).toBe(0);
+  expect(
+    await page.evaluate(
+      () => getComputedStyle(document.documentElement).scrollBehavior,
+    ),
+  ).toBe('auto');
+});
+
+test('missing WebGL keeps the visual and content usable', async ({ page }) => {
+  await page.addInitScript(() => {
+    const original = HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext = function (
+      this: HTMLCanvasElement,
+      type: string,
+      ...args: unknown[]
+    ) {
+      if (type.includes('webgl')) return null;
+      return original.apply(this, [type, ...args] as Parameters<
+        typeof original
+      >);
+    } as typeof original;
+  });
+  await page.goto('./');
+  await expect(page.locator('.core-static')).toBeVisible();
+  await expect(page.locator('.core-static')).not.toHaveClass(/is-hidden/);
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+});
+
+test('3D renders on desktop and its pause control works', async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, 'Mobile deliberately uses the static illustration');
+  await page.goto('./');
+  const pause = page.getByRole('button', {
+    name: 'Mettre l’animation 3D en pause',
+  });
+  await expect(pause).toBeVisible({ timeout: 20000 });
+  await expect(page.locator('.core-visual canvas')).toBeVisible();
+  await pause.click();
+  await expect(
+    page.getByRole('button', { name: 'Reprendre l’animation 3D' }),
+  ).toBeVisible();
+});
+
+test('no horizontal overflow at common viewport sizes', async ({ page }) => {
+  for (const width of [320, 390, 768, 1024, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto('./');
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth,
+      ),
+      `Overflow at ${width}px`,
+    ).toBeTruthy();
   }
+});
+
+test('automated WCAG AA checks pass on the page and modal', async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('./');
+  await page.addScriptTag({ content: axe });
+  const scan = () =>
+    page.evaluate(async () => {
+      const api = (
+        window as unknown as {
+          axe: {
+            run: (
+              options: object,
+            ) => Promise<{ violations: { id: string; nodes: unknown[] }[] }>;
+          };
+        }
+      ).axe;
+      return (
+        await api.run({
+          runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21aa'] },
+        })
+      ).violations;
+    });
+  expect(await scan()).toEqual([]);
+  await page
+    .getByRole('button', { name: /Voir le projet.*SecuriSPOT · Vision/ })
+    .click();
+  await expect(page.getByRole('dialog')).toBeVisible();
+  expect(await scan()).toEqual([]);
+});
+
+test('server-rendered content remains readable without JavaScript', async ({
+  browser,
+  baseURL,
+}) => {
+  const context = await browser.newContext({ javaScriptEnabled: false });
+  const page = await context.newPage();
+  await page.goto(baseURL!);
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'La vision au plus près du terrain.' }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('link', { name: 'Télécharger mon CV' }),
+  ).toHaveAttribute('href', '/portofolio/bucket/abdallah.kassan.pdf');
+  await context.close();
 });
