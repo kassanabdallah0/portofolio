@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { resolve } from 'node:path';
+import { createHash } from 'node:crypto';
 
 const axe = readFileSync(resolve('node_modules/axe-core/axe.min.js'), 'utf8');
 
@@ -35,7 +36,7 @@ test('project filters change the visible selection and can reset', async ({
   await page.goto('./#projets');
   await expect(
     page.getByRole('button', { name: /Voir le projet/ }),
-  ).toHaveCount(4);
+  ).toHaveCount(6);
   await page.getByRole('button', { name: 'Vision & IA', exact: true }).click();
   await expect(
     page.getByRole('button', { name: /Voir le projet/ }),
@@ -54,7 +55,7 @@ test('project filters change the visible selection and can reset', async ({
     .click();
   await expect(
     page.getByRole('button', { name: /Voir le projet/ }),
-  ).toHaveCount(4);
+  ).toHaveCount(6);
 });
 
 test('case study dialog supports keyboard, focus restoration and browser history', async ({
@@ -161,7 +162,10 @@ test('CV download is a real PDF with current content', async ({
     name: 'Télécharger mon CV',
     exact: true,
   });
-  await expect(link).toHaveAttribute('download', '');
+  await expect(link).toHaveAttribute(
+    'download',
+    'CV_Reference_Abdallah_Kassan_2026.pdf',
+  );
   const response = await request.get((await link.getAttribute('href'))!);
   expect(response.ok()).toBeTruthy();
   expect((await response.body()).subarray(0, 5).toString()).toBe('%PDF-');
@@ -174,7 +178,22 @@ test('CV download is a real PDF with current content', async ({
     { encoding: 'utf8' },
   );
   expect(cv).toContain('ABDALLAH KASSAN');
-  expect(cv).toContain('Septembre 2024');
+  expect(cv).toContain('COLAS');
+  expect(cv).toContain('644 Go');
+  expect(
+    createHash('sha256')
+      .update(await response.body())
+      .digest('hex'),
+  ).toBe('7851b83eba479b97baf2261e6f085a27cda8ce12199de4dd1882b000e404d8b5');
+  const legacy = await request.get('/portofolio/bucket/abdallah.kassan.pdf');
+  expect(await legacy.body()).toEqual(await response.body());
+  expect(
+    execFileSync(
+      'pdfinfo',
+      ['public/bucket/CV_Reference_Abdallah_Kassan_2026.pdf'],
+      { encoding: 'utf8' },
+    ),
+  ).toMatch(/Pages:\s+4/);
   expect(cv).toContain('TensorRT');
   expect(cv).toContain('estimations');
 });
@@ -287,6 +306,67 @@ test('server-rendered content remains readable without JavaScript', async ({
   ).toBeVisible();
   await expect(
     page.getByRole('link', { name: 'Télécharger mon CV' }),
-  ).toHaveAttribute('href', '/portofolio/bucket/abdallah.kassan.pdf');
+  ).toHaveAttribute(
+    'href',
+    '/portofolio/bucket/CV_Reference_Abdallah_Kassan_2026.pdf',
+  );
   await context.close();
+});
+
+test('reference CV additions explain ownership and measurement scope', async ({
+  page,
+}) => {
+  await page.goto('./#projets');
+  await page.getByRole('button', { name: 'Logiciel', exact: true }).click();
+  await expect(
+    page.getByRole('button', { name: /Voir le projet/ }),
+  ).toHaveCount(2);
+  await page.getByRole('button', { name: /Voir le projet : COLAS/ }).click();
+  const dialog = page.getByRole('dialog');
+  await expect(dialog).toContainText('10 FPS');
+  await expect(dialog).toContainText('développée par un collègue');
+  await expect(dialog).toContainText('Le choix technique'.toUpperCase());
+  await page.keyboard.press('Escape');
+  await page
+    .getByRole('button', { name: 'Données & exploitation', exact: true })
+    .click();
+  await expect(
+    page.getByRole('button', { name: /Voir le projet/ }),
+  ).toHaveCount(1);
+  await page
+    .getByRole('button', { name: /Voir le projet : Cluster ELK/ })
+    .click();
+  await expect(dialog).toContainText('180 jours');
+  await expect(dialog).toContainText('volumes historiques');
+});
+
+test('visible impact links to the supporting case study and the PDF preview loads', async ({
+  page,
+}) => {
+  await page.goto('./');
+  await page
+    .getByRole('button', { name: 'Découvrir : migrés vers AWS' })
+    .click();
+  await expect(page.getByRole('dialog')).toContainText(
+    '70 PC embarqués supprimés',
+  );
+  await page.keyboard.press('Escape');
+  const preview = page.getByRole('img', {
+    name: /Première page du CV de référence/,
+  });
+  await preview.scrollIntoViewIfNeeded();
+  await expect(preview).toBeVisible();
+  await expect
+    .poll(() =>
+      preview.evaluate(
+        (img: HTMLImageElement) => img.complete && img.naturalWidth > 0,
+      ),
+    )
+    .toBe(true);
+  await expect(
+    page.getByRole('link', { name: 'Ouvrir le CV de référence en PDF' }),
+  ).toHaveAttribute(
+    'href',
+    '/portofolio/bucket/CV_Reference_Abdallah_Kassan_2026.pdf',
+  );
 });

@@ -286,6 +286,186 @@ export default function ProjectVisual({ type }: { type: Project['visual'] }) {
           <path d="m313 254-9 3 9 3" stroke="#818cf8" />
         </svg>
       )}
+      {type === 'scan' && (
+        <svg viewBox="0 0 640 340" fill="none">
+          <path d="M70 282h500M104 300h432" stroke="#263f50" />
+          <rect
+            x="137"
+            y="42"
+            width="368"
+            height="229"
+            rx="8"
+            fill="#0a131f"
+            stroke="#476274"
+          />
+          <rect
+            x="150"
+            y="55"
+            width="342"
+            height="195"
+            rx="3"
+            fill="#10202d"
+            stroke="#263f50"
+          />
+          <path
+            d="M296 272v24h51v-24M268 298h107"
+            stroke="#6c8296"
+            strokeWidth="3"
+          />
+          <path d="M169 77h65M169 83h40" stroke="#49697c" />
+          <g transform="translate(261 105)">
+            <circle r="17" fill="#8aa7b8" />
+            <path
+              d="M-19-2a19 19 0 0 1 38 0"
+              stroke="#00d4e6"
+              strokeWidth="5"
+            />
+            <path d="m-17 26-13 64h60L17 26Z" fill="#1e4b57" stroke="#61d3dd" />
+            <path
+              d="M-10 27v58M10 27v58M-22 63h44"
+              stroke="#9debf1"
+              strokeWidth="3"
+            />
+            <path
+              d="m-17 90-3 32m37-32 3 32"
+              stroke="#8aa7b8"
+              strokeWidth="9"
+              strokeLinecap="round"
+            />
+          </g>
+          <path
+            d="M214 89V76h16m63 0h16v13m0 131v14h-16m-63 0h-16v-14"
+            stroke="#00d5e5"
+          />
+          <path
+            d="M207 155h109"
+            stroke="#00e5ff"
+            strokeOpacity=".55"
+            strokeDasharray="3 4"
+          />
+          {[
+            ['CASQUE', 100],
+            ['GILET', 145],
+            ['VALIDATION', 190],
+          ].map(([label, y]) => (
+            <g key={label} transform={`translate(353 ${y})`}>
+              <rect
+                width="112"
+                height="30"
+                rx="3"
+                fill="#0d3038"
+                stroke="#2b6470"
+              />
+              <path d="m10 15 4 4 8-9" stroke="#71dfcd" />
+              <text
+                x="31"
+                y="19"
+                fill="#accdd7"
+                fontSize="9"
+                fontFamily="monospace"
+              >
+                {label}
+              </text>
+            </g>
+          ))}
+          <path d="m92 134 45 0M92 142h45" stroke="#4b6574" />
+          <rect
+            x="49"
+            y="121"
+            width="43"
+            height="35"
+            rx="3"
+            fill="#11232c"
+            stroke="#4f6a7a"
+          />
+          <text
+            x="46"
+            y="178"
+            fill="#7b9caf"
+            fontSize="8"
+            fontFamily="monospace"
+          >
+            JETSON
+          </text>
+        </svg>
+      )}
+      {type === 'observability' && (
+        <svg viewBox="0 0 640 340" fill="none">
+          <ellipse
+            cx="320"
+            cy="183"
+            rx="230"
+            ry="101"
+            stroke="#323759"
+            strokeDasharray="3 7"
+          />
+          <path
+            d="M192 159h256M192 211h256"
+            stroke="#4b5086"
+            strokeDasharray="5 6"
+          />
+          {[161, 320, 479].map((x, i) => (
+            <g transform={`translate(${x} 128)`} key={x}>
+              <rect
+                x="-49"
+                y="-22"
+                width="98"
+                height="117"
+                rx="5"
+                fill="#0f1726"
+                stroke="#686f9c"
+              />
+              <path d="M-49 15h98M-49 52h98" stroke="#363f66" />
+              {[0, 37, 74].map((y) => (
+                <g key={y}>
+                  <circle cx="-29" cy={y} r="3" fill="#7ad3c5" />
+                  <path d={`M-16 ${y}h43`} stroke="#687c9e" />
+                </g>
+              ))}
+              <text
+                x="0"
+                y="120"
+                fill="#aebcd2"
+                fontFamily="monospace"
+                fontSize="9"
+                textAnchor="middle"
+              >
+                NŒUD {i + 1}
+              </text>
+            </g>
+          ))}
+          <rect
+            x="229"
+            y="39"
+            width="182"
+            height="30"
+            rx="15"
+            fill="#141c31"
+            stroke="#565c8e"
+          />
+          <text
+            x="320"
+            y="58"
+            textAnchor="middle"
+            fill="#bbbdf2"
+            fontFamily="monospace"
+            fontSize="10"
+          >
+            ÉCHANGES CHIFFRÉS / TLS
+          </text>
+          <path d="M320 69v37" stroke="#656ba1" strokeDasharray="4 4" />
+          <text
+            x="320"
+            y="298"
+            textAnchor="middle"
+            fill="#a3a9db"
+            fontFamily="monospace"
+            fontSize="10"
+          >
+            CYCLE DE VIE DES INDEX / ILM · 180 JOURS
+          </text>
+        </svg>
+      )}
       <span className="art-caption">SCHÉMA ILLUSTRATIF</span>
       <span className="art-corner">+</span>
     </div>
