@@ -1,8 +1,6 @@
 /* Interactive Engineering Lab: an explanatory layer, not a glass overlay.
    The existing Liquid Glass containers frame these crisp technical surfaces. */
 .demo-world--blueprint { overflow: hidden; background: #0e1a25; }
-.lab-compatibility-scene { position: absolute; width: 0; height: 0; overflow: hidden; pointer-events: none; }
-.lab-compatibility-scene .exhibit-scene { width: 0; height: 0; }
 .lab-blueprint { --lab-bg: #101f2b; --lab-panel: #152936; --lab-panel-2: #1d3543; --lab-border: #355061; --lab-text: #e5f1f5; --lab-muted: #a5bbc7; --lab-accent: #7ccfdf; --lab-ok: #9adbc0; font-family: var(--font-sans, Inter, sans-serif); background: var(--lab-bg); color: var(--lab-text); position: relative; isolation: isolate; font-size: 12px; letter-spacing: 0; }
 .lab-blueprint::before { content: ''; position: absolute; inset: 0 0 auto; height: 55%; background: radial-gradient(ellipse at 74% 9%, #5a9cbe1a, transparent 63%); pointer-events: none; z-index: -1; }
 .lab-blueprint * { box-sizing: border-box; }
@@ -32,9 +30,6 @@
 .lab-industrial-svg { width:100%; display:block; height:auto; }
 .lab-camera-event { position:absolute; bottom:0; left:0; right:0; background:linear-gradient(0deg,#0c2228ee,#14333bad); border-top:1px solid #54758780; align-items:center; }
 .lab-camera-event.is-alert { background:#1f433bd9; color:#b5f1d5; }
-.lab-worker-track { transform-origin:center; animation:lab-worker-patrol 8s ease-in-out infinite alternate; animation-play-state:paused; }
-.lab-blueprint[data-motion='running'] .lab-worker-track { animation-play-state:running; }
-@keyframes lab-worker-patrol { from { transform:translateX(-20px) } to {transform:translateX(35px)} }
 .lab-scanline { animation:lab-sweep 3s ease-in-out infinite alternate; animation-play-state:paused; transform-origin:center; }
 .lab-blueprint[data-motion='running'] .lab-scanline { animation-play-state:running; }
 @keyframes lab-sweep { from { transform:translateY(-26px);opacity:.15 } to {transform:translateY(44px);opacity:.7} }
@@ -229,4 +224,22 @@
 }
 @media(prefers-reduced-motion: reduce) {
  .lab-blueprint *,.lab-blueprint *::before,.lab-blueprint *::after {animation:none!important;transition:none!important;}
+}
+
+/* Keep machine schematics readable at constrained sizes without enlarging the page. */
+.lab-blueprint { min-width: 0; width: 100%; }
+.lab-blueprint-content,.lab-blueprint-content > div,.lab-topology-row,.lab-elk-row { min-width:0; }
+.lab-camera-toolbar > span:last-child { text-align:right; }
+.lab-blueprint :is(.lab-topo-node,.lab-release-node,.lab-elk-cluster) { overflow-wrap:anywhere; }
+.lab-app-status,.lab-code-lines,.lab-cloud-security { overflow-wrap:anywhere; }
+.lab-blueprint :is(.lab-camera-view,.lab-topo-node,.lab-release-node,.lab-elk-cluster) { transition: border-color .35s ease, background-color .35s ease; }
+.lab-blueprint .lab-online-dot { box-shadow:0 0 0 3px #85d9c01b; }
+@media(max-width:690px) {
+  .lab-cloud-security { flex-wrap:wrap; }
+  .lab-cloud-security span { text-align:left; }
+  .lab-camera-toolbar { font-size:7px; }
+  .lab-release-terminal code { white-space:normal; overflow-wrap:anywhere; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .lab-blueprint .lab-connector i { animation:none!important; opacity:.9; transform:none; }
 }
