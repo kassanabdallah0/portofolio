@@ -4,6 +4,7 @@ import '@fontsource-variable/inter';
 import '@fontsource-variable/jetbrains-mono';
 import './globals.css';
 import './liquid-glass.css';
+import './engineering-lab.css';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://kassanabdallah0.github.io'),
