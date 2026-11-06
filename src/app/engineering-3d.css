@@ -1,0 +1,184 @@
+/* Physical project exhibits: original procedural 3D, concise and legible storytelling.
+   Three.js owns the hardware; HTML owns typography. No backdrop blurring of the canvas. */
+.lab-blueprint-content:has(.lab-three-story) {
+  padding: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+.lab-three-story {
+  width: 100%;
+  min-width: 0;
+  background: #101f2b;
+  color: #e2eef3;
+  position: relative;
+  isolation: isolate;
+}
+.lab-three-stage {
+  position: relative;
+  min-height: 344px;
+  height: clamp(340px, 32vw, 450px);
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 64% 32%, #315c714a, transparent 65%),
+    linear-gradient(145deg,#1d3544,#0b1a25 75%);
+}
+.lab-physical-canvas {
+  display: block!important;
+  width:100%!important;
+  height:100%!important;
+  position:absolute!important;
+  inset:0;
+  touch-action: pan-y!important;
+  background:#111f2b;
+}
+.lab-three-stage canvas { display:block; }
+.lab-three-topbar {
+  position:absolute;
+  top: 15px;
+  left: 16px;
+  right: 16px;
+  z-index:2;
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  justify-content:space-between;
+  align-items:center;
+  color:#c5dfe9;
+  font: 9px var(--font-mono,monospace);
+  letter-spacing:.055em;
+  pointer-events:none;
+  text-shadow:0 2px 4px #04121d;
+}
+.lab-three-topbar>span:last-child{color:#94b9ca;white-space:nowrap;}
+.lab-three-metric {
+  position:absolute;
+  top:48px;
+  left:16px;
+  z-index:2;
+  display:grid;
+  gap:4px;
+  padding:10px 13px;
+  border:1px solid #80bdce66;
+  border-radius:9px;
+  background:linear-gradient(125deg,#153343eb,#1e3e4ac0);
+  box-shadow: 0 10px 24px #0818234d,inset 0 1px #d4e9f328;
+  pointer-events:none;
+}
+.lab-three-metric>span {
+  font:9px var(--font-mono,monospace);
+  letter-spacing:.08em;
+  color:#9bc9d6;
+}
+.lab-three-metric strong {
+  font-size:23px;
+  font-weight:580;
+  letter-spacing:-.045em;
+  color:#effaff;
+}
+.lab-three-stage-note {
+  position:absolute;
+  right:14px;
+  bottom:14px;
+  z-index:3;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  gap:4px;
+  background:#102734dc;
+  border:1px solid #7cadbe56;
+  border-radius:9px;
+  padding:9px 12px;
+  min-width:160px;
+  max-width:min(65%,250px);
+  box-shadow:0 10px 30px #05182180;
+  pointer-events:none;
+}
+.lab-three-stage-note span {
+  font:9px var(--font-mono,monospace);
+  color:#a0c4d1;
+  letter-spacing:.08em;
+}
+.lab-three-stage-note strong {
+  color:#e9f5fa;
+  font-size:14px;
+  font-weight:570;
+  line-height:1.35;
+  text-align:right;
+}
+.lab-three-floor-glow {
+  position:absolute;
+  width:70%;
+  bottom:-40px;
+  left:15%;
+  height:100px;
+  border-radius:50%;
+  background: radial-gradient(ellipse,#58a3c021,transparent 68%);
+  pointer-events:none;
+  mix-blend-mode:screen;
+}
+.lab-three-flow {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 12px minmax(0,1fr) 12px minmax(0,1fr) 12px minmax(0,1fr);
+  gap:7px;
+  align-items:center;
+  background:#142a38;
+  padding:16px 18px;
+  border-top:1px solid #476777;
+  border-bottom:1px solid #3d5c6d;
+}
+.lab-three-flow>span {
+  color:#94c8d7;
+  font:10px var(--font-mono,monospace);
+  letter-spacing:.04em;
+  line-height:1.45;
+  white-space:normal;
+}
+.lab-three-flow b {
+  display:inline-block;
+  color:#f0f7fa;
+  margin-top:3px;
+  font:600 11px var(--font-sans,Arial,sans-serif);
+  letter-spacing:0;
+}
+.lab-three-flow>i {font-style:normal;font-size:21px;color:#77d0d5;align-self:center;text-align:center;}
+.lab-three-footnote {
+  color:#bbcad3;
+  font:10px/1.65 var(--font-sans,Arial,sans-serif);
+  margin:0;
+  padding:11px 18px 15px;
+  background:#142a38;
+}
+.lab-3d-loading,.lab-3d-unsupported {
+  min-height:280px;
+  display:grid;
+  place-items:center;
+  color:#b6d8e5;
+  background:radial-gradient(ellipse,#315a6a,#112533);
+  padding:18px;
+  font-size:12px;
+  text-align:center;
+}
+.lab-three-story--scan .lab-three-metric strong{color:#f8e0ae;}
+.lab-three-story--vision .lab-three-metric strong{color:#a3eee1;}
+.lab-three-story--cloud .lab-three-metric strong{color:#d3e9fc;}
+.lab-blueprint .lab-three-story + .lab-signal {border-top:1px solid #476777;}
+@media (max-width:1030px) {
+ .lab-three-stage{height:350px;}
+ .lab-three-metric strong {font-size:20px;}
+ .lab-three-flow{gap:4px;padding:12px;}
+ .lab-three-flow b{font-size:10px;}
+ .lab-three-flow>span{font-size:9px;}
+}
+@media (max-width:760px) {
+ .lab-three-stage{height:310px;min-height:310px;}
+ .lab-three-topbar{font-size:8px;}
+ .lab-three-metric strong{font-size:18px;}
+ .lab-three-flow{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;}
+ .lab-three-flow>i{display:none;}
+ .lab-three-flow>span{min-width:0;font-size:9px;}
+ .lab-three-flow b{font-size:9px;}
+ .lab-three-stage-note{right:10px;min-width:130px;}
+}
+@media (prefers-reduced-motion:reduce) {
+ .lab-three-floor-glow,.lab-three-story * {animation:none!important;transition:none!important;}
+}
