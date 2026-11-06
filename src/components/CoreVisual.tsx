@@ -242,6 +242,7 @@ export default function CoreVisual({
     >
       <div className="hardware-caption">
         <span>Du monde physique à la décision.</span>
+        <span>VISION EMBARQUÉE</span>
       </div>
       <div className="hardware-stage">
         <div className={`core-static ${live && ready ? 'is-hidden' : ''}`}>
@@ -259,6 +260,12 @@ export default function CoreVisual({
             </SceneBoundary>
           </div>
         )}
+        <div className="hardware-object-label camera-label">
+          01 <span>Acquérir</span>
+        </div>
+        <div className="hardware-object-label edge-label">
+          02 <span>Comprendre</span>
+        </div>
       </div>
       <div
         className="hero-process"

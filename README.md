@@ -93,9 +93,3 @@ The narrowly scoped `minimatch` override patches a security advisory in TypeScri
 The homepage is prerendered; project detail views use hash URLs such as `#projet/jetson-vision`. Prior `#/projects/...`, `#/contact`, `#/cv`, `#/about`, `#/skills` and `#/experience` links remain compatible. Case studies are not separate indexable pages.
 
 For another hosting path, update the Next base path, asset URLs in content/metadata, robots/sitemap, static preview and Playwright base URL together.
-
-### V3 recruiter overview
-
-The home page leads with results, featured projects (Manager, Vision, MediaSpot) and experience before the profile and expertise sections. `featuredProjectSlugs` in the portfolio data defines this order independently of the full project collection. Each project card uses `EngineeringDemo` with `presentation="preview"`: the animated scene and pause control remain, while the full architecture and local controls are available in the case-study dialog (`presentation="full"`, the default). All six studies and existing anchors remain available.
-
-The hero and contact area link directly to the unchanged reference CV. `tests/recruiter.spec.ts` verifies overview order, preview/full separation, featured projects, and the sticky close control across all six studies. Responsive checks include 360, 393, 768 and 1440 px.

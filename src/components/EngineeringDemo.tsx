@@ -729,13 +729,7 @@ function Scene({
   );
 }
 
-export default function EngineeringDemo({
-  type,
-  presentation = 'full',
-}: {
-  type: DemoType;
-  presentation?: 'preview' | 'full';
-}) {
+export default function EngineeringDemo({ type }: { type: DemoType }) {
   const root = useRef<HTMLDivElement>(null);
   const id = useId().replace(/:/g, '');
   const definition = simulations[type];
@@ -967,8 +961,7 @@ export default function EngineeringDemo({
   return (
     <div
       ref={root}
-      className={`engineering-demo demo-${type} demo-${presentation}`}
-      data-presentation={presentation}
+      className={`engineering-demo demo-${type}`}
       data-demo={type}
       data-running={running}
       data-stage={stage}
@@ -999,105 +992,97 @@ export default function EngineeringDemo({
         />
         <div className="optical-reflection" aria-hidden="true" />
       </div>
-      {presentation === 'full' && (
-        <>
-          {type === 'interface' && (
-            <div className="demo-interaction manager-controls">
-              <label htmlFor={`${id}-sensitivity`}>
-                Taille de zone <output>{sensitivity}%</output>
-                <input
-                  id={`${id}-sensitivity`}
-                  aria-label="Taille de la zone"
-                  type="range"
-                  min="20"
-                  max="100"
-                  value={sensitivity}
-                  onChange={(e) => setSensitivity(Number(e.target.value))}
-                />
-              </label>
-              <button onClick={apply} disabled={pending}>
-                {pending ? 'Transmission…' : 'Appliquer'}
-                {pending ? <ArrowRight size={13} /> : <Check size={13} />}
-              </button>
-              <span role="status" aria-label="État de la configuration">
-                {pending
-                  ? 'Configuration en cours'
-                  : `Configuration active : ${applied}%`}
-              </span>
-            </div>
-          )}
-          {type === 'cloud' && (
-            <div className="demo-interaction fleet-controls">
-              <span>Suivre un bus</span>
-              <div role="group" aria-label="Choisir un bus illustratif">
-                {['A', 'B', 'C'].map((bus, i) => (
-                  <button
-                    key={bus}
-                    aria-pressed={selectedBus === i}
-                    onClick={() => setSelectedBus(i)}
-                  >
-                    Bus {bus}
-                  </button>
-                ))}
-              </div>
-              <p>
-                Bus {String.fromCharCode(65 + selectedBus)} → tunnel VPN →
-                services AWS
-              </p>
-            </div>
-          )}
-          {type === 'delivery' && (
-            <div className="demo-interaction delivery-controls">
-              <span>Scénario illustratif</span>
-              <button
-                aria-pressed={rollback}
-                onClick={() => setRollback(!rollback)}
-              >
-                <RotateCcw size={13} />
-                {rollback
-                  ? 'Retour à la version stable'
-                  : 'Explorer le rollback'}
-              </button>
-            </div>
-          )}
-          <div
-            className="architecture"
-            aria-label={`Architecture : ${definition.title}`}
-          >
-            <div className="architecture-stages">
-              {definition.stages.map((item, i) => (
-                <button
-                  key={item.name}
-                  className={`${stage === i ? 'is-active' : ''} ${focus === i ? 'is-inspected' : ''}`}
-                  type="button"
-                  aria-pressed={inspected === i}
-                  onMouseEnter={() => setHovered(i)}
-                  onMouseLeave={() => setHovered(null)}
-                  onFocus={() => setHovered(i)}
-                  onBlur={() => setHovered(null)}
-                  onClick={() => setInspected(inspected === i ? null : i)}
-                >
-                  <span className="stage-index">
-                    {String(i + 1).padStart(2, '0')}
-                  </span>
-                  <span>{item.name}</span>
-                  <i aria-hidden="true" />
-                </button>
-              ))}
-            </div>
-            <p className="stage-explanation">
-              <span>{definition.stages[focus].name}</span>
-              {definition.stages[focus].explanation}
-            </p>
-          </div>
-        </>
+      {type === 'interface' && (
+        <div className="demo-interaction manager-controls">
+          <label htmlFor={`${id}-sensitivity`}>
+            Taille de zone <output>{sensitivity}%</output>
+            <input
+              id={`${id}-sensitivity`}
+              aria-label="Taille de la zone"
+              type="range"
+              min="20"
+              max="100"
+              value={sensitivity}
+              onChange={(e) => setSensitivity(Number(e.target.value))}
+            />
+          </label>
+          <button onClick={apply} disabled={pending}>
+            {pending ? 'Transmission…' : 'Appliquer'}
+            {pending ? <ArrowRight size={13} /> : <Check size={13} />}
+          </button>
+          <span role="status" aria-label="État de la configuration">
+            {pending
+              ? 'Configuration en cours'
+              : `Configuration active : ${applied}%`}
+          </span>
+        </div>
       )}
+      {type === 'cloud' && (
+        <div className="demo-interaction fleet-controls">
+          <span>Suivre un bus</span>
+          <div role="group" aria-label="Choisir un bus illustratif">
+            {['A', 'B', 'C'].map((bus, i) => (
+              <button
+                key={bus}
+                aria-pressed={selectedBus === i}
+                onClick={() => setSelectedBus(i)}
+              >
+                Bus {bus}
+              </button>
+            ))}
+          </div>
+          <p>
+            Bus {String.fromCharCode(65 + selectedBus)} → tunnel VPN → services
+            AWS
+          </p>
+        </div>
+      )}
+      {type === 'delivery' && (
+        <div className="demo-interaction delivery-controls">
+          <span>Scénario illustratif</span>
+          <button
+            aria-pressed={rollback}
+            onClick={() => setRollback(!rollback)}
+          >
+            <RotateCcw size={13} />
+            {rollback ? 'Retour à la version stable' : 'Explorer le rollback'}
+          </button>
+        </div>
+      )}
+      <div
+        className="architecture"
+        aria-label={`Architecture : ${definition.title}`}
+      >
+        <div className="architecture-stages">
+          {definition.stages.map((item, i) => (
+            <button
+              key={item.name}
+              className={`${stage === i ? 'is-active' : ''} ${focus === i ? 'is-inspected' : ''}`}
+              type="button"
+              aria-pressed={inspected === i}
+              onMouseEnter={() => setHovered(i)}
+              onMouseLeave={() => setHovered(null)}
+              onFocus={() => setHovered(i)}
+              onBlur={() => setHovered(null)}
+              onClick={() => setInspected(inspected === i ? null : i)}
+            >
+              <span className="stage-index">
+                {String(i + 1).padStart(2, '0')}
+              </span>
+              <span>{item.name}</span>
+              <i aria-hidden="true" />
+            </button>
+          ))}
+        </div>
+        <p className="stage-explanation">
+          <span>{definition.stages[focus].name}</span>
+          {definition.stages[focus].explanation}
+        </p>
+      </div>
       <p className="demo-caption">
         Simulation illustrative
         {type === 'interface' ? ' · interactions locales' : ''}{' '}
-        {presentation === 'full' && (
-          <span>Sélectionnez une étape pour l’explorer.</span>
-        )}
+        <span>Survolez ou sélectionnez une étape pour l’explorer.</span>
       </p>
     </div>
   );
