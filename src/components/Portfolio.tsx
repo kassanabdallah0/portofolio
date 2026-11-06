@@ -33,8 +33,8 @@ import {
   timeline,
 } from '@/data/portfolio';
 import type { Project } from '@/data/portfolio';
-import CoreVisual, { NeuralFallback } from './CoreVisual';
-import ProjectVisual from './ProjectVisual';
+import CoreVisual from './CoreVisual';
+import EngineeringDemo from './EngineeringDemo';
 import ResumeCard from './ResumeCard';
 
 function Reveal({
@@ -230,7 +230,7 @@ function DomainDiagram() {
           stroke="#2c5360"
           strokeDasharray="3 6"
         />
-        <circle className="orbit-dot" cx="260" cy="75" r="3" fill="#00e5ff" />
+        <circle className="orbit-dot" cx="260" cy="75" r="3" fill="#527e96" />
       </svg>
       <div className="domain-center">
         <Cpu size={31} />
@@ -276,11 +276,13 @@ function ProjectDialog({
     }
     const previousFocus = document.activeElement as HTMLElement | null;
     dialog.showModal();
+    document.dispatchEvent(new Event('portfolio:dialog'));
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     return () => {
       document.body.style.overflow = previousOverflow;
       dialog.close();
+      document.dispatchEvent(new Event('portfolio:dialog'));
       previousFocus?.focus({ preventScroll: true });
     };
   }, [project]);
@@ -326,7 +328,7 @@ function ProjectDialog({
               <span>MON RÔLE</span>
               <p>{project.role}</p>
             </div>
-            <ProjectVisual type={project.visual} />
+            <EngineeringDemo key={project.slug} type={project.visual} />
             <div className="tag-list">
               {project.tags.map((tag) => (
                 <span key={tag}>{tag}</span>
@@ -344,15 +346,6 @@ function ProjectDialog({
                 <li key={item}>{item}</li>
               ))}
             </ul>
-            <div className="project-flow">
-              {project.flow.map((step, i) => (
-                <span key={step}>
-                  <b>{String(i + 1).padStart(2, '0')}</b>
-                  {step}
-                  {i < project.flow.length - 1 && <ArrowRight size={14} />}
-                </span>
-              ))}
-            </div>
             <div className="result-block">
               <p className="eyebrow">RÉSULTAT SUR LE TERRAIN</p>
               <p>{project.result}</p>
@@ -412,9 +405,7 @@ function Contact() {
         event.currentTarget.style.setProperty('--cy', '0px');
       }}
     >
-      <div className="contact-art" aria-hidden="true">
-        <NeuralFallback compact />
-      </div>
+      <div className="contact-art" aria-hidden="true" />
       <div className="container contact-content">
         <SectionLabel number="06">CONTACT</SectionLabel>
         <div className="contact-layout">
@@ -600,7 +591,7 @@ export default function Portfolio() {
                 Disponible pour de nouvelles opportunités
               </p>
             </div>
-            <CoreVisual />
+            <CoreVisual suspended={Boolean(selectedProject)} />
             <div className="hero-bottom">
               <a href="#a-propos" className="scroll-link">
                 <span className="scroll-icon">
@@ -806,26 +797,29 @@ export default function Portfolio() {
               className={`projects-grid ${filter === 'all' ? 'curated-grid' : ''}`}
             >
               {filtered.map((project) => (
-                <Reveal key={project.slug} className="project-card">
-                  <button
-                    type="button"
-                    className="project-visual-button"
-                    aria-label={`Voir le projet : ${project.subtitle}`}
-                    onClick={() => {
-                      window.location.hash = `projet/${project.slug}`;
-                    }}
-                  >
-                    <ProjectVisual type={project.visual} />
-                    <span className="project-open-icon">
-                      <ArrowUpRight size={22} />
-                    </span>
-                  </button>
+                <Reveal
+                  key={project.slug}
+                  className={`project-card project-${project.visual}`}
+                >
+                  <div className="project-demonstration">
+                    <EngineeringDemo type={project.visual} />
+                  </div>
                   <div className="project-info">
                     <div className="project-meta">
                       <span className="project-category">{project.label}</span>
                       <span className="project-number">/{project.number}</span>
                     </div>
-                    <p className="project-subtitle">{project.subtitle}</p>
+                    <button
+                      type="button"
+                      className="project-subtitle"
+                      aria-label={`Voir le projet : ${project.subtitle}`}
+                      onClick={() => {
+                        window.location.hash = `projet/${project.slug}`;
+                      }}
+                    >
+                      {project.subtitle}
+                      <ArrowUpRight size={14} />
+                    </button>
                     <h3>{project.title}</h3>
                     <p className="project-description">{project.description}</p>
                     <div className="project-metric">

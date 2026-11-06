@@ -203,7 +203,7 @@ test('reduced motion uses the static illustration and disables smooth scrolling'
 }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('./');
-  await expect(page.locator('.neural-fallback').first()).toBeVisible();
+  await expect(page.locator('.hardware-fallback').first()).toBeVisible();
   expect(await page.locator('.core-visual canvas').count()).toBe(0);
   expect(
     await page.evaluate(
@@ -236,7 +236,7 @@ test('3D renders on desktop and its pause control works', async ({
   page,
   isMobile,
 }) => {
-  test.skip(isMobile, 'Mobile deliberately uses the static illustration');
+  test.skip(isMobile, 'Mobile deliberately uses an animated 2D hardware scene');
   await page.goto('./');
   const pause = page.getByRole('button', {
     name: 'Mettre l’animation 3D en pause',
@@ -283,7 +283,10 @@ test('automated WCAG AA checks pass on the page and modal', async ({
         await api.run({
           runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21aa'] },
         })
-      ).violations;
+      ).violations.map(({ id, nodes }) => ({
+        id,
+        nodes: nodes.map((node) => (node as { target: string[] }).target),
+      }));
     });
   expect(await scan()).toEqual([]);
   await page
