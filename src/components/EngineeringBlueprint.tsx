@@ -329,7 +329,9 @@ export default function EngineeringBlueprint(props: Props) {
       <div className="lab-blueprint-content">
         {physical && (
           <EngineeringStory3D mode={type as 'vision' | 'scan' | 'cloud'}
-            stage={stage} running={running} selectedBus={props.selectedBus} />
+            stage={stage} running={running} selectedBus={props.selectedBus}
+            fallback={type === 'vision' ? <Vision {...props} /> :
+              type === 'scan' ? <Scan {...props} /> : <Cloud {...props} />} />
         )}
         {!physical && type === 'vision' && <Vision {...props} />}
         {type === 'interface' && <Manager {...props} />}
