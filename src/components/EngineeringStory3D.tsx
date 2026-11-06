@@ -80,7 +80,7 @@ export default function EngineeringStory3D({ mode, stage, running, selectedBus }
         <div className="lab-three-floor-glow" aria-hidden="true" />
       </div>
       {mode==='cloud'&&(
-        <div className="lab-three-flow" aria-label="Architecture réseau illustrée">
+        <div className="lab-three-flow" role="group" aria-label="Architecture réseau illustrée">
           <span>PASSAGER<br/><b>Wi-Fi local</b></span><i aria-hidden="true">›</i>
           <span>BUS<br/><b>RUTX11 + cellulaire</b></span><i aria-hidden="true">›</i>
           <span>VPN<br/><b>OpenVPN sur EC2</b></span><i aria-hidden="true">›</i>
@@ -88,7 +88,7 @@ export default function EngineeringStory3D({ mode, stage, running, selectedBus }
         </div>
       )}
       {mode==='scan'&&(
-        <div className="lab-three-flow" aria-label="Architecture vidéo et affichage">
+        <div className="lab-three-flow" role="group" aria-label="Architecture vidéo et affichage">
           <span>CAPTURE<br/><b>Caméra / Jetson</b></span><i aria-hidden="true">›</i>
           <span>VIDÉO<br/><b>GStreamer · WebRTC</b></span><i aria-hidden="true">›</i>
           <span>INTERFACE<br/><b>React / Chromium</b></span><i aria-hidden="true">›</i>
@@ -96,7 +96,7 @@ export default function EngineeringStory3D({ mode, stage, running, selectedBus }
         </div>
       )}
       {mode==='vision'&&(
-        <div className="lab-three-flow" aria-label="Pipeline de vision embarquée">
+        <div className="lab-three-flow" role="group" aria-label="Pipeline de vision embarquée">
           <span>CAPTURE<br/><b>RealSense</b></span><i aria-hidden="true">›</i>
           <span>INFÉRENCE<br/><b>YOLO / TensorRT</b></span><i aria-hidden="true">›</i>
           <span>RÈGLES<br/><b>Suivi + FIFO</b></span><i aria-hidden="true">›</i>
