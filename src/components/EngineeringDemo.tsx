@@ -31,6 +31,15 @@ export default function EngineeringDemo({ type }: { type: DemoType }) {
   const [selectedBus, setSelectedBus] = useState(0);
   const [rollback, setRollback] = useState(false);
   const [restored, setRestored] = useState(false);
+  const [desktop3D, setDesktop3D] = useState(false);
+
+  useEffect(() => {
+    const media = window.matchMedia('(min-width: 760px)');
+    const update = () => setDesktop3D(media.matches);
+    update();
+    media.addEventListener('change', update);
+    return () => media.removeEventListener('change', update);
+  }, []);
 
   const draw = useCallback((seconds: number) => {
     const duration = type === 'vision' ? 18 : type === 'interface' ? 12 : 16;
@@ -61,6 +70,7 @@ export default function EngineeringDemo({ type }: { type: DemoType }) {
     }
 
     root.current?.style.setProperty('--step-progress', String(progress));
+    if (root.current) root.current.dataset.simulationMs = String(Math.round(seconds * 1000));
     if (next !== stageRef.current) {
       stageRef.current = next;
       setStage(next);
@@ -74,11 +84,14 @@ export default function EngineeringDemo({ type }: { type: DemoType }) {
     }
   }, [type, rollback]);
 
-  const { running, reduced, time } = useSimulation(root, paused, draw);
+  const { running, reduced, visible, time } = useSimulation(root, paused, draw);
+  // Only a visible desktop exhibit owns a GPU context. A paused foreground
+  // scene keeps its last frame; offscreen/dialog-obscured scenes are disposed.
+  const active3D = desktop3D && visible && !reduced && (running || paused);
   useEffect(() => {
     trackedPerson.current = root.current?.querySelector<SVGGElement>('[data-person]') ?? null;
     return () => { trackedPerson.current = null; };
-  }, [type]);
+  }, [type, active3D]);
 
   useEffect(() => {
     if (reduced && pending) {
@@ -147,6 +160,7 @@ export default function EngineeringDemo({ type }: { type: DemoType }) {
           rollback={rollback}
           restored={restored}
           pending={pending}
+          active3D={active3D}
         />
       </div>
 
