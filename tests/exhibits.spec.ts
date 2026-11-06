@@ -157,3 +157,51 @@ test('changing reduced-motion preference during a local update leaves controls u
   ).toBeEnabled();
   await expect(demo).toHaveAttribute('data-running', 'false');
 });
+
+test('batched viewport transitions use the latest visibility state', async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    const NativeObserver = window.IntersectionObserver;
+    window.IntersectionObserver = class extends NativeObserver {
+      constructor(
+        callback: IntersectionObserverCallback,
+        options?: IntersectionObserverInit,
+      ) {
+        super((entries, observer) => {
+          const entry = entries.find((item) =>
+            item.target.matches('[data-demo]'),
+          );
+          if (!entry) return callback(entries, observer);
+          // Model an older queued transition followed by the current native
+          // entry. Exercise both entering and leaving without replacing the
+          // browser's actual geometry or disabling the simulation clock.
+          const previous = new Proxy(entry, {
+            get(target, property) {
+              return property === 'isIntersecting'
+                ? !target.isIntersecting
+                : Reflect.get(target, property, target);
+            },
+          });
+          callback([previous, ...entries], observer);
+        }, options);
+      }
+    };
+  });
+  await page.goto('./#projet/jetson-vision');
+  const dialog = page.getByRole('dialog');
+  const demo = dialog.locator('[data-demo="vision"]');
+  await expect(demo).toHaveAttribute('data-running', 'true');
+  const person = demo.locator('[data-person]');
+  const initial = await person.getAttribute('transform');
+  await expect.poll(() => person.getAttribute('transform')).not.toBe(initial);
+  await dialog.locator('.dialog-bottom').scrollIntoViewIfNeeded();
+  await expect(demo).not.toBeInViewport();
+  await expect(demo).toHaveAttribute('data-running', 'false');
+  const frozen = await person.getAttribute('transform');
+  await page.waitForTimeout(200);
+  expect(await person.getAttribute('transform')).toBe(frozen);
+  await demo.scrollIntoViewIfNeeded();
+  await expect(demo).toHaveAttribute('data-running', 'true');
+  await expect.poll(() => person.getAttribute('transform')).not.toBe(frozen);
+});

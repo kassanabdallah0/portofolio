@@ -32,7 +32,11 @@ export function useSimulation(
     document.addEventListener('visibilitychange', visibility);
     document.addEventListener('portfolio:dialog', visibility);
     const observer = new IntersectionObserver(
-      ([entry]) => {
+      (entries) => {
+        // Several transitions can queue before delivery (e.g. anchor scrolling
+        // during layout). The last entry is the current state, not the first.
+        const entry = entries[entries.length - 1];
+        if (!entry) return;
         setVisible(entry.isIntersecting);
         if (entry.isIntersecting) setEntered(true);
       },
