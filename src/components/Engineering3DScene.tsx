@@ -295,21 +295,52 @@ function Tree({x,z}:{x:number;z:number}){
     <mesh position={[0,1.12,0]}><icosahedronGeometry args={[.53,1]}/><meshStandardMaterial color="#427a73" roughness={.84}/></mesh></group>;
 }
 
-function NetworkPulse({ running }: { running: boolean }) {
-  const group=useRef<THREE.Group>(null);
-  const t=useRef(0);
-  const path=useMemo(()=>new THREE.QuadraticBezierCurve3(
-    new THREE.Vector3(-2.5,0.9,-0.65), new THREE.Vector3(-0.35,4.0,-1.6),new THREE.Vector3(3.75,2.5,-1.6)),[]);
-  const tube=useMemo(()=>new THREE.TubeGeometry(path,36,0.018,6,false),[path]);
-  useEffect(()=>()=>tube.dispose(),[tube]);
-  useFrame((_,delta)=>{if(!running||!group.current)return;t.current=(t.current+Math.min(delta,.05)*.21)%1;
-    const p=path.getPointAt(t.current);group.current.position.copy(p);group.current.scale.setScalar(Math.max(.05,Math.sin(Math.PI*t.current)));
+function NetworkPulse({ running, selectedBus }: { running: boolean; selectedBus: number }) {
+  const packet = useRef<THREE.Group>(null);
+  const connection = useRef<THREE.Line>(null);
+  const seconds = useRef(0);
+  const route = useMemo(() => new THREE.CatmullRomCurve3([
+    new THREE.Vector3(-3.55,0,1.95),new THREE.Vector3(-1.75,0,2.2),
+    new THREE.Vector3(1.45,0,2.18),new THREE.Vector3(2.65,0,1.45),
+    new THREE.Vector3(2.8,0,-1.45),new THREE.Vector3(1.4,0,-2.1),
+    new THREE.Vector3(-1.7,0,-2.18),new THREE.Vector3(-3.5,0,-1.4),
+  ], true, 'centripetal', 0.3), []);
+  useFrame((_, delta) => {
+    if (!running) return;
+    seconds.current += Math.min(delta, 0.05);
+    // The start is tied to the selected moving bus, not a fixed point.
+    const phase = (seconds.current * 0.017 + selectedBus / 8 + selectedBus * 0.31 * 0.017) % 1;
+    const source = route.getPointAt(phase);
+    const start = new THREE.Vector3(source.x, 1.05, source.z);
+    const via = new THREE.Vector3((source.x + 3.95)/2, 4.1, (source.z - 1.67)/2);
+    const end = new THREE.Vector3(3.95, 2.55, -1.67);
+    const point = (u: number) => start.clone().multiplyScalar((1-u)*(1-u))
+      .addScaledVector(via,2*(1-u)*u).addScaledVector(end,u*u);
+    if (connection.current) {
+      const positions = connection.current.geometry.getAttribute('position') as THREE.BufferAttribute;
+      for (let i=0;i<29;i++) {
+        const p=point(i/28);
+        positions.setXYZ(i,p.x,p.y,p.z);
+      }
+      positions.needsUpdate=true;
+      connection.current.geometry.computeBoundingSphere();
+    }
+    const u=(seconds.current*.20)%1;
+    if (packet.current) {
+      packet.current.position.copy(point(u));
+      packet.current.scale.setScalar(Math.max(.001,Math.sin(Math.PI*u)));
+    }
   });
   return (
     <group>
-      <mesh geometry={tube}><meshBasicMaterial color="#89d3e3" transparent opacity={.5} depthWrite={false}/></mesh>
-      <group ref={group} position={path.getPointAt(0)}>
-        <mesh><sphereGeometry args={[0.14,12,10]}/><meshBasicMaterial color="#adf4de"/></mesh>
+      <line ref={connection} frustumCulled={false}>
+        <bufferGeometry>
+          <bufferAttribute attach="attributes-position" args={[new Float32Array(29*3),3]} />
+        </bufferGeometry>
+        <lineBasicMaterial color="#9bdce8" transparent opacity={.67} depthWrite={false} />
+      </line>
+      <group ref={packet}>
+        <mesh><sphereGeometry args={[0.12,12,10]}/><meshBasicMaterial color="#b9f7e5"/></mesh>
       </group>
     </group>
   );
@@ -342,7 +373,7 @@ function Fleet({ selectedBus, running }: {selectedBus:number;running:boolean}){
         <mesh position={[0,1.12,.47]}><boxGeometry args={[.4,.65,.03]}/><meshBasicMaterial color="#82abba"/></mesh>
       </group>)}
       <CloudHub/>
-      <NetworkPulse running={running}/>
+      <NetworkPulse running={running} selectedBus={selectedBus}/>
     </group>
   );
 }
