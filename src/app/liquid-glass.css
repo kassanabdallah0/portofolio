@@ -1,0 +1,1150 @@
+/* Liquid Glass: the material layer over V2's layout and simulation styles.
+   Surfaces opt in with .glass; nested controls use the same inset tokens.
+   Opaque defaults are intentional: blur is progressive enhancement. */
+:root {
+  --glass-text-secondary: #4c6475;
+  --glass-light: rgb(248 251 253 / 76%);
+  --glass-light-solid: #f4f8fb;
+  --glass-dark: rgb(24 37 49 / 88%);
+  --glass-dark-solid: #1a2936;
+  --glass-navigation: rgb(247 251 254 / 88%);
+  --glass-dialog: rgb(246 250 253 / 94%);
+  --glass-border: rgb(128 153 173 / 32%);
+  --glass-border-dark: rgb(177 208 230 / 26%);
+  --glass-highlight: rgb(255 255 255 / 92%);
+  --glass-highlight-dark: rgb(205 229 247 / 21%);
+  --glass-reflection: linear-gradient(
+    128deg,
+    #ffffff6b,
+    #ffffff08 34%,
+    #ffffff00 62%,
+    #c7dce817
+  );
+  --glass-reflection-dark: linear-gradient(
+    128deg,
+    #b9d9ef12,
+    #ffffff00 38%,
+    #ffffff00 65%,
+    #8db5d70a
+  );
+  --glass-inset: rgb(225 236 243 / 58%);
+  --glass-inset-dark: rgb(119 155 181 / 10%);
+  --shadow-low: 0 5px 14px #253d5010;
+  --shadow-medium: 0 12px 32px -12px #253d5030;
+  --shadow-high: 0 24px 64px -24px #253d504d;
+  --shadow-dialog: 0 32px 100px #07121e66;
+  --blur-low: 8px;
+  --blur-medium: 16px;
+  --blur-high: 24px;
+  --glass-saturation: 135%;
+  --radius-small: 12px;
+  --radius-medium: 20px;
+  --radius-large: 30px;
+  --radius-pill: 999px;
+  --duration-fast: 160ms;
+  --duration-material: 280ms;
+  --ease-material: cubic-bezier(0.2, 0.7, 0.3, 1);
+  --focus-ring: #286689;
+  --surface-hover: #dcebf4;
+  --atmosphere-light:
+    radial-gradient(ellipse at 85% 10%, #c7dce766, transparent 55%),
+    linear-gradient(140deg, #f9fbfc, #edf3f7);
+  --atmosphere-dark:
+    radial-gradient(ellipse at 88% 0%, #35587166, transparent 58%),
+    radial-gradient(ellipse at 0% 100%, #243e523d, transparent 55%), #101922;
+}
+.glass {
+  --surface-fill: var(--glass-light);
+  --surface-solid: var(--glass-light-solid);
+  --surface-border: var(--glass-border);
+  --surface-highlight: var(--glass-highlight);
+  --surface-reflection: var(--glass-reflection);
+  --surface-shadow: var(--shadow-low);
+  --surface-blur: var(--blur-low);
+  background-color: var(--surface-solid);
+  background-image: var(--surface-reflection);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-medium);
+  box-shadow:
+    inset 0 1px 0 var(--surface-highlight),
+    inset 0 -1px 0 #7394aa0d,
+    var(--surface-shadow);
+}
+.glass--dark {
+  --surface-fill: var(--glass-dark);
+  --surface-solid: var(--glass-dark-solid);
+  --surface-border: var(--glass-border-dark);
+  --surface-highlight: var(--glass-highlight-dark);
+  --surface-reflection: var(--glass-reflection-dark);
+  --glass-inset: var(--glass-inset-dark);
+  --surface-hover: #304b60;
+  --focus-ring: #b7dff7;
+  --muted: #b7c8d4;
+  color: #edf5fa;
+}
+.glass--raised {
+  --surface-shadow: var(--shadow-high);
+  border-radius: var(--radius-large);
+}
+.glass--navigation {
+  --surface-fill: var(--glass-navigation);
+  --surface-shadow: var(--shadow-medium);
+  --surface-blur: var(--blur-medium);
+}
+.glass--dialog {
+  --surface-fill: var(--glass-dialog);
+  --surface-shadow: var(--shadow-dialog);
+  --surface-blur: var(--blur-high);
+  border-radius: var(--radius-large);
+}
+@supports (
+  (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
+) {
+  .glass {
+    background-color: var(--surface-fill);
+  }
+  /* Blur only optical surfaces. Repeated static panels use layered material
+     fills; filtering every card adds compositor work without visual benefit. */
+  .glass--optical,
+  .glass--navigation,
+  .glass--dialog {
+    -webkit-backdrop-filter: blur(var(--surface-blur))
+      saturate(var(--glass-saturation));
+    backdrop-filter: blur(var(--surface-blur)) saturate(var(--glass-saturation));
+  }
+}
+/* A consistent tactile inset; no additional blur on controls or animated SVGs. */
+:is(
+  .button,
+  .nav-contact,
+  .menu-toggle,
+  .icon-button,
+  .animation-control,
+  .demo-pause,
+  .demo-interaction button,
+  .project-filters button,
+  .social-link,
+  .project-detail-link,
+  .domain-node,
+  .tag-list > span,
+  .tech-symbol,
+  .experience-evidence > span,
+  .timeline-date span
+) {
+  border-radius: var(--radius-small);
+  transition:
+    background-color var(--duration-material) var(--ease-material),
+    box-shadow var(--duration-material) var(--ease-material),
+    border-color var(--duration-material) var(--ease-material),
+    translate var(--duration-material) var(--ease-material);
+}
+.button,
+.nav-contact,
+.menu-toggle,
+.icon-button,
+.animation-control,
+.project-filters button,
+.domain-node,
+.tag-list > span,
+.tech-symbol,
+.experience-evidence > span,
+.timeline-date span {
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-small);
+  background-color: var(--glass-inset);
+  background-image: var(--glass-reflection);
+  box-shadow:
+    inset 0 1px 0 #ffffff73,
+    var(--shadow-low);
+}
+.button-primary {
+  background-color: #243d50;
+  background-image: var(--glass-reflection-dark);
+  border-color: #56758b;
+  box-shadow:
+    inset 0 1px 0 #d0e9fb33,
+    0 7px 18px #263e5233;
+  color: #fff;
+}
+:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 4px;
+}
+button:focus-visible {
+  border-radius: var(--radius-small);
+}
+.glass--interactive {
+  transition:
+    translate var(--duration-material) var(--ease-material),
+    box-shadow var(--duration-material),
+    border-color var(--duration-material);
+}
+@media (hover: hover) and (pointer: fine) {
+  .glass--interactive:hover {
+    translate: 0 -3px;
+    --surface-shadow: var(--shadow-medium);
+    border-color: #7c9aaf;
+  }
+  :is(
+    .button,
+    .nav-contact,
+    .menu-toggle,
+    .icon-button,
+    .animation-control,
+    .social-link,
+    .project-detail-link
+  ):hover {
+    translate: 0 -2px;
+    background-color: var(--surface-hover);
+  }
+  .button-primary:hover {
+    background-color: #355870;
+  }
+  .tech-column li:hover .tech-symbol {
+    background-color: #d5e5f0;
+    border-color: #93b0c3;
+  }
+}
+:where(
+  .button,
+  .nav-contact,
+  .menu-toggle,
+  .icon-button,
+  .project-filters button
+):active {
+  translate: 0 1px;
+}
+
+/* Navigation floats as one optical surface; the mobile drawer shares its material. */
+.site-header {
+  top: 16px;
+  left: 50%;
+  width: min(1360px, calc(100% - 48px));
+  transform: translateX(-50%);
+  border-radius: var(--radius-pill);
+  transition:
+    box-shadow var(--duration-material),
+    background-color var(--duration-material);
+}
+.site-header.is-scrolled {
+  background-color: var(--surface-fill);
+  --surface-shadow: var(--shadow-high);
+  border-color: var(--surface-border);
+}
+.nav-shell {
+  height: 68px;
+  width: calc(100% - 44px);
+}
+.main-nav {
+  gap: 8px;
+}
+.main-nav a {
+  padding: 9px 12px;
+  border-radius: var(--radius-pill);
+  color: #4c6070;
+}
+.main-nav a[aria-current],
+.main-nav a:hover {
+  background: var(--glass-inset);
+  box-shadow: inset 0 1px 0 #fff9;
+  color: #233b4d;
+}
+.main-nav a[aria-current]:after {
+  display: none;
+}
+.nav-contact {
+  border-radius: var(--radius-pill);
+}
+
+/* Ambient light is static. Curved reflections sit behind content, never over it. */
+.hero {
+  background: var(--atmosphere-light);
+  padding-top: 102px;
+}
+.hero-grid {
+  display: block;
+  position: absolute;
+  pointer-events: none;
+  width: 86%;
+  height: 115%;
+  right: -28%;
+  top: -23%;
+  border: 1px solid #ffffffc4;
+  border-radius: 50%;
+  transform: rotate(-27deg);
+  box-shadow:
+    inset 0 16px 32px #ffffff5c,
+    0 18px 50px #6b98b412;
+}
+.hero-inner {
+  column-gap: 40px;
+  padding-top: 72px;
+}
+.hero h1 > span:nth-child(2),
+.muted-heading {
+  color: #647583;
+}
+.hero h1 {
+  text-wrap: balance;
+}
+.hero-eyebrow {
+  color: #3f6075;
+}
+.hero-copy > .availability {
+  color: #4c6658;
+}
+.core-visual {
+  margin: 0 0 20px;
+  padding: 24px 0 20px;
+}
+.hardware-caption {
+  padding: 0 24px;
+}
+.hero-process {
+  margin: 0 24px;
+  padding: 6px;
+  background: var(--glass-inset);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-small);
+}
+.hero-process button {
+  padding: 8px 7px;
+  white-space: normal;
+  border-radius: 8px;
+}
+.hero-process button.is-active,
+.hero-process button[aria-pressed='true'] {
+  background: #ffffffa8;
+  box-shadow:
+    inset 0 1px 0 #fff,
+    var(--shadow-low);
+  color: #244d67;
+}
+.hero-process button.is-active:after {
+  display: none;
+}
+.hardware-explanation {
+  margin-left: 24px;
+  margin-right: 24px;
+}
+.hardware-note {
+  color: #4b6476;
+}
+.hardware-object-label {
+  background: #f3f8fbbf;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-pill);
+  padding: 4px 9px;
+}
+.hero-bottom {
+  border-color: #a5becb66;
+}
+
+/* Pearl surfaces stay readable over the softly illuminated page. */
+.impact-section,
+.about-section,
+.projects-section,
+.experience-section {
+  background: var(--atmosphere-light);
+}
+.impact-section {
+  padding-top: 45px;
+  padding-bottom: 42px;
+  border-bottom: 1px solid var(--glass-border);
+}
+.impact-grid {
+  gap: 16px;
+}
+.impact-item,
+.impact-item:first-child {
+  padding: 25px 22px;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-medium);
+}
+.impact-value {
+  color: #263e50;
+}
+.impact-value > span {
+  color: #526b7b;
+}
+.about-visual {
+  padding: 30px 18px 24px;
+}
+.domain-left {
+  left: 0;
+}
+.domain-right {
+  right: 0;
+}
+.domain-node {
+  background-color: #f5f9fcdf;
+  border-color: var(--glass-border);
+}
+.approach-grid {
+  gap: 20px;
+  border: 0;
+  padding-top: 0;
+}
+.approach-item {
+  padding: 24px;
+}
+
+/* Graphite is a material family, not a separate visual theme. */
+.expertise-section,
+.contact-section {
+  background: var(--atmosphere-dark);
+}
+.expertise-section .muted-heading {
+  color: #a3bccd;
+}
+.expertise-grid {
+  gap: 16px;
+  border: 0;
+}
+.expertise-card,
+.expertise-card:first-child,
+.expertise-card:last-child {
+  padding: 28px 22px;
+  border: 1px solid var(--glass-border-dark);
+}
+.expertise-icon {
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--glass-border-dark);
+  border-radius: 16px;
+  background: var(--glass-inset);
+  box-shadow: inset 0 1px 0 #d6ecfa26;
+  margin-bottom: 28px;
+}
+.expertise-label {
+  color: #acc6d7;
+}
+.expertise-description {
+  min-height: 145px;
+}
+.expertise-card li {
+  color: #c0ced8;
+}
+
+/* The project frame is translucent; all six instrument interiors remain opaque. */
+.projects-grid {
+  gap: 40px;
+}
+.project-card {
+  padding: 28px;
+  gap: 30px;
+  border: 1px solid var(--surface-border);
+}
+.project-info {
+  min-width: 0;
+  padding: 12px 4px;
+}
+.project-meta {
+  padding: 9px 12px;
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-small);
+  background: var(--glass-inset);
+}
+.project-metric {
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-small);
+  background: var(--glass-inset);
+  padding: 16px;
+  gap: 16px;
+}
+.project-detail-link {
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-small);
+  background: var(--glass-inset);
+  padding: 10px 14px;
+}
+.project-delivery {
+  padding: 36px;
+  --surface-solid: #152330;
+  --surface-fill: rgb(21 35 48 / 97%);
+}
+.project-delivery .project-info {
+  padding: 0;
+}
+.project-delivery .project-metric {
+  padding: 16px;
+}
+.project-delivery .tag-list > span {
+  background-image: var(--glass-reflection-dark);
+  box-shadow: inset 0 1px 0 var(--glass-highlight-dark);
+}
+.project-filters button {
+  border-radius: var(--radius-pill);
+  color: #455e70;
+}
+.project-filters button[aria-pressed='true'] {
+  background: #263e50;
+  color: #fff;
+  border-color: #3e6179;
+  box-shadow:
+    inset 0 1px 0 #ffffff33,
+    var(--shadow-low);
+}
+.glass-instrument {
+  border-radius: var(--radius-medium);
+  box-shadow:
+    inset 0 1px 0 #c6e1f026,
+    var(--shadow-medium);
+  /* No backdrop filter, opacity, extra canvas or additional animation clock. */
+}
+.demo-heading {
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--demo-line);
+  background: linear-gradient(130deg, #a0c5de0f, transparent);
+}
+.demo-pause,
+.demo-interaction button {
+  border-radius: var(--radius-small);
+  box-shadow: inset 0 1px 0 #c9dfed26;
+  background: #8cb2ce0e;
+}
+.demo-pause:hover,
+.demo-interaction button:hover,
+.demo-interaction button[aria-pressed='true'] {
+  background: #8cb2ce26;
+}
+.architecture-stages button {
+  border-radius: 8px 8px 0 0;
+  padding-top: 7px;
+}
+.architecture-stages button.is-active,
+.architecture-stages button.is-inspected {
+  background: #8cb2ce12;
+}
+.engineering-demo {
+  --focus-ring: #286689;
+}
+.demo-vision,
+.demo-delivery,
+.demo-scan,
+.demo-observability {
+  --focus-ring: #c5e5fa;
+}
+
+.technologies-section {
+  background:
+    radial-gradient(ellipse at 10% 20%, #b8d1e14d, transparent 60%), #e9f1f6;
+}
+.tech-grid {
+  gap: 20px;
+}
+.tech-column {
+  padding: 26px;
+}
+.tech-symbol {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  color: #3d6077;
+}
+.tech-column li {
+  padding: 7px 0;
+}
+.education-note,
+.language-note {
+  padding: 22px;
+  max-width: 390px;
+}
+.timeline {
+  border-color: #91aec080;
+}
+.timeline-item,
+.timeline-item:last-child {
+  padding: 25px;
+  margin-bottom: 22px;
+}
+.timeline-dot {
+  top: 32px;
+  background: #e4eef5;
+}
+.is-current .timeline-dot {
+  background: #4e7b96;
+  box-shadow:
+    0 0 0 5px #c2d9e75c,
+    0 0 12px #729fb03d;
+}
+.timeline-date span {
+  color: #385970;
+}
+
+.contact-layout {
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.8fr);
+  gap: 32px;
+  align-items: stretch;
+}
+.contact-panel {
+  padding: 38px;
+  border-radius: var(--radius-large);
+  align-self: center;
+}
+.contact-section h2 {
+  font-size: clamp(34px, 3.6vw, 52px);
+}
+.contact-section h2 > span {
+  color: #aac9dc;
+}
+.contact-art {
+  border-color: #adc9df24;
+  box-shadow:
+    0 30px 80px #adcede08,
+    inset 0 -20px 35px #aecce014;
+}
+.social-link {
+  padding: 9px 12px;
+  border: 1px solid var(--glass-border-dark);
+  border-radius: var(--radius-small);
+  background: var(--glass-inset);
+}
+.contact-actions {
+  gap: 12px;
+}
+.copy-button {
+  border-color: var(--glass-border-dark);
+  background-image: var(--glass-reflection-dark);
+  box-shadow: inset 0 1px 0 var(--glass-highlight-dark);
+}
+.contact-practical {
+  border-top: 1px solid var(--glass-border-dark);
+  padding-top: 20px;
+  color: #b4c9d7;
+}
+.resume-card {
+  width: 100%;
+  max-width: 350px;
+  transform: none;
+}
+.resume-card:hover {
+  transform: none;
+}
+.resume-card-heading,
+.resume-format,
+.resume-card-content .eyebrow,
+.resume-card-content > p:not(.eyebrow) {
+  color: #b6cddd;
+}
+.resume-card .button {
+  background-color: #dbeaf5;
+  background-image: var(--glass-reflection);
+  color: #203d52;
+  border-color: #d9ebf9;
+}
+.resume-card .button:hover {
+  background-color: #f3faff;
+}
+.site-footer {
+  background: #0e1821;
+  border-top: 1px solid var(--glass-border-dark);
+}
+.site-footer :focus-visible {
+  outline-color: #c5e5fa;
+}
+
+/* Native dialog and focus/history handlers are unchanged. */
+.project-dialog {
+  margin: auto;
+}
+.project-dialog::backdrop {
+  background: #1426379c;
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
+}
+.dialog-top {
+  border-radius: 0;
+  border-top: 0;
+  border-left: 0;
+  border-right: 0;
+  --surface-shadow: var(--shadow-low);
+}
+.project-role {
+  padding: 16px;
+  background: var(--glass-inset);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-small);
+}
+.decision-block {
+  border-left: 2px solid #739bb5;
+}
+.result-block {
+  --surface-fill: #e2eef6e6;
+  --surface-solid: #e2eef6;
+}
+
+@media (max-width: 1150px) {
+  .nav-shell {
+    width: calc(100% - 36px);
+  }
+  .main-nav {
+    gap: 3px;
+  }
+  .main-nav a {
+    padding: 9px 10px;
+  }
+  .core-visual {
+    margin-right: 0;
+  }
+  .hero-inner {
+    column-gap: 22px;
+  }
+  .hardware-caption {
+    padding-inline: 20px;
+  }
+  .hero-process {
+    margin-inline: 16px;
+  }
+  .hero-process button {
+    padding-inline: 4px;
+  }
+  .expertise-card,
+  .expertise-card:first-child,
+  .expertise-card:last-child {
+    padding: 24px 18px;
+  }
+  .expertise-description {
+    min-height: 175px;
+  }
+  .project-card {
+    padding: 24px;
+    gap: 24px;
+  }
+  .project-info h3 {
+    font-size: 30px;
+  }
+  .contact-panel {
+    padding: 26px;
+  }
+  .contact-layout {
+    gap: 24px;
+  }
+  .about-visual {
+    padding: 24px 16px;
+  }
+  .impact-item,
+  .impact-item:first-child {
+    padding: 20px 16px;
+  }
+}
+@media (max-width: 899px) {
+  .site-header .nav-shell {
+    height: 64px;
+  }
+  .hero {
+    padding-top: 96px;
+  }
+  .core-visual {
+    margin: 36px auto 10px;
+  }
+  .expertise-description {
+    min-height: 0;
+  }
+  .expertise-card:nth-child(3),
+  .expertise-card:nth-child(2) {
+    padding: 24px 18px;
+    border: 1px solid var(--glass-border-dark);
+  }
+  .about-layout {
+    grid-template-columns: 1fr;
+  }
+  .about-visual {
+    width: 100%;
+    max-width: 500px;
+    justify-self: center;
+  }
+  .domain-node {
+    font-size: 10px;
+    padding: 10px;
+  }
+  .domain-node > svg {
+    display: block;
+  }
+  .domain-left,
+  .domain-right {
+    top: 50%;
+  }
+  .domain-top {
+    top: 7%;
+  }
+  .domain-bottom {
+    bottom: 7%;
+  }
+  .approach-item {
+    padding: 20px;
+  }
+  .project-info {
+    padding: 0;
+  }
+  .contact-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.8fr);
+  }
+  .contact-panel {
+    padding: 22px;
+  }
+  .email-link {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+  .email-row {
+    gap: 12px;
+  }
+  .timeline-item,
+  .timeline-item:last-child {
+    padding: 22px;
+  }
+  .tech-grid {
+    gap: 16px;
+  }
+  .tech-column {
+    padding: 20px;
+  }
+}
+@media (max-width: 640px) {
+  :root {
+    --radius-large: 22px;
+    --radius-medium: 16px;
+    --shadow-high: 0 12px 30px -14px #253d5040;
+  }
+  /* Mobile: blur only the floating nav and active dialog, never the card grid. */
+  .glass {
+    --surface-fill: var(--surface-solid);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  .glass--navigation {
+    --surface-fill: var(--glass-navigation);
+  }
+  .glass--dialog {
+    --surface-fill: var(--glass-dialog);
+  }
+  @supports (
+    (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
+  ) {
+    .glass--navigation,
+    .glass--dialog {
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+    }
+  }
+  .site-header {
+    top: 10px;
+    width: calc(100% - 24px);
+    border-radius: 22px;
+  }
+  .site-header .nav-shell {
+    width: calc(100% - 28px);
+    height: 60px !important;
+  }
+  .main-nav {
+    top: 70px;
+    left: -1px;
+    right: -1px;
+    padding: 12px;
+    border: 1px solid var(--glass-border);
+    border-radius: 22px;
+    background: var(--glass-light-solid);
+    background-image: var(--glass-reflection);
+    box-shadow: var(--shadow-high);
+  }
+  .main-nav a {
+    border-radius: var(--radius-small);
+    padding: 11px 15px;
+  }
+  .main-nav .mobile-contact {
+    margin-top: 8px;
+  }
+  .hero {
+    padding-top: 88px;
+  }
+  .hero-inner {
+    padding-top: 42px;
+  }
+  .hero h1 {
+    text-wrap: initial;
+  }
+  .hero-grid {
+    width: 180%;
+    right: -130%;
+    top: 10%;
+  }
+  .core-visual {
+    width: 100%;
+    margin: 32px 0 0;
+    padding: 18px 0;
+  }
+  .hardware-caption {
+    padding: 0 14px;
+    font-size: 10px;
+  }
+  .hardware-caption > span:last-child {
+    font-size: 6px;
+  }
+  .hero-process {
+    margin: 0 12px;
+    gap: 3px;
+    padding: 4px;
+  }
+  .hero-process button {
+    font-size: 8px;
+    padding: 8px 4px;
+  }
+  .hardware-explanation {
+    margin: 12px 14px 0;
+  }
+  .hardware-explanation > p {
+    font-size: 10px;
+  }
+  .impact-grid {
+    gap: 10px;
+  }
+  .impact-item,
+  .impact-item:first-child,
+  .impact-item:nth-child(3) {
+    padding: 18px 12px;
+    border: 1px solid var(--glass-border);
+  }
+  .impact-value {
+    font-size: 30px;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .impact-value > span {
+    font-size: 12px;
+  }
+  .impact-label {
+    flex-wrap: wrap;
+    line-height: 1.5;
+  }
+  .about-visual {
+    padding: 24px 12px 18px;
+  }
+  .domain-node {
+    font-size: 8px;
+    padding: 8px;
+  }
+  .approach-grid {
+    gap: 12px;
+  }
+  .approach-item {
+    padding: 22px;
+  }
+  .expertise-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .expertise-card,
+  .expertise-card:first-child,
+  .expertise-card:last-child,
+  .expertise-card:nth-child(3),
+  .expertise-card:nth-child(2) {
+    padding: 26px;
+  }
+  .expertise-card h3 {
+    min-height: 0;
+    font-size: 26px;
+  }
+  .expertise-label {
+    font-size: 9px;
+  }
+  .expertise-description {
+    font-size: 13px;
+  }
+  .expertise-card li {
+    font-size: 11px;
+  }
+  .expertise-icon {
+    margin-bottom: 22px;
+  }
+  .projects-grid {
+    gap: 24px;
+  }
+  .project-card,
+  .project-delivery {
+    padding: 20px 12px 12px;
+    gap: 24px;
+  }
+  .project-info,
+  .project-interface .project-info,
+  .project-observability .project-info {
+    padding: 0 6px;
+  }
+  .project-delivery .project-info {
+    padding: 0 6px;
+  }
+  .project-delivery .project-demonstration {
+    margin: 0;
+  }
+  .project-info h3,
+  .project-delivery .project-info h3 {
+    font-size: 30px;
+  }
+  .project-metric,
+  .project-delivery .project-metric {
+    padding: 14px 12px;
+    gap: 8px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .project-metric > strong {
+    font-size: 24px;
+  }
+  .project-meta {
+    padding: 8px 10px;
+  }
+  .project-detail-link {
+    padding: 10px 12px;
+  }
+  .engineering-demo {
+    border-radius: var(--radius-small);
+  }
+  .demo-heading {
+    padding-bottom: 12px;
+  }
+  .tech-grid {
+    gap: 14px;
+  }
+  .tech-column {
+    padding: 22px;
+  }
+  .timeline-item,
+  .timeline-item:last-child {
+    padding: 22px 18px;
+  }
+  .contact-layout {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .contact-panel {
+    padding: 26px 20px;
+  }
+  .contact-section h2 {
+    font-size: 34px;
+  }
+  .resume-card {
+    margin: 0 auto;
+  }
+  .project-dialog {
+    width: calc(100% - 20px);
+    border-radius: var(--radius-large);
+  }
+  .project-role {
+    padding: 14px;
+  }
+}
+@media (max-width: 360px) {
+  .project-info h3,
+  .project-delivery .project-info h3 {
+    font-size: 27px;
+  }
+  .project-metric {
+    flex-wrap: wrap;
+  }
+  .impact-value {
+    font-size: 27px;
+  }
+  .impact-item,
+  .impact-item:first-child,
+  .impact-item:nth-child(3) {
+    padding: 16px 10px;
+  }
+  .contact-panel {
+    padding: 22px 16px;
+  }
+  .contact-section h2 {
+    font-size: 30px;
+  }
+  .domain-node {
+    font-size: 7px;
+    padding: 6px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .glass,
+  .button,
+  .nav-contact,
+  .menu-toggle,
+  .icon-button,
+  .animation-control,
+  .social-link,
+  .project-detail-link,
+  .project-filters button,
+  .tech-symbol {
+    transition: none;
+    translate: none;
+  }
+  .glass--interactive:hover,
+  :is(
+    .button,
+    .nav-contact,
+    .menu-toggle,
+    .icon-button,
+    .animation-control,
+    .social-link,
+    .project-detail-link
+  ):hover {
+    translate: none;
+  }
+}
+@media (prefers-contrast: more) {
+  .glass {
+    --surface-fill: var(--surface-solid);
+    --surface-border: #607f94;
+  }
+  .glass--dark {
+    --surface-border: #a6c7df;
+  }
+}
+@media (forced-colors: active) {
+  .glass,
+  .glass-instrument,
+  .button,
+  .project-filters button {
+    background: Canvas;
+    color: CanvasText;
+    border: 1px solid CanvasText;
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+  .hero-grid,
+  .contact-art {
+    display: none;
+  }
+}
+
+/* Explicit readable fallback also covers scrolled navigation overrides. */
+@supports not (
+  (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
+) {
+  .glass,
+  .site-header.is-scrolled {
+    background-color: var(--surface-solid);
+  }
+}
+@media (max-width: 640px) {
+  .tech-grid {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 640px) {
+  .section-heading-row > p br,
+  .experience-intro h2 br:nth-child(2) {
+    display: initial;
+  }
+}
+
+/* Small labels need AA contrast over the darkest light-material backing. */
+.tag-list > span,
+.project-category,
+.project-subtitle {
+  color: var(--glass-text-secondary);
+}
+@media (max-width: 640px) {
+  /* Keep the first/last deployment stages inside the instrument frame. */
+  .demo-delivery .demo-world {
+    margin-inline: 0;
+  }
+}

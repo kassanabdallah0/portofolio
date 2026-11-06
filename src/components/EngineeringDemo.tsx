@@ -961,7 +961,7 @@ export default function EngineeringDemo({ type }: { type: DemoType }) {
   return (
     <div
       ref={root}
-      className={`engineering-demo demo-${type}`}
+      className={`engineering-demo glass-instrument demo-${type}`}
       data-demo={type}
       data-running={running}
       data-stage={stage}

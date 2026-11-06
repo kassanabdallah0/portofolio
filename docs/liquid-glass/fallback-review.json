@@ -1,0 +1,12 @@
+{
+  "unsupportedBackdrop": {
+    "simulation": "CSS supports branches evaluated as unsupported; unsupported filter declarations removed",
+    "materials": 35,
+    "pageViolations": [],
+    "dialogViolations": []
+  },
+  "mobileFilters": [
+    "site-header glass glass--navigation "
+  ],
+  "highContrastOpaque": true
+}

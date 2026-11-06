@@ -257,7 +257,7 @@ test('3D renders on desktop and its pause control works', async ({
 });
 
 test('no horizontal overflow at common viewport sizes', async ({ page }) => {
-  for (const width of [320, 390, 768, 1024, 1440]) {
+  for (const width of [320, 360, 390, 393, 768, 1024, 1440]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto('./');
     expect(
