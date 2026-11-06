@@ -15,10 +15,10 @@ test('French content, metadata and navigation targets are present', async ({
   await expect(page).toHaveTitle(/Abdallah Kassan.*IA embarquée/);
   await expect(page.locator('html')).toHaveAttribute('lang', 'fr');
   await expect(page.getByRole('heading', { level: 1 })).toContainText(
-    'Ingénieur Logiciel.',
+    'Ingénieur logiciel',
   );
   await expect(page.getByRole('heading', { level: 1 })).toContainText(
-    'IA Embarquée.',
+    'IA embarquée',
   );
   const ids = await page
     .locator('a[href^="#"]')
@@ -42,7 +42,9 @@ test('project filters change the visible selection and can reset', async ({
     page.getByRole('button', { name: /Voir le projet/ }),
   ).toHaveCount(1);
   await expect(
-    page.getByRole('heading', { name: 'La vision au plus près du terrain.' }),
+    page.getByRole('heading', {
+      name: 'Voir le projet : SecuriSPOT · Vision industrielle',
+    }),
   ).toBeVisible();
   await page
     .getByRole('button', { name: 'Cloud & systèmes', exact: true })
@@ -158,7 +160,7 @@ test('CV download is a real PDF with current content', async ({
   request,
 }) => {
   await page.goto('./#contact');
-  const link = page.getByRole('link', {
+  const link = page.locator('#accueil').getByRole('link', {
     name: 'Télécharger mon CV',
     exact: true,
   });
@@ -257,7 +259,7 @@ test('3D renders on desktop and its pause control works', async ({
 });
 
 test('no horizontal overflow at common viewport sizes', async ({ page }) => {
-  for (const width of [320, 390, 768, 1024, 1440]) {
+  for (const width of [320, 360, 393, 768, 1024, 1440]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto('./');
     expect(
@@ -312,10 +314,12 @@ test('server-rendered content remains readable without JavaScript', async ({
   await page.goto(baseURL!);
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
   await expect(
-    page.getByRole('heading', { name: 'La vision au plus près du terrain.' }),
+    page.getByRole('heading', {
+      name: 'Voir le projet : SecuriSPOT · Vision industrielle',
+    }),
   ).toBeVisible();
   await expect(
-    page.getByRole('link', { name: 'Télécharger mon CV' }),
+    page.locator('#accueil').getByRole('link', { name: 'Télécharger mon CV' }),
   ).toHaveAttribute(
     'href',
     '/portofolio/bucket/CV_Reference_Abdallah_Kassan_2026.pdf',

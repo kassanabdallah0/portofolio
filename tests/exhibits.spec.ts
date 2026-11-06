@@ -18,6 +18,9 @@ test('simulation, active diagram and pause share one persistent clock', async ({
   await page.clock.install();
   await page.goto('./#projet/jetson-vision');
   const demo = page.getByRole('dialog').locator('[data-demo="vision"]');
+  await demo.evaluate((el) =>
+    el.scrollIntoView({ behavior: 'instant', block: 'center' }),
+  );
   await expect(demo).toHaveAttribute('data-running', 'true');
   const person = demo.locator('[data-person]');
   const initial = await person.getAttribute('transform');
