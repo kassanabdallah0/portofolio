@@ -1,0 +1,40 @@
+[
+  {
+    "width": 1440,
+    "sections": [
+      "impact",
+      "about",
+      "expertise",
+      "vision",
+      "manager",
+      "fleet",
+      "delivery",
+      "colas",
+      "elk",
+      "stack",
+      "experience",
+      "contact"
+    ],
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "width": 393,
+    "sections": [
+      "impact",
+      "about",
+      "expertise",
+      "vision",
+      "manager",
+      "fleet",
+      "delivery",
+      "colas",
+      "elk",
+      "stack",
+      "experience",
+      "contact"
+    ],
+    "overflow": false,
+    "errors": []
+  }
+]

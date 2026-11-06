@@ -168,7 +168,9 @@ function Navigation() {
     return () => window.removeEventListener('keydown', escape);
   }, [open]);
   return (
-    <header className={`site-header ${scrolled || open ? 'is-scrolled' : ''}`}>
+    <header
+      className={`site-header glass glass--navigation ${scrolled || open ? 'is-scrolled' : ''}`}
+    >
       <div className="nav-shell">
         <Logo />
         <nav
@@ -289,7 +291,7 @@ function ProjectDialog({
   return (
     <dialog
       ref={ref}
-      className="project-dialog"
+      className="project-dialog glass glass--dialog"
       aria-labelledby="project-dialog-title"
       onCancel={(event) => {
         event.preventDefault();
@@ -310,7 +312,7 @@ function ProjectDialog({
     >
       {project && (
         <>
-          <div className="dialog-top">
+          <div className="dialog-top glass glass--navigation">
             <span className="eyebrow">ÉTUDE DE CAS / {project.number}</span>
             <button
               className="icon-button"
@@ -336,7 +338,7 @@ function ProjectDialog({
             </div>
             <h3>Le contexte</h3>
             <p>{project.context}</p>
-            <div className="decision-block">
+            <div className="decision-block glass">
               <span className="eyebrow">LE CHOIX TECHNIQUE</span>
               <p>{project.decision}</p>
             </div>
@@ -346,7 +348,7 @@ function ProjectDialog({
                 <li key={item}>{item}</li>
               ))}
             </ul>
-            <div className="result-block">
+            <div className="result-block glass">
               <p className="eyebrow">RÉSULTAT SUR LE TERRAIN</p>
               <p>{project.result}</p>
             </div>
@@ -409,7 +411,7 @@ function Contact() {
       <div className="container contact-content">
         <SectionLabel number="06">CONTACT</SectionLabel>
         <div className="contact-layout">
-          <Reveal>
+          <Reveal className="contact-panel glass glass--dark">
             <p className="availability">
               <span className="status-dot" />
               Disponible pour de nouvelles opportunités
@@ -617,7 +619,7 @@ export default function Portfolio() {
               {impact.map((item) => (
                 <button
                   key={item.project}
-                  className="impact-item"
+                  className="impact-item glass glass--interactive"
                   type="button"
                   onClick={() => {
                     window.location.hash = `projet/${item.project}`;
@@ -678,7 +680,10 @@ export default function Portfolio() {
                   </div>
                 </div>
               </Reveal>
-              <Reveal className="about-visual" delay={0.1}>
+              <Reveal
+                className="about-visual glass glass--raised glass--optical"
+                delay={0.1}
+              >
                 <DomainDiagram />
                 <p className="diagram-caption">
                   UNE APPROCHE SYSTÈME, DE BOUT EN BOUT
@@ -687,7 +692,7 @@ export default function Portfolio() {
             </div>
             <div className="approach-grid">
               {approach.map((item) => (
-                <div className="approach-item" key={item.number}>
+                <div className="approach-item glass" key={item.number}>
                   <span>{item.number}</span>
                   <div>
                     <h3>{item.title}</h3>
@@ -723,7 +728,7 @@ export default function Portfolio() {
                 return (
                   <Reveal
                     key={item.title}
-                    className="expertise-card"
+                    className="expertise-card glass glass--dark"
                     delay={i * 0.05}
                   >
                     <div className="expertise-icon">
@@ -799,7 +804,7 @@ export default function Portfolio() {
               {filtered.map((project) => (
                 <Reveal
                   key={project.slug}
-                  className={`project-card project-${project.visual}`}
+                  className={`project-card glass ${project.visual === 'delivery' ? 'glass--dark' : 'glass--raised'} project-${project.visual}`}
                 >
                   <div className="project-demonstration">
                     <EngineeringDemo type={project.visual} />
@@ -889,7 +894,7 @@ export default function Portfolio() {
             <div className="tech-grid">
               {technologies.map((category, i) => (
                 <Reveal
-                  className="tech-column"
+                  className="tech-column glass"
                   key={category.label}
                   delay={i * 0.04}
                 >
@@ -940,7 +945,7 @@ export default function Portfolio() {
                   Mon CV de référence
                   <Download size={16} />
                 </a>
-                <div className="education-note">
+                <div className="education-note glass">
                   <BrainCircuit size={22} />
                   <div>
                     <strong>Continuer à apprendre.</strong>
@@ -950,7 +955,7 @@ export default function Portfolio() {
                     </p>
                   </div>
                 </div>
-                <div className="language-note">
+                <div className="language-note glass">
                   <span className="eyebrow">LANGUES DE TRAVAIL</span>
                   <p>
                     Français <span>Professionnel</span>
@@ -966,7 +971,7 @@ export default function Portfolio() {
               <div className="timeline">
                 {timeline.map((item) => (
                   <Reveal
-                    className={`timeline-item ${item.current ? 'is-current' : ''}`}
+                    className={`timeline-item glass ${item.current ? 'is-current' : ''}`}
                     key={item.organization}
                   >
                     <span className="timeline-dot" />

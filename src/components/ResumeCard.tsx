@@ -4,7 +4,10 @@ import { profile } from '@/data/portfolio';
 
 export default function ResumeCard() {
   return (
-    <aside className="resume-card" aria-labelledby="resume-title">
+    <aside
+      className="resume-card glass glass--dark glass--raised"
+      aria-labelledby="resume-title"
+    >
       <div className="resume-card-heading">
         <FileText size={17} />
         <span>CV DE RÉFÉRENCE</span>

@@ -235,7 +235,7 @@ export default function CoreVisual({
   const live = enabled && entered && !failed && (!suspended || ready);
   return (
     <div
-      className="core-visual"
+      className="core-visual glass glass--raised glass--optical"
       ref={root}
       data-running={running}
       data-stage={stage}

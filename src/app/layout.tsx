@@ -3,6 +3,7 @@ import '@fontsource-variable/space-grotesk';
 import '@fontsource-variable/inter';
 import '@fontsource-variable/jetbrains-mono';
 import './globals.css';
+import './liquid-glass.css';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://kassanabdallah0.github.io'),
