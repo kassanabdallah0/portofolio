@@ -107,8 +107,17 @@ test('offscreen and obscured exhibits stop, and repeated dialogs release their s
     background.getByRole('button', { name: /Mettre en pause/ }),
   ).toBeEnabled();
   await page.evaluate(() => document.fonts.ready);
-  await background.scrollIntoViewIfNeeded();
-  await expect(background).toHaveAttribute('data-running', 'true');
+  // A native hash scroll can still be settling after fonts/hydration. Establish
+  // a foreground, stable viewport before testing the visibility-driven clock.
+  await expect
+    .poll(async () => {
+      await page.bringToFront();
+      await background.evaluate((el) =>
+        el.scrollIntoView({ behavior: 'instant', block: 'center' }),
+      );
+      return background.getAttribute('data-running');
+    })
+    .toBe('true');
   const trigger = page.getByRole('button', {
     name: 'Explorer l’étude de cas : SecuriSPOT · Vision industrielle',
   });
