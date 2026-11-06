@@ -247,6 +247,13 @@ test('3D renders on desktop and its pause control works', async ({
   await expect(
     page.getByRole('button', { name: 'Reprendre l’animation 3D' }),
   ).toBeVisible();
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await expect(page.locator('.core-visual canvas')).toHaveCount(0);
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await expect(page.locator('.core-visual canvas')).toBeVisible({
+    timeout: 20000,
+  });
+  await expect(page.locator('.core-static')).toHaveClass(/is-hidden/);
 });
 
 test('no horizontal overflow at common viewport sizes', async ({ page }) => {

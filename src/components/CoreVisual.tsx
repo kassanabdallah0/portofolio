@@ -225,6 +225,7 @@ export default function CoreVisual({
         }
       }
       setEnabled(media.matches && !!supported);
+      setReady(false);
     };
     update();
     media.addEventListener('change', update);
