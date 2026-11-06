@@ -2,6 +2,7 @@
 
 import { useId, type CSSProperties } from 'react';
 import type { DemoType } from '@/data/simulations';
+import EngineeringStory3D from './EngineeringStory3D';
 
 type Props = {
   type: DemoType;
@@ -13,6 +14,7 @@ type Props = {
   rollback: boolean;
   restored: boolean;
   pending: boolean;
+  active3D: boolean;
 };
 
 const steps: Record<DemoType, string[]> = {
@@ -319,16 +321,21 @@ const label: Record<DemoType, string> = {
 export default function EngineeringBlueprint(props: Props) {
   const { type, stage, running } = props;
   const rootStyle = { '--lab-progress': (stage + 1) / steps[type].length * 100 + '%' } as CSSProperties;
+  const physical = (type === 'scan' || type === 'vision' || type === 'cloud') && props.active3D;
   return (
     <div className={'lab-blueprint lab-blueprint--' + type} data-lab={type}
       data-motion={running ? 'running' : 'paused'} data-step={stage} style={rootStyle}>
       <div className="lab-blueprint-heading"><span><i className="lab-online-dot" /> {label[type]}</span><span>ÉTUDE DE CAS · RECONSTITUTION</span></div>
       <div className="lab-blueprint-content">
-        {type === 'vision' && <Vision {...props} />}
+        {physical && (
+          <EngineeringStory3D mode={type as 'vision' | 'scan' | 'cloud'}
+            stage={stage} running={running} selectedBus={props.selectedBus} />
+        )}
+        {!physical && type === 'vision' && <Vision {...props} />}
         {type === 'interface' && <Manager {...props} />}
-        {type === 'cloud' && <Cloud {...props} />}
+        {!physical && type === 'cloud' && <Cloud {...props} />}
         {type === 'delivery' && <Delivery {...props} />}
-        {type === 'scan' && <Scan {...props} />}
+        {!physical && type === 'scan' && <Scan {...props} />}
         {type === 'observability' && <Observability {...props} />}
       </div>
       <SignalPath type={type} stage={stage} />
