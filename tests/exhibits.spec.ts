@@ -1,4 +1,20 @@
 import { test, expect } from '@playwright/test';
+
+test('project illustrations remain usable when WebGL is unavailable', async ({ page }) => {
+  await page.addInitScript(() => {
+    const getContext = HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext = function (this: HTMLCanvasElement, kind: string, ...args: unknown[]) {
+      if (kind.includes('webgl')) return null;
+      return getContext.apply(this, [kind, ...args] as Parameters<typeof getContext>);
+    } as typeof getContext;
+  });
+  await page.goto('./#projet/colas-scan-epi');
+  const scan = page.getByRole('dialog').locator('[data-demo="scan"]');
+  await expect(scan.locator('.lab-scan-layout')).toBeVisible();
+  await expect(scan.locator('canvas')).toHaveCount(0);
+  await expect(scan).toContainText('GStreamer / WebRTC');
+});
+
 test('3D exhibits represent different systems and label FPS scopes correctly', async ({ page, isMobile }) => {
   test.skip(isMobile, 'The mobile experience deliberately uses the lightweight 2D alternative');
   await page.goto('./#projet/colas-scan-epi');
