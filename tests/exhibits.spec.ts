@@ -1,15 +1,38 @@
 import { test, expect } from '@playwright/test';
-import { orbit } from '../src/data/simulations';
-
-test('vehicle paths remain continuous across their period boundary', () => {
-  const period = (Math.PI * 2) / 0.23;
-  for (const offset of [0, (Math.PI * 2) / 3, (Math.PI * 4) / 3]) {
-    const before = orbit(period - 0.001, offset),
-      after = orbit(period + 0.001, offset);
-    expect(Math.hypot(before.x - after.x, before.y - after.y)).toBeLessThan(
-      0.1,
-    );
+test('six genuine engineering exhibits render without invisible legacy SVGs', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('./#projets');
+  for (const name of [
+    'vision',
+    'interface',
+    'cloud',
+    'delivery',
+    'scan',
+    'observability',
+  ]) {
+    await expect(page.locator(`[data-demo="${name}"] [data-lab="${name}"]`)).toHaveCount(1);
   }
+  await expect(page.locator('.lab-compatibility-scene')).toHaveCount(0);
+  await expect(page.locator('.lab-blueprint')).toHaveCount(6);
+});
+
+test('manager visual follows the edited value and the last applied configuration', async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('./#projet/securispot');
+  const dialog = page.getByRole('dialog');
+  const demo = dialog.locator('[data-demo="interface"]');
+  const slider = demo.getByRole('slider', { name: 'Taille de la zone' });
+  await slider.fill('80');
+  await expect(demo.locator('.lab-manager-feed')).toContainText('ROI 01 · 80%');
+  await expect(demo.locator('.lab-config-state')).toContainText(
+    'Modification non appliquée',
+  );
+  await demo.getByRole('button', { name: 'Appliquer', exact: true }).click();
+  await expect(demo.locator('.lab-config-state')).toContainText(
+    'Configuration active : 80%',
+  );
 });
 
 test('simulation, active diagram and pause share one persistent clock', async ({
