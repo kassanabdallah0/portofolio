@@ -123,7 +123,7 @@ function Vision({ stage, running }: Props) {
         <div className="lab-code-label">MÉTADONNÉES / INTERPROCESSUS</div>
         <div className="lab-code-lines"><span>frame_id <b>01847</b></span><span>class <b>person</b></span><span>track_id <b>01</b></span><span>bbox <b>[x, y, w, h]</b></span></div>
         <div className="lab-code-label">VALIDATION TEMPORELLE</div>
-        <div className="lab-observations" aria-label="Illustration des observations de suivi">
+        <div className="lab-observations" role="img" aria-label="Illustration des observations de suivi">
           {Array.from({ length: 10 }, (_, i) =>
             <span key={i} className={i < (stage + 1) * 2 ? 'is-confirmed' : ''} />
           )}
