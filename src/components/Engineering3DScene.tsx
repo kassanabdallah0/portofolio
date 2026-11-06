@@ -77,7 +77,7 @@ function CameraRig({ position = [-1.65, 3.25, -1.85] }: { position?: [number, nu
   );
 }
 
-function Worker({ mode, running }: { mode: 'scan' | 'vision'; running: boolean }) {
+function Worker({ mode, running, detection = false }: { mode: 'scan' | 'vision'; running: boolean; detection?: boolean }) {
   const root = useRef<THREE.Group>(null);
   const leftArm = useRef<THREE.Group>(null);
   const rightArm = useRef<THREE.Group>(null);
@@ -109,6 +109,13 @@ function Worker({ mode, running }: { mode: 'scan' | 'vision'; running: boolean }
       <mesh position={[0, 2.29, 0]} castShadow><sphereGeometry args={[0.205, 18, 14]} /><meshStandardMaterial color="#ba8667" roughness={0.82} /></mesh>
       <mesh position={[0, 2.49, 0]} scale={[1.08, 0.65, 1]} castShadow><sphereGeometry args={[0.236, 18, 14]} /><meshStandardMaterial color="#f1c56b" roughness={0.46} /></mesh>
       <mesh position={[0, 2.42, 0.145]} scale={[1, 0.16, 0.53]}><cylinderGeometry args={[0.27, 0.27, 0.12, 24]} /><meshStandardMaterial color="#f4d589" /></mesh>
+      {detection && (
+        <mesh position={[0,1.38,0]}>
+          <boxGeometry args={[0.96,2.85,0.8]} />
+          <meshBasicMaterial color="#79d9e8" transparent opacity={0.22}
+            wireframe depthWrite={false} />
+        </mesh>
+      )}
       {[-1, 1].map((side) => (
         <group key={side}>
           <group ref={side < 0 ? leftArm : rightArm} position={[side * 0.37, 1.91, 0]}>
@@ -229,15 +236,9 @@ function Workshop({stage,running}:{stage:number;running:boolean}){
       ))}
       <mesh position={[0,0.024,0.95]} rotation={[-Math.PI/2,0,0]}><planeGeometry args={[3.9,2.5]}/><meshBasicMaterial color="#f1b96a" transparent opacity={0.15}/></mesh>
       <mesh position={[0,0.037,0.95]} rotation={[-Math.PI/2,0,0]}><ringGeometry args={[1.05,1.10,40]}/><meshBasicMaterial color="#f3c476"/></mesh>
-      <Worker mode="vision" running={running}/>
+      <Worker mode="vision" running={running} detection={stage>=1}/>
       <CameraRig position={[-2.0,3.15,-2.1]}/>
       <DeviceBox position={[3.55,0.46,1.5]} size={[1.05,0.42,0.82]}/>
-      {stage>=1 && (
-        <mesh position={[-0.48,1.35,0.95]} >
-          <boxGeometry args={[1.2,2.75,1.0]}/>
-          <meshBasicMaterial color="#79d9e8" transparent opacity={0.22} wireframe depthWrite={false}/>
-        </mesh>
-      )}
       {stage===4 && (
         <group position={[3.4,0.86,1.5]}>
           <mesh><cylinderGeometry args={[0.12,0.14,0.29,18]}/><meshBasicMaterial color="#eaa24c"/></mesh>
@@ -298,6 +299,7 @@ function Tree({x,z}:{x:number;z:number}){
 function NetworkPulse({ running, selectedBus }: { running: boolean; selectedBus: number }) {
   const packet = useRef<THREE.Group>(null);
   const connection = useRef<THREE.Line>(null);
+  const lineObject = useMemo(() => new THREE.Line(), []);
   const seconds = useRef(0);
   const route = useMemo(() => new THREE.CatmullRomCurve3([
     new THREE.Vector3(-3.55,0,1.95),new THREE.Vector3(-1.75,0,2.2),
@@ -333,12 +335,12 @@ function NetworkPulse({ running, selectedBus }: { running: boolean; selectedBus:
   });
   return (
     <group>
-      <line ref={connection} frustumCulled={false}>
+      <primitive object={lineObject} ref={connection} frustumCulled={false}>
         <bufferGeometry>
           <bufferAttribute attach="attributes-position" args={[new Float32Array(29*3),3]} />
         </bufferGeometry>
         <lineBasicMaterial color="#9bdce8" transparent opacity={.67} depthWrite={false} />
-      </line>
+      </primitive>
       <group ref={packet}>
         <mesh><sphereGeometry args={[0.12,12,10]}/><meshBasicMaterial color="#b9f7e5"/></mesh>
       </group>
