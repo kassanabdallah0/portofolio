@@ -28,7 +28,7 @@ const steps: Record<DemoType, string[]> = {
 
 function SignalPath({ type, stage }: { type: DemoType; stage: number }) {
   return (
-    <div className="lab-signal" aria-label="Étapes du système">
+    <div className="lab-signal" role="group" aria-label="Étapes du système">
       {steps[type].map((label, index) => (
         <div key={label} className={'lab-signal-step ' + (index === stage ? 'is-current' : index < stage ? 'is-complete' : '')}>
           <span className="lab-signal-index">{String(index + 1).padStart(2, '0')}</span>
