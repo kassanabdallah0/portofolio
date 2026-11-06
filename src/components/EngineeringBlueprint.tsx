@@ -8,6 +8,7 @@ type Props = {
   stage: number;
   running: boolean;
   sensitivity: number;
+  applied: number;
   selectedBus: number;
   rollback: boolean;
   restored: boolean;
@@ -18,7 +19,7 @@ const steps: Record<DemoType, string[]> = {
   vision: ['Caméra', 'YOLO · TRT', 'Suivi', 'FIFO · règles', 'Alerte'],
   interface: ['React', 'REST', 'Flask', 'Jetson', 'Accusé'],
   cloud: ['Routeur', 'VPN', 'Services AWS', 'Portail · rapports'],
-  delivery: ['Tag Git', 'Tests CI', 'Contrôle local', 'Activation', 'Santé / repli'],
+  delivery: ['Tag Git', 'Tests · Registry', 'Contrôle Jetson', 'Activation', 'Santé / repli'],
   scan: ['Stabiliser', 'Acquérir', 'Valider', 'Afficher'],
   observability: ['Journaux', 'Logstash', 'Cluster ES', 'Kibana'],
 };
@@ -86,7 +87,7 @@ function IndustrialView({ stage, running, scan = false }: { stage: number; runni
         <path d={scan ? 'M197 265L290 194L369 194L453 265Z' : 'M227 283L277 199L445 199L504 283Z'}
           fill={scan ? '#82c0dc19' : '#e7b7631d'} stroke={scan ? '#8dd7f5' : '#ffca81'}
           strokeWidth="2" strokeDasharray="8 7" />
-        <g className={scan ? 'lab-worker-static' : 'lab-worker-track'}>
+        <g data-person="true" className={scan ? 'lab-worker-static' : 'lab-worker-track'}>
           <Worker x={scan ? 322 : 329} y={scan ? 250 : 258} />
           <rect x={scan ? 292 : 300} y={scan ? 145 : 154} width="60" height="113"
             fill="none" stroke={stage >= 1 ? '#91e8d4' : '#9cd7f0'} strokeWidth="2" rx="4" />
@@ -134,10 +135,10 @@ function Vision({ stage, running }: Props) {
   );
 }
 
-function Manager({ stage, sensitivity, pending }: Props) {
+function Manager({ stage, sensitivity, applied, pending }: Props) {
   return (
     <div className="lab-manager-app">
-      <div className="lab-app-header"><span className="lab-app-mark">S</span><strong>SecuriSPOT <em>Manager</em></strong><span className="lab-app-status"><i className="lab-online-dot" /> JETSON CONNECTÉ · SIMULATION</span></div>
+      <div className="lab-app-header"><span className="lab-app-mark">S</span><strong>SecuriSPOT <em>Manager</em></strong><span className="lab-app-status"><i className="lab-online-dot" /> JETSON SIMULÉ · HORS LIGNE</span></div>
       <div className="lab-manager-shell">
         <aside className="lab-app-sidebar">
           <span className="is-selected">◉ &nbsp; Vue caméra</span><span>▧ &nbsp; Zones</span><span>▤ &nbsp; Alarmes</span><span>⌁ &nbsp; Équipement</span>
@@ -157,7 +158,7 @@ function Manager({ stage, sensitivity, pending }: Props) {
                 stroke="#8fe1f2" strokeWidth="2" strokeDasharray="7 4" fill="#7bc7ec1e" rx="3" />
               <g fill="#cfeaf1" fontFamily="monospace" fontSize="10"><text x="15" y="18">CAM-01 · ZONE CONFIGURABLE</text><text x="322" y="217">1280 × 720</text></g>
             </svg>
-            <div className="lab-feed-corner">ROI 01 · {sensitivity}%</div>
+            <div className="lab-feed-corner">ROI 01 · {sensitivity}% {applied !== sensitivity ? '· MODIFIÉE' : ''}</div>
           </div>
         </div>
         <aside className="lab-config-pane">
@@ -168,7 +169,7 @@ function Manager({ stage, sensitivity, pending }: Props) {
           <div className="lab-setting"><span>Règles</span><b>Actives</b></div>
           <div className="lab-setting"><span>API</span><b>Flask · REST</b></div>
           <div className={'lab-config-state ' + (pending ? 'is-pending' : stage === 4 ? 'is-valid' : '')}>
-            {pending ? 'Transmission simulée…' : stage === 4 ? 'Configuration confirmée' : 'Prêt à configurer'}
+            {pending ? 'Transmission simulée…' : applied === sensitivity ? 'Configuration active : ' + applied + '%' : 'Modification non appliquée'}
           </div>
           <small>Le curseur et le bouton sous cette illustration modifient cet exemple.</small>
         </aside>
@@ -223,8 +224,8 @@ function Cloud({ selectedBus, stage }: Props) {
 
 function Delivery({ stage, rollback, restored }: Props) {
   const status = (index: number) => index < stage ? 'TERMINÉ' : index === stage ? 'EN COURS' : 'EN ATTENTE';
-  const titles = ['01 · Tag Git', '02 · GitLab CI', '03 · Registry', '04 · Jetson', '05 · Health'];
-  const descriptions = ['Version identifiée', 'Jest + pytest', 'Image Docker', 'Commande locale', 'Smoke tests'];
+  const titles = ['01 · Tag Git', '02 · GitLab CI / Registry', '03 · Contrôles Jetson', '04 · Activation', '05 · Health'];
+  const descriptions = ['Version identifiée', 'Tests + image Docker', 'Commande locale + prérequis', 'Mise à jour contrôlée', 'Smoke tests / repli'];
   return (
     <div className="lab-release-layout">
       <div className="lab-release-header"><div><span className="lab-code-label">CHAÎNE DE LIVRAISON</span><strong>Release contrôlée</strong></div><span className="lab-release-version">v1.2.4 · EXEMPLE</span></div>
@@ -237,9 +238,9 @@ function Delivery({ stage, rollback, restored }: Props) {
       <div className="lab-release-bottom">
         <div className="lab-release-terminal"><div><i /><i /><i /> <span>JETSON · CONTRÔLES LOCAUX</span></div>
           <code>$ verify --camera --models --health</code>
-          <code>✓ Caméra RealSense / USB</code>
-          <code>✓ Images et modèles disponibles</code>
-          <code className={rollback ? 'is-warning' : ''}>{rollback ? '↺ Health check dégradé · retour en cours' : '✓ Tests et vérifications applicatives'}</code>
+          <code>• Caméra RealSense / USB</code>
+          <code>• Images et modèles à vérifier</code>
+          <code className={rollback ? 'is-warning' : ''}>{rollback ? '↺ Health check dégradé · retour en cours' : '• Tests et vérifications applicatives'}</code>
         </div>
         <div className={'lab-release-outcome ' + (rollback ? 'is-rollback' : '')}>
           <span>ÉTAT DU DÉPLOIEMENT</span><strong>{rollback ? (restored ? 'Service restauré' : 'Retour à la version stable') : 'Activation contrôlée'}</strong>
