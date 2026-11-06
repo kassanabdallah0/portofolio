@@ -57,7 +57,7 @@ export default function EngineeringStory3D({ mode, stage, running, selectedBus, 
     }
   });
   if (!supported) {
-    return <div className="lab-3d-unsupported" data-renderer="2d" aria-label="Illustration de secours">{fallback}</div>;
+    return <div className="lab-3d-unsupported" role="group" data-renderer="2d" aria-label="Illustration de secours">{fallback}</div>;
   }
 
   const item = spec[mode];
