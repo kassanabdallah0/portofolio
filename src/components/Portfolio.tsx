@@ -1,11 +1,10 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { motion, MotionConfig, useReducedMotion } from 'motion/react';
 import {
   ArrowDown,
-  ArrowRight,
   ArrowUpRight,
   BrainCircuit,
   Check,
@@ -23,6 +22,7 @@ import {
 } from 'lucide-react';
 import {
   expertise,
+  featuredProjectSlugs,
   approach,
   impact,
   navigation,
@@ -51,10 +51,10 @@ function Reveal({
     <motion.div
       className={className}
       initial={{ y: 0 }}
-      whileInView={{ y: [reduced ? 0 : 16, 0] }}
+      whileInView={{ y: [reduced ? 0 : 8, 0] }}
       viewport={{ once: true, amount: 0.12 }}
       transition={{
-        duration: reduced ? 0 : 0.65,
+        duration: reduced ? 0 : 0.35,
         delay,
         ease: [0.2, 0.7, 0.3, 1],
       }}
@@ -198,7 +198,7 @@ function Navigation() {
           </a>
         </nav>
         <a href="#contact" className="nav-contact">
-          Parlons de votre projet <ArrowUpRight size={15} />
+          Me contacter <ArrowUpRight size={15} />
         </a>
         <button
           ref={toggle}
@@ -324,18 +324,27 @@ function ProjectDialog({
             <p className="project-category">{project.label}</p>
             <h2 id="project-dialog-title">{project.title}</h2>
             <p className="dialog-subtitle">{project.subtitle}</p>
+            <h3>Le contexte</h3>
+            <p>{project.context}</p>
             <div className="project-role">
               <span>MON RÔLE</span>
               <p>{project.role}</p>
             </div>
-            <EngineeringDemo key={project.slug} type={project.visual} />
+            <div className="result-block">
+              <p className="eyebrow">RÉSULTAT SUR LE TERRAIN</p>
+              <p>{project.result}</p>
+            </div>
+            <p className="scope-note">{project.scope}</p>
+            <EngineeringDemo
+              key={project.slug}
+              type={project.visual}
+              presentation="full"
+            />
             <div className="tag-list">
               {project.tags.map((tag) => (
                 <span key={tag}>{tag}</span>
               ))}
             </div>
-            <h3>Le contexte</h3>
-            <p>{project.context}</p>
             <div className="decision-block">
               <span className="eyebrow">LE CHOIX TECHNIQUE</span>
               <p>{project.decision}</p>
@@ -346,11 +355,6 @@ function ProjectDialog({
                 <li key={item}>{item}</li>
               ))}
             </ul>
-            <div className="result-block">
-              <p className="eyebrow">RÉSULTAT SUR LE TERRAIN</p>
-              <p>{project.result}</p>
-            </div>
-            <p className="scope-note">{project.scope}</p>
             <div className="dialog-bottom">
               <span>
                 <span className="status-dot muted" /> Code professionnel non
@@ -420,9 +424,8 @@ function Contact() {
               <span>plus intelligents.</span>
             </h2>
             <p className="contact-description">
-              Une application métier, une plateforme cloud ou un système de
-              vision embarquée ? Parlons de ce que nous pouvons construire
-              ensemble.
+              Vous recrutez un ingénieur logiciel avec une expérience en cloud
+              et en IA embarquée ? Échangeons sur votre équipe et vos projets.
             </p>
             <div className="email-row">
               <a href={`mailto:${profile.email}`} className="email-link">
@@ -446,6 +449,13 @@ function Contact() {
               {copied}
             </p>
             <div className="contact-actions">
+              <a
+                className="social-link"
+                href={profile.cv}
+                download={profile.cvFilename}
+              >
+                <Download size={18} /> Télécharger le CV
+              </a>
               <a
                 className="social-link"
                 href={profile.github}
@@ -540,7 +550,15 @@ export default function Portfolio() {
     code: Code2,
     network: Network,
   };
-  const filtered = projects.filter(
+  const orderedProjects = [
+    ...featuredProjectSlugs.map((slug) =>
+      projects.find((project) => project.slug === slug)!,
+    ),
+    ...projects.filter(
+      (project) => !featuredProjectSlugs.some((slug) => slug === project.slug),
+    ),
+  ];
+  const filtered = orderedProjects.filter(
     (project) => filter === 'all' || project.category === filter,
   );
 
@@ -560,31 +578,26 @@ export default function Portfolio() {
                 ABDALLAH KASSAN / INGÉNIEUR UTT
               </p>
               <motion.h1 initial={{ opacity: 1 }} animate={{ opacity: 1 }}>
-                <span>Ingénieur Logiciel.</span>
-                <span>
-                  Systèmes
-                  <br className="medium-break" /> Intelligents.
-                </span>
-                <span className="accent-text">IA Embarquée.</span>
+                <span>Ingénieur logiciel</span>
+                <span className="hero-specialism">· IA embarquée</span>
               </motion.h1>
-              <p className="hero-specialties">
-                Full Stack <span>/</span> Backend <span>/</span> Cloud{' '}
-                <span>/</span> Edge AI
-              </p>
               <p className="hero-description">
-                Des interfaces React aux services AWS, jusqu’à la vision sur
-                NVIDIA Jetson : je conçois, livre et maintiens des logiciels qui
-                fonctionnent sur le terrain.
+                Je développe des applications, des services cloud et des
+                systèmes de vision embarquée, du besoin utilisateur à la
+                production.
               </p>
               <div className="hero-actions">
                 <MagneticLink href="#projets" className="button button-primary">
                   Explorer mes projets
                   <ArrowUpRight size={18} />
                 </MagneticLink>
-                <MagneticLink href="#contact" className="button button-quiet">
-                  Me contacter
-                  <ArrowRight size={16} />
-                </MagneticLink>
+                <a
+                  href={profile.cv}
+                  download={profile.cvFilename}
+                  className="button button-quiet"
+                >
+                  Télécharger mon CV <Download size={16} />
+                </a>
               </div>
               <p className="availability">
                 <span className="status-dot" />
@@ -593,11 +606,11 @@ export default function Portfolio() {
             </div>
             <CoreVisual suspended={Boolean(selectedProject)} />
             <div className="hero-bottom">
-              <a href="#a-propos" className="scroll-link">
+              <a href="#projets" className="scroll-link">
                 <span className="scroll-icon">
                   <ArrowDown size={15} />
                 </span>
-                DÉCOUVRIR MON UNIVERS
+                DÉCOUVRIR MES RÉALISATIONS
               </a>
               <span className="hero-location">
                 <MapPin size={13} />
@@ -643,9 +656,237 @@ export default function Portfolio() {
           </div>
         </section>
 
+        <section
+          id="projets"
+          className="section section-anchor projects-section"
+        >
+          <div className="container">
+            <SectionLabel number="01">PROJETS SÉLECTIONNÉS</SectionLabel>
+            <Reveal className="section-heading-row">
+              <h2>
+                Des idées aux
+                <br />
+                <span className="muted-heading">systèmes fonctionnels.</span>
+              </h2>
+              <p>
+                Six réalisations, de l’interface à l’exploitation.
+                <br />
+                Mon rôle, mes choix et leurs effets sur le terrain.
+              </p>
+            </Reveal>
+            <div
+              className="project-filters"
+              role="group"
+              aria-label="Filtrer les projets"
+            >
+              {[
+                ['all', 'Tous les projets'],
+                ['vision', 'Vision & IA'],
+                ['logiciel', 'Logiciel'],
+                ['cloud', 'Cloud & systèmes'],
+                ['operations', 'Données & exploitation'],
+              ].map(([value, label]) => (
+                <button
+                  key={value}
+                  type="button"
+                  aria-pressed={filter === value}
+                  onClick={() => setFilter(value)}
+                >
+                  {label}
+                  {filter === value && <span className="filter-dot" />}
+                </button>
+              ))}
+            </div>
+            <p className="sr-only" role="status">
+              {filtered.length} projets affichés
+            </p>
+            <div
+              className={`projects-grid ${filter === 'all' ? 'curated-grid' : ''}`}
+            >
+              {filtered.map((project, index) => (
+                <Fragment key={project.slug}>
+                  {filter === 'all' &&
+                    (index === 0 || index === featuredProjectSlugs.length) && (
+                      <p className="project-group-label">
+                        {index === 0
+                          ? 'Trois projets pour découvrir mon travail'
+                          : 'Fiabilité, interfaces et exploitation'}
+                        <span>
+                          {index === 0
+                            ? 'LOGICIEL · VISION · CLOUD'
+                            : 'AUTRES RÉALISATIONS'}
+                        </span>
+                      </p>
+                    )}
+                  <Reveal
+                    className={`project-card project-${project.visual} ${featuredProjectSlugs.some((slug) => slug === project.slug) ? 'project-featured' : 'project-secondary'}`}
+                  >
+                    <div className="project-demonstration">
+                      <EngineeringDemo
+                        type={project.visual}
+                        presentation="preview"
+                      />
+                    </div>
+                    <div className="project-info">
+                      <div className="project-meta">
+                        <span className="project-category">
+                          {project.label}
+                        </span>
+                        <span className="project-number">
+                          /{project.number}
+                        </span>
+                      </div>
+                      <h3>
+                        <button
+                          type="button"
+                          className="project-subtitle"
+                          aria-label={`Voir le projet : ${project.subtitle}`}
+                          onClick={() => {
+                            window.location.hash = `projet/${project.slug}`;
+                          }}
+                        >
+                          {project.subtitle}
+                          <ArrowUpRight size={14} />
+                        </button>
+                      </h3>
+                      <p className="project-description">
+                        {project.description}
+                      </p>
+                      <div className="project-metric">
+                        <strong>{project.metric.value}</strong>
+                        <div>
+                          <span>{project.metric.label}</span>
+                          <p>{project.metric.note}</p>
+                        </div>
+                      </div>
+                      <div className="tag-list">
+                        {project.tags.slice(0, 4).map((tag) => (
+                          <span key={tag}>{tag}</span>
+                        ))}
+                      </div>
+                      <button
+                        className="project-detail-link"
+                        onClick={() => {
+                          window.location.hash = `projet/${project.slug}`;
+                        }}
+                      >
+                        Explorer l’étude de cas <ArrowUpRight size={17} />
+                        <span className="sr-only"> : {project.subtitle}</span>
+                      </button>
+                    </div>
+                  </Reveal>
+                </Fragment>
+              ))}
+            </div>
+            <div className="projects-note">
+              <p>
+                Projets professionnels réalisés chez Fastpoint ·
+                2024–aujourd’hui.
+                <br />
+                Contributions, résultats et périmètre détaillés dans chaque
+                étude de cas.
+              </p>
+              <a
+                href={profile.github}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Github size={17} />
+                Retrouvez-moi sur GitHub
+                <ArrowUpRight size={14} />
+              </a>
+            </div>
+          </div>
+        </section>
+
+        <section
+          id="parcours"
+          className="section section-anchor experience-section"
+        >
+          <div className="container">
+            <SectionLabel number="02">PARCOURS</SectionLabel>
+            <div className="experience-layout">
+              <Reveal className="experience-intro">
+                <h2>
+                  Une progression
+                  <br />
+                  guidée par
+                  <br />
+                  <span className="muted-heading">l’ingénierie.</span>
+                </h2>
+                <p>
+                  Apprendre, construire, confronter
+                  <br />
+                  les idées à la réalité.
+                </p>
+                <a
+                  href={profile.cv}
+                  download={profile.cvFilename}
+                  className="text-link"
+                >
+                  Mon CV de référence
+                  <Download size={16} />
+                </a>
+                <div className="education-note">
+                  <BrainCircuit size={22} />
+                  <div>
+                    <strong>Continuer à apprendre.</strong>
+                    <p>
+                      Certificat professionnel et spécialisation TensorFlow sur
+                      Coursera.
+                    </p>
+                  </div>
+                </div>
+                <div className="language-note">
+                  <span className="eyebrow">LANGUES DE TRAVAIL</span>
+                  <p>
+                    Français <span>Professionnel</span>
+                  </p>
+                  <p>
+                    Anglais <span>Professionnel</span>
+                  </p>
+                  <p>
+                    Arabe <span>Langue maternelle</span>
+                  </p>
+                </div>
+              </Reveal>
+              <div className="timeline">
+                {timeline.map((item) => (
+                  <Reveal
+                    className={`timeline-item ${item.current ? 'is-current' : ''}`}
+                    key={item.organization}
+                  >
+                    <span className="timeline-dot" />
+                    <p className="timeline-organization">{item.organization}</p>
+                    <h3>{item.title}</h3>
+                    <p className="timeline-date">
+                      {item.date}
+                      {item.current && <span>ACTUEL</span>}
+                    </p>
+                    <p className="timeline-location">{item.location}</p>
+                    <p className="timeline-description">{item.description}</p>
+                    {item.current && (
+                      <div className="experience-evidence">
+                        <span>React / TypeScript</span>
+                        <span>Python / Node.js</span>
+                        <span>AWS / Jetson</span>
+                        <p>
+                          Releases adaptées aux installations COLAS, IDEA et
+                          SNCF. Diagnostic à distance, tests automatisés et
+                          maintien en production.
+                        </p>
+                      </div>
+                    )}
+                  </Reveal>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
         <section id="a-propos" className="section section-anchor about-section">
           <div className="container">
-            <SectionLabel number="01">À PROPOS</SectionLabel>
+            <SectionLabel number="03">À PROPOS</SectionLabel>
             <div className="about-layout">
               <Reveal className="about-copy">
                 <h2>
@@ -704,7 +945,7 @@ export default function Portfolio() {
           className="section section-anchor expertise-section"
         >
           <div className="container">
-            <SectionLabel number="02">EXPERTISE</SectionLabel>
+            <SectionLabel number="04">EXPERTISE</SectionLabel>
             <Reveal className="section-heading-row">
               <h2>
                 De l’algorithme
@@ -750,130 +991,11 @@ export default function Portfolio() {
         </section>
 
         <section
-          id="projets"
-          className="section section-anchor projects-section"
-        >
-          <div className="container">
-            <SectionLabel number="03">PROJETS SÉLECTIONNÉS</SectionLabel>
-            <Reveal className="section-heading-row">
-              <h2>
-                Des idées aux
-                <br />
-                <span className="muted-heading">systèmes fonctionnels.</span>
-              </h2>
-              <p>
-                Six réalisations, de l’interface à l’exploitation.
-                <br />
-                Mon rôle, mes choix et leurs effets sur le terrain.
-              </p>
-            </Reveal>
-            <div
-              className="project-filters"
-              role="group"
-              aria-label="Filtrer les projets"
-            >
-              {[
-                ['all', 'Tous les projets'],
-                ['vision', 'Vision & IA'],
-                ['logiciel', 'Logiciel'],
-                ['cloud', 'Cloud & systèmes'],
-                ['operations', 'Données & exploitation'],
-              ].map(([value, label]) => (
-                <button
-                  key={value}
-                  type="button"
-                  aria-pressed={filter === value}
-                  onClick={() => setFilter(value)}
-                >
-                  {label}
-                  {filter === value && <span className="filter-dot" />}
-                </button>
-              ))}
-            </div>
-            <p className="sr-only" role="status">
-              {filtered.length} projets affichés
-            </p>
-            <div
-              className={`projects-grid ${filter === 'all' ? 'curated-grid' : ''}`}
-            >
-              {filtered.map((project) => (
-                <Reveal
-                  key={project.slug}
-                  className={`project-card project-${project.visual}`}
-                >
-                  <div className="project-demonstration">
-                    <EngineeringDemo type={project.visual} />
-                  </div>
-                  <div className="project-info">
-                    <div className="project-meta">
-                      <span className="project-category">{project.label}</span>
-                      <span className="project-number">/{project.number}</span>
-                    </div>
-                    <button
-                      type="button"
-                      className="project-subtitle"
-                      aria-label={`Voir le projet : ${project.subtitle}`}
-                      onClick={() => {
-                        window.location.hash = `projet/${project.slug}`;
-                      }}
-                    >
-                      {project.subtitle}
-                      <ArrowUpRight size={14} />
-                    </button>
-                    <h3>{project.title}</h3>
-                    <p className="project-description">{project.description}</p>
-                    <div className="project-metric">
-                      <strong>{project.metric.value}</strong>
-                      <div>
-                        <span>{project.metric.label}</span>
-                        <p>{project.metric.note}</p>
-                      </div>
-                    </div>
-                    <div className="tag-list">
-                      {project.tags.map((tag) => (
-                        <span key={tag}>{tag}</span>
-                      ))}
-                    </div>
-                    <button
-                      className="project-detail-link"
-                      onClick={() => {
-                        window.location.hash = `projet/${project.slug}`;
-                      }}
-                    >
-                      Explorer l’étude de cas <ArrowUpRight size={17} />
-                      <span className="sr-only"> : {project.subtitle}</span>
-                    </button>
-                  </div>
-                </Reveal>
-              ))}
-            </div>
-            <div className="projects-note">
-              <p>
-                Projets professionnels réalisés chez Fastpoint ·
-                2024–aujourd’hui.
-                <br />
-                Contributions, résultats et périmètre détaillés dans chaque
-                étude de cas.
-              </p>
-              <a
-                href={profile.github}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Github size={17} />
-                Retrouvez-moi sur GitHub
-                <ArrowUpRight size={14} />
-              </a>
-            </div>
-          </div>
-        </section>
-
-        <section
           id="technologies"
           className="section section-anchor technologies-section"
         >
           <div className="container">
-            <SectionLabel number="04">TECHNOLOGIES</SectionLabel>
+            <SectionLabel number="05">TECHNOLOGIES</SectionLabel>
             <Reveal className="section-heading-row">
               <h2>
                 Les outils derrière
@@ -908,91 +1030,6 @@ export default function Portfolio() {
                   <p className="tech-note">{category.note}</p>
                 </Reveal>
               ))}
-            </div>
-          </div>
-        </section>
-
-        <section
-          id="parcours"
-          className="section section-anchor experience-section"
-        >
-          <div className="container">
-            <SectionLabel number="05">PARCOURS</SectionLabel>
-            <div className="experience-layout">
-              <Reveal className="experience-intro">
-                <h2>
-                  Une progression
-                  <br />
-                  guidée par
-                  <br />
-                  <span className="muted-heading">l’ingénierie.</span>
-                </h2>
-                <p>
-                  Apprendre, construire, confronter
-                  <br />
-                  les idées à la réalité.
-                </p>
-                <a
-                  href={profile.cv}
-                  download={profile.cvFilename}
-                  className="text-link"
-                >
-                  Mon CV de référence
-                  <Download size={16} />
-                </a>
-                <div className="education-note">
-                  <BrainCircuit size={22} />
-                  <div>
-                    <strong>Continuer à apprendre.</strong>
-                    <p>
-                      Certificat professionnel et spécialisation TensorFlow sur
-                      Coursera.
-                    </p>
-                  </div>
-                </div>
-                <div className="language-note">
-                  <span className="eyebrow">LANGUES DE TRAVAIL</span>
-                  <p>
-                    Français <span>Professionnel</span>
-                  </p>
-                  <p>
-                    Anglais <span>Professionnel</span>
-                  </p>
-                  <p>
-                    Arabe <span>Langue maternelle</span>
-                  </p>
-                </div>
-              </Reveal>
-              <div className="timeline">
-                {timeline.map((item) => (
-                  <Reveal
-                    className={`timeline-item ${item.current ? 'is-current' : ''}`}
-                    key={item.organization}
-                  >
-                    <span className="timeline-dot" />
-                    <p className="timeline-date">
-                      {item.date}
-                      {item.current && <span>ACTUEL</span>}
-                    </p>
-                    <h3>{item.title}</h3>
-                    <p className="timeline-organization">{item.organization}</p>
-                    <p className="timeline-location">{item.location}</p>
-                    <p className="timeline-description">{item.description}</p>
-                    {item.current && (
-                      <div className="experience-evidence">
-                        <span>React / TypeScript</span>
-                        <span>Python / Node.js</span>
-                        <span>AWS / Jetson</span>
-                        <p>
-                          Releases adaptées aux installations COLAS, IDEA et
-                          SNCF. Diagnostic à distance, tests automatisés et
-                          maintien en production.
-                        </p>
-                      </div>
-                    )}
-                  </Reveal>
-                ))}
-              </div>
             </div>
           </div>
         </section>

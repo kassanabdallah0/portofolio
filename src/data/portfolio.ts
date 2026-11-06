@@ -13,11 +13,17 @@ export const profile = {
 
 export const navigation = [
   ['accueil', 'Accueil'],
+  ['projets', 'Projets'],
+  ['parcours', 'Parcours'],
   ['a-propos', 'À propos'],
   ['expertise', 'Expertise'],
-  ['projets', 'Projets'],
   ['technologies', 'Technologies'],
-  ['parcours', 'Parcours'],
+] as const;
+
+export const featuredProjectSlugs = [
+  'securispot',
+  'jetson-vision',
+  'mediaspot',
 ] as const;
 
 export type Project = {
@@ -51,7 +57,7 @@ export const projects: Project[] = [
     label: 'VISION & IA EMBARQUÉE',
     visual: 'vision',
     description:
-      'De la caméra à la décision : un pipeline de vision optimisé sur NVIDIA Jetson pour la sécurité industrielle.',
+      'J’intègre et optimise le pipeline de vision sur NVIDIA Jetson, du traitement vidéo aux règles de confirmation des alertes.',
     tags: ['Python', 'YOLO', 'TensorRT', 'NVIDIA Jetson'],
     role: 'Intégration IA, backend multiprocessus et optimisation du pipeline',
     decision:
@@ -89,7 +95,7 @@ export const projects: Project[] = [
     label: 'INGÉNIERIE LOGICIELLE',
     visual: 'interface',
     description:
-      'Une interface de configuration et de supervision qui donne aux utilisateurs la maîtrise de leurs équipements.',
+      'Je conçois et développe l’interface React et les API Flask pour configurer et superviser les équipements en autonomie.',
     tags: ['React', 'TypeScript', 'Flask', 'API REST'],
     role: 'Conception produit, UX/UI, développement frontend et backend',
     decision:
@@ -126,7 +132,7 @@ export const projects: Project[] = [
     label: 'CLOUD & SYSTÈMES CONNECTÉS',
     visual: 'cloud',
     description:
-      'Migration de 70 bus vers AWS, portail passagers et services de supervision construits pour l’exploitation.',
+      'Je migre les services de 70 bus vers AWS et développe le backend ainsi que le portail passagers React.',
     tags: ['Node.js', 'TypeScript', 'AWS', 'OpenVPN'],
     role: 'Migration cloud, architecture backend, réseau et portail React',
     decision:
