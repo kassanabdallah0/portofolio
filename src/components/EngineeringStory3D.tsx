@@ -1,7 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import type { PhysicalScene } from './Engineering3DScene';
 
 const Scene3D = dynamic(() => import('./Engineering3DScene'), {
@@ -14,6 +14,7 @@ type Props = {
   stage: number;
   running: boolean;
   selectedBus: number;
+  fallback: ReactNode;
 };
 
 const spec = {
@@ -40,7 +41,7 @@ const spec = {
   },
 };
 
-export default function EngineeringStory3D({ mode, stage, running, selectedBus }: Props) {
+export default function EngineeringStory3D({ mode, stage, running, selectedBus, fallback }: Props) {
   const [supported] = useState(() => {
     // This component only mounts after the client-side viewport/WebGL gate.
     // Resolve support once instead of creating a second render through an effect.
@@ -56,7 +57,7 @@ export default function EngineeringStory3D({ mode, stage, running, selectedBus }
     }
   });
   if (!supported) {
-    return <div className="lab-3d-unsupported" role="status">La scène 3D nécessite WebGL. Le schéma explicatif reste disponible ci-dessous.</div>;
+    return <div className="lab-3d-unsupported" data-renderer="2d" aria-label="Illustration de secours">{fallback}</div>;
   }
 
   const item = spec[mode];
