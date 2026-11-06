@@ -394,6 +394,7 @@ export default function Engineering3DScene({mode,stage,running,selectedBus}:Scen
       dpr={[1,1.4]}
       frameloop={running?'always':'demand'}
       gl={{alpha:false,antialias:true,powerPreference:'low-power',preserveDrawingBuffer:false}}
+      role="img"
       aria-label={mode==='scan'?'Reconstitution tridimensionnelle du scan EPI':mode==='cloud'?'Flotte de bus 3D et serveur OpenVPN sur AWS':'Atelier industriel et détection par caméra'}>
       <color attach="background" args={['#111f2b']}/>
       <fog attach="fog" args={['#111f2b',17,35]}/>
