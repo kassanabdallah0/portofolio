@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { ArrowRight, Check, Pause, Play, RotateCcw } from 'lucide-react';
 import { simulations, type DemoType } from '@/data/simulations';
 import EngineeringBlueprint from './EngineeringBlueprint';
@@ -12,8 +12,8 @@ import { useSimulation } from './useSimulation';
  */
 export default function EngineeringDemo({ type }: { type: DemoType }) {
   const root = useRef<HTMLDivElement>(null);
+  const controlId = useId();
   const trackedPerson = useRef<SVGGElement | null>(null);
-  const elapsed = useRef(0);
   const requestAt = useRef<number | null>(null);
   const requestValue = useRef(60);
   const confirmedUntil = useRef(0);
@@ -33,7 +33,6 @@ export default function EngineeringDemo({ type }: { type: DemoType }) {
   const [restored, setRestored] = useState(false);
 
   const draw = useCallback((seconds: number) => {
-    elapsed.current = seconds;
     const duration = type === 'vision' ? 18 : type === 'interface' ? 12 : 16;
     const phase = (seconds % duration) / duration;
     const stages = simulations[type].stages.length;
@@ -153,10 +152,10 @@ export default function EngineeringDemo({ type }: { type: DemoType }) {
 
       {type === 'interface' && (
         <div className="demo-interaction manager-controls">
-          <label htmlFor="manager-zone-size">
+          <label htmlFor={controlId}>
             Taille de zone <output>{sensitivity}%</output>
             <input
-              id="manager-zone-size"
+              id={controlId}
               aria-label="Taille de la zone"
               type="range"
               min="20"
