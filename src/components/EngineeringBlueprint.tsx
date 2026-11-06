@@ -1,6 +1,6 @@
 'use client';
 
-import type { CSSProperties } from 'react';
+import { useId, type CSSProperties } from 'react';
 import type { DemoType } from '@/data/simulations';
 
 type Props = {
@@ -53,6 +53,9 @@ function Worker({ x, y, accent = '#b7d7e4' }: { x: number; y: number; accent?: s
 }
 
 function IndustrialView({ stage, running, scan = false }: { stage: number; running: boolean; scan?: boolean }) {
+  const sceneId = useId().replace(/:/g, '');
+  const floorId = sceneId + '-floor';
+  const wallId = sceneId + '-wall';
   return (
     <div className={'lab-camera-view ' + (scan ? 'lab-camera-view--scan' : '')} data-motion={running ? 'running' : 'paused'}>
       <div className="lab-camera-toolbar">
@@ -62,16 +65,16 @@ function IndustrialView({ stage, running, scan = false }: { stage: number; runni
       <svg viewBox="0 0 640 315" className="lab-industrial-svg" role="img"
         aria-label={scan ? 'Scène de scan EPI illustrative, avec zone de positionnement' : 'Atelier industriel synthétique, personne suivie et zone de sécurité'}>
         <defs>
-          <linearGradient id={scan ? 'lab-floor-scan' : 'lab-floor-vision'} x1="0" y1="0" x2="0" y2="1">
+          <linearGradient id={floorId} x1="0" y1="0" x2="0" y2="1">
             <stop stopColor="#2d4554" />
             <stop offset="1" stopColor="#111d28" />
           </linearGradient>
-          <linearGradient id={scan ? 'lab-wall-scan' : 'lab-wall-vision'} x1="0" y1="0" x2="1" y2="1">
+          <linearGradient id={wallId} x1="0" y1="0" x2="1" y2="1">
             <stop stopColor="#3a5261" /><stop offset="1" stopColor="#192b39" />
           </linearGradient>
         </defs>
-        <rect width="640" height="315" fill={'url(#' + (scan ? 'lab-wall-scan' : 'lab-wall-vision') + ')'} />
-        <path d="M0 170L640 170V315H0Z" fill={'url(#' + (scan ? 'lab-floor-scan' : 'lab-floor-vision') + ')'} />
+        <rect width="640" height="315" fill={'url(#' + wallId + ')'} />
+        <path d="M0 170L640 170V315H0Z" fill={'url(#' + floorId + ')'} />
         <g stroke="#688393" strokeWidth="1" opacity=".24">
           <path d="M0 210H640M0 260H640M0 308H640M320 170L0 315M320 170L140 315M320 170L320 315M320 170L500 315M320 170L640 315" />
           <path d="M0 37H640M0 93H640" />
