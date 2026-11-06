@@ -1,7 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import type { PhysicalScene } from './Engineering3DScene';
 
 const Scene3D = dynamic(() => import('./Engineering3DScene'), {
@@ -41,21 +41,20 @@ const spec = {
 };
 
 export default function EngineeringStory3D({ mode, stage, running, selectedBus }: Props) {
-  const [supported, setSupported] = useState<boolean | null>(null);
-  useEffect(() => {
-    const canvas = document.createElement('canvas');
+  const [supported] = useState(() => {
+    // This component only mounts after the client-side viewport/WebGL gate.
+    // Resolve support once instead of creating a second render through an effect.
+    if (typeof document === 'undefined') return false;
     try {
-      const gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
-      setSupported(Boolean(gl));
-      // Release the short-lived probe context, preserving the real scene's GPU budget.
+      const probe = document.createElement('canvas');
+      const gl = probe.getContext('webgl2') || probe.getContext('webgl');
+      const available = Boolean(gl);
       gl?.getExtension('WEBGL_lose_context')?.loseContext();
+      return available;
     } catch {
-      setSupported(false);
+      return false;
     }
-  }, []);
-  if (supported === null) {
-    return <div className="lab-3d-loading" role="status">Préparation de l’illustration tridimensionnelle…</div>;
-  }
+  });
   if (!supported) {
     return <div className="lab-3d-unsupported" role="status">La scène 3D nécessite WebGL. Le schéma explicatif reste disponible ci-dessous.</div>;
   }
