@@ -4,6 +4,7 @@ import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { ArrowRight, Check, Pause, Play, RotateCcw } from 'lucide-react';
 import { orbit, simulations, type DemoType } from '@/data/simulations';
 import { useSimulation } from './useSimulation';
+import EngineeringBlueprint from './EngineeringBlueprint';
 
 function Person({ x = 0, y = 0 }: { x?: number; y?: number }) {
   return (
@@ -980,17 +981,30 @@ export default function EngineeringDemo({ type }: { type: DemoType }) {
           <span>{reduced ? 'Vue fixe' : paused ? 'Reprendre' : 'Pause'}</span>
         </button>
       </div>
-      <div className="demo-world">
-        <Scene
+      <div className="demo-world demo-world--blueprint">
+        <EngineeringBlueprint
           type={type}
-          id={id}
-          sensitivity={applied}
+          stage={stage}
+          running={running}
+          sensitivity={sensitivity}
           selectedBus={selectedBus}
           rollback={rollback}
           restored={restored}
-          stage={stage}
+          pending={pending}
         />
-        <div className="optical-reflection" aria-hidden="true" />
+        {/* Retain the established SVG clock and DOM instrumentation while the
+            richer visual scenes are progressively qualified. */}
+        <div className="lab-compatibility-scene" aria-hidden="true">
+          <Scene
+            type={type}
+            id={id}
+            sensitivity={applied}
+            selectedBus={selectedBus}
+            rollback={rollback}
+            restored={restored}
+            stage={stage}
+          />
+        </div>
       </div>
       {type === 'interface' && (
         <div className="demo-interaction manager-controls">
