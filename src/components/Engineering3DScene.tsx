@@ -130,19 +130,13 @@ function Worker({ mode, running }: { mode: 'scan' | 'vision'; running: boolean }
 /** Render a synthetic SCAN UI into an actual television screen texture. */
 function ScanScreen({ stage }: { stage: number }) {
   const texture = useMemo(() => {
+    // Construct the entire image before publishing it to React: no mutation of
+    // memoized hook return values in effects (React 19 immutability rule).
     const canvas = document.createElement('canvas');
     canvas.width = 640;
     canvas.height = 400;
-    const next = new THREE.CanvasTexture(canvas);
-    next.colorSpace = THREE.SRGBColorSpace;
-    next.anisotropy = 2;
-    return next;
-  }, []);
-
-  useEffect(() => {
-    const canvas = texture.image as HTMLCanvasElement;
     const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    if (!ctx) return null;
     const phases = ['POSITIONNEMENT', 'ACQUISITION', 'VALIDATION', 'RÉSULTAT'];
     ctx.fillStyle = '#0d1d2a'; ctx.fillRect(0, 0, 640, 400);
     ctx.fillStyle = '#173247'; ctx.fillRect(0, 0, 640, 57);
@@ -165,10 +159,14 @@ function ScanScreen({ stage }: { stage: number }) {
     }
     if (stage===3) {ctx.fillStyle='#a9e8ce';ctx.font='bold 17px Arial';ctx.fillText('✓ RESTITUTION',419,292);}
     ctx.fillStyle='#94b0bf';ctx.font='11px monospace';ctx.fillText('ÉCRAN SYNTHÉTIQUE • NON CONNECTÉ',25,387);
-    texture.needsUpdate=true;
-  }, [stage,texture]);
-  useEffect(()=>()=>texture.dispose(),[texture]);
+    const finished = new THREE.CanvasTexture(canvas);
+    finished.colorSpace = THREE.SRGBColorSpace;
+    finished.anisotropy = 2;
+    return finished;
+  }, [stage]);
+  useEffect(() => () => texture?.dispose(), [texture]);
 
+  if (!texture) return null;
   return (
     <mesh position={[0, 1.97, 0.168]}>
       <planeGeometry args={[2.58, 1.58]} />
