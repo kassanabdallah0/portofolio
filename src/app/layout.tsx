@@ -3,6 +3,7 @@ import '@fontsource-variable/space-grotesk';
 import '@fontsource-variable/inter';
 import '@fontsource-variable/jetbrains-mono';
 import './globals.css';
+import './refinements.css';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://kassanabdallah0.github.io'),
@@ -15,7 +16,7 @@ export const metadata: Metadata = {
     description:
       'De l’algorithme au monde réel. Logiciel, vision par ordinateur et systèmes embarqués.',
     url: '/portofolio/',
-    siteName: 'Abdallah Kassan · Ingénierie logicielle',
+    siteName: 'Abdallah Kassan · Neural Core',
     locale: 'fr_FR',
     type: 'website',
     images: [
@@ -31,7 +32,7 @@ export const metadata: Metadata = {
   icons: { icon: '/portofolio/favicon.svg' },
   robots: { index: true, follow: true },
 };
-export const viewport: Viewport = { themeColor: '#F6F7F8' };
+export const viewport: Viewport = { themeColor: '#06090F' };
 
 export default function RootLayout({
   children,
