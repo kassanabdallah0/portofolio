@@ -6,6 +6,24 @@ import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
+function SceneStatus({
+  onReady,
+  onUnavailable,
+}: {
+  onReady: () => void;
+  onUnavailable: () => void;
+}) {
+  const { gl } = useThree();
+  useEffect(() => {
+    const canvas = gl.domElement;
+    canvas.addEventListener('webglcontextlost', onUnavailable);
+    onReady();
+    // R3F intentionally loses its context during disposal. That is not a rendering failure.
+    return () => canvas.removeEventListener('webglcontextlost', onUnavailable);
+  }, [gl, onReady, onUnavailable]);
+  return null;
+}
+
 function Studio() {
   const { gl, scene } = useThree();
   useEffect(() => {
@@ -408,14 +426,11 @@ export default function HardwareScene({
       shadows
       camera={{ position: [3.9, 2.5, 7.6], fov: 30 }}
       gl={{ alpha: true, antialias: true, powerPreference: 'low-power' }}
-      onCreated={({ gl, camera }) => {
+      onCreated={({ camera }) => {
         camera.lookAt(0, 0.2, 0);
-        gl.domElement.addEventListener('webglcontextlost', onUnavailable, {
-          once: true,
-        });
-        onReady();
       }}
     >
+      <SceneStatus onReady={onReady} onUnavailable={onUnavailable} />
       <Studio />
       <ambientLight intensity={0.55} />
       <directionalLight
