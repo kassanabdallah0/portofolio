@@ -226,6 +226,7 @@ export default function ObservabilityScene({ stage, running }: Props) {
             <span>ILM</span>
           </div>
           <div
+            role="group"
             className="eng-index-lifecycle"
             aria-label="Les index sont conservés 180 jours, puis supprimés automatiquement"
           >
