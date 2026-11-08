@@ -5,6 +5,12 @@ import { ArrowRight, Check, Pause, Play, RotateCcw } from 'lucide-react';
 import { simulations, type DemoType } from '@/data/simulations';
 import EngineeringBlueprint from './EngineeringBlueprint';
 import { useSimulation } from './useSimulation';
+import {
+  scanState,
+  visionState,
+  deliveryState,
+  stageTimes,
+} from './engineering/animations/timelines';
 
 /**
  * Shared simulation controller. The project-specific view lives in
@@ -31,6 +37,8 @@ export default function EngineeringDemo({ type }: { type: DemoType }) {
   const [selectedBus, setSelectedBus] = useState(0);
   const [rollback, setRollback] = useState(false);
   const [restored, setRestored] = useState(false);
+  const [releaseCycle, setReleaseCycle] = useState(0);
+  const releaseCycleRef = useRef(0);
   const [desktop3D, setDesktop3D] = useState(false);
 
   useEffect(() => {
@@ -41,56 +49,98 @@ export default function EngineeringDemo({ type }: { type: DemoType }) {
     return () => media.removeEventListener('change', update);
   }, []);
 
-  const draw = useCallback((seconds: number) => {
-    const duration = type === 'vision' ? 18 : type === 'interface' ? 12 : 16;
-    const phase = (seconds % duration) / duration;
-    const stages = simulations[type].stages.length;
-    let next = Math.min(stages - 1, Math.floor(phase * stages));
-    let progress = (phase * stages) % 1;
+  const draw = useCallback(
+    (seconds: number) => {
+      const duration =
+        type === 'vision'
+          ? 30
+          : type === 'scan'
+            ? 32
+            : type === 'delivery'
+              ? 26
+              : type === 'interface'
+                ? 12
+                : 24;
+      const phase = (seconds % duration) / duration;
+      const stages = simulations[type].stages.length;
+      let next = Math.min(stages - 1, Math.floor(phase * stages));
+      let progress = (phase * stages) % 1;
+      if (type === 'scan') next = scanState(seconds).stage;
+      if (type === 'vision') next = visionState(seconds).stage;
+      if (type === 'delivery') next = deliveryState(seconds, rollback).stage;
 
-    if (type === 'interface') {
-      if (seconds < confirmedUntil.current) next = 4;
-      if (requestAt.current !== null) {
-        const age = seconds - requestAt.current;
-        next = Math.min(4, Math.floor(age / 0.65));
-        progress = (age / 0.65) % 1;
-        if (age >= 3.25) {
-          requestAt.current = null;
-          confirmedUntil.current = seconds + 2;
-          setApplied(requestValue.current);
-          setPending(false);
-          next = 4;
+      if (type === 'interface') {
+        if (seconds < confirmedUntil.current) next = 4;
+        if (requestAt.current !== null) {
+          const age = seconds - requestAt.current;
+          next = Math.min(4, Math.floor(age / 0.65));
+          progress = (age / 0.65) % 1;
+          if (age >= 3.25) {
+            requestAt.current = null;
+            confirmedUntil.current = seconds + 2;
+            setApplied(requestValue.current);
+            setPending(false);
+            next = 4;
+          }
         }
       }
-    }
 
-    if (type === 'delivery' && rollback && phase > 0.94 && !restoredRef.current) {
-      restoredRef.current = true;
-      setRestored(true);
-    }
+      if (type === 'delivery') {
+        const cycle = Math.floor(seconds / 26);
+        if (cycle !== releaseCycleRef.current) {
+          releaseCycleRef.current = cycle;
+          setReleaseCycle(cycle);
+        }
+        const complete = deliveryState(seconds, rollback).restored;
+        if (complete !== restoredRef.current) {
+          restoredRef.current = complete;
+          setRestored(complete);
+        }
+      }
 
-    root.current?.style.setProperty('--step-progress', String(progress));
-    if (root.current) root.current.dataset.simulationMs = String(Math.round(seconds * 1000));
-    if (next !== stageRef.current) {
-      stageRef.current = next;
-      setStage(next);
-    }
+      root.current?.style.setProperty('--step-progress', String(progress));
+      if (root.current)
+        root.current.dataset.simulationMs = String(Math.round(seconds * 1000));
+      if (next !== stageRef.current) {
+        stageRef.current = next;
+        setStage(next);
+      }
 
-    // Animate the REAL, visible industrial scene. The same clock drives stages,
-    // pause/resume, visibility suspension and the test-observable worker.
-    if (trackedPerson.current) {
-      const dx = type === 'scan' ? Math.sin(seconds * 0.34) * 5 : Math.sin(seconds * 0.52) * 32;
-      trackedPerson.current.setAttribute('transform', `translate(${dx.toFixed(2)} 0)`);
-    }
-  }, [type, rollback]);
+      // Animate the REAL, visible industrial scene. The same clock drives stages,
+      // pause/resume, visibility suspension and the test-observable worker.
+      if (trackedPerson.current) {
+        const dx =
+          type === 'scan'
+            ? Math.sin(seconds * 0.34) * 5
+            : Math.sin(seconds * 0.52) * 32;
+        trackedPerson.current.setAttribute(
+          'transform',
+          `translate(${dx.toFixed(2)} 0)`,
+        );
+      }
+    },
+    [type, rollback],
+  );
 
-  const { running, reduced, visible, time } = useSimulation(root, paused, draw);
+  const { running, reduced, visible, pageVisible, time, seek } = useSimulation(
+    root,
+    paused || inspected !== null,
+    draw,
+  );
   // Only a visible desktop exhibit owns a GPU context. A paused foreground
   // scene keeps its last frame; offscreen/dialog-obscured scenes are disposed.
-  const active3D = desktop3D && visible && !reduced && (running || paused);
+  const active3D =
+    desktop3D &&
+    visible &&
+    pageVisible &&
+    !reduced &&
+    (running || paused || inspected !== null);
   useEffect(() => {
-    trackedPerson.current = root.current?.querySelector<SVGGElement>('[data-person]') ?? null;
-    return () => { trackedPerson.current = null; };
+    trackedPerson.current =
+      root.current?.querySelector<SVGGElement>('[data-person]') ?? null;
+    return () => {
+      trackedPerson.current = null;
+    };
   }, [type, active3D]);
 
   useEffect(() => {
@@ -120,9 +170,12 @@ export default function EngineeringDemo({ type }: { type: DemoType }) {
 
   const toggleRollback = () => {
     setRollback(!rollback);
+    seek(0);
+    setInspected(null);
     setRestored(false);
     restoredRef.current = false;
   };
+  const held = paused || inspected !== null;
   const focus = hovered ?? inspected ?? stage;
   const displayStage = inspected ?? stage;
 
@@ -140,12 +193,15 @@ export default function EngineeringDemo({ type }: { type: DemoType }) {
           type="button"
           className="demo-pause"
           disabled={reduced}
-          onClick={() => setPaused((value) => !value)}
-          aria-label={`${paused ? 'Reprendre' : 'Mettre en pause'} : ${definition.title}`}
-          aria-pressed={paused}
+          onClick={() => {
+            setPaused(!held);
+            setInspected(null);
+          }}
+          aria-label={`${held ? 'Reprendre' : 'Mettre en pause'} : ${definition.title}`}
+          aria-pressed={held}
         >
-          {paused || reduced ? <Play size={13} /> : <Pause size={13} />}
-          <span>{reduced ? 'Vue fixe' : paused ? 'Reprendre' : 'Pause'}</span>
+          {held || reduced ? <Play size={13} /> : <Pause size={13} />}
+          <span>{reduced ? 'Vue fixe' : held ? 'Reprendre' : 'Pause'}</span>
         </button>
       </div>
 
@@ -159,8 +215,16 @@ export default function EngineeringDemo({ type }: { type: DemoType }) {
           selectedBus={selectedBus}
           rollback={rollback}
           restored={restored}
+          cycle={releaseCycle}
           pending={pending}
           active3D={active3D}
+          time={time}
+          onZoneChange={setSensitivity}
+          onSelectBus={setSelectedBus}
+          onReplay={() => {
+            seek(0);
+            setInspected(null);
+          }}
         />
       </div>
 
@@ -183,7 +247,9 @@ export default function EngineeringDemo({ type }: { type: DemoType }) {
             {pending ? <ArrowRight size={13} /> : <Check size={13} />}
           </button>
           <span role="status" aria-label="État de la configuration">
-            {pending ? 'Configuration en cours' : `Configuration active : ${applied}%`}
+            {pending
+              ? 'Configuration en cours'
+              : `Configuration active : ${applied}%`}
           </span>
         </div>
       )}
@@ -203,21 +269,31 @@ export default function EngineeringDemo({ type }: { type: DemoType }) {
               </button>
             ))}
           </div>
-          <p>Bus {String.fromCharCode(65 + selectedBus)} → tunnel VPN → services AWS</p>
+          <p>
+            Accès de gestion : Bus {String.fromCharCode(65 + selectedBus)} →
+            tunnel VPN → services AWS. Le chemin applicatif est distinct.
+          </p>
         </div>
       )}
 
       {type === 'delivery' && (
         <div className="demo-interaction delivery-controls">
           <span>Scénario illustratif</span>
-          <button type="button" aria-pressed={rollback} onClick={toggleRollback}>
+          <button
+            type="button"
+            aria-pressed={rollback}
+            onClick={toggleRollback}
+          >
             <RotateCcw size={13} />
             {rollback ? 'Retour à la version stable' : 'Explorer le rollback'}
           </button>
         </div>
       )}
 
-      <div className="architecture" aria-label={`Architecture : ${definition.title}`}>
+      <div
+        className="architecture"
+        aria-label={`Architecture : ${definition.title}`}
+      >
         <div className="architecture-stages">
           {definition.stages.map((item, index) => (
             <button
@@ -229,9 +305,18 @@ export default function EngineeringDemo({ type }: { type: DemoType }) {
               onMouseLeave={() => setHovered(null)}
               onFocus={() => setHovered(index)}
               onBlur={() => setHovered(null)}
-              onClick={() => setInspected(inspected === index ? null : index)}
+              onClick={() => {
+                if (inspected === index) {
+                  setInspected(null);
+                  return;
+                }
+                seek(stageTimes[type][index]);
+                setInspected(index);
+              }}
             >
-              <span className="stage-index">{String(index + 1).padStart(2, '0')}</span>
+              <span className="stage-index">
+                {String(index + 1).padStart(2, '0')}
+              </span>
               <span>{item.name}</span>
               <i aria-hidden="true" />
             </button>

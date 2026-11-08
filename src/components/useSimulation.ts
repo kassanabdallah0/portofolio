@@ -66,5 +66,9 @@ export function useSimulation(
     frame = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(frame);
   }, [running]);
-  return { running, reduced, visible, entered, time };
+  const seek = (seconds: number) => {
+    time.current = seconds;
+    callback.current(seconds);
+  };
+  return { running, reduced, visible, entered, pageVisible, time, seek };
 }
