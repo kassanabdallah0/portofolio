@@ -91,6 +91,7 @@ function Architecture({ mode, stage }: { mode: PhysicalScene; stage: number }) {
       ];
   return (
     <div
+      role="group"
       className="eng-architecture-panel"
       aria-label={
         scan
