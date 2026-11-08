@@ -116,9 +116,35 @@ test('ELK distinguishes retention and historical scale from synthetic operationa
   );
 });
 
+test('real 3D Jetson hardware is present in the release console on desktop', async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, 'Mobile intentionally uses a lightweight technical illustration.');
+  await page.goto('./#projet/edge-delivery');
+  const demo = page.getByRole('dialog').locator('[data-demo="delivery"]');
+  await expect(demo.locator('.eng-delivery canvas[data-context="ready"]')).toBeVisible({
+    timeout: 20000,
+  });
+  await expect(demo).toContainText('ACTIVATION LOCALE');
+});
+
 test('a failed Jetson release restores its previous version only after rollback completes', async ({
   page,
 }) => {
+  // Verify deterministic release timing independently of software WebGL.
+  // Other browser tests exercise the real rendered Jetson hardware.
+  await page.addInitScript(() => {
+    const native = HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext = function (
+      this: HTMLCanvasElement,
+      kind: string,
+      ...args: unknown[]
+    ) {
+      if (kind.includes('webgl')) return null;
+      return native.apply(this, [kind, ...args] as Parameters<typeof native>);
+    } as typeof native;
+  });
   await page.clock.install();
   await page.goto('./#projet/edge-delivery');
   const demo = page.getByRole('dialog').locator('[data-demo="delivery"]');
