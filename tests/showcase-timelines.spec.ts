@@ -57,6 +57,30 @@ test('vision tracking follows physical entry and temporal evidence precedes an a
   );
 });
 
+test('real 3D animation clock freezes while paused and advances after resuming', async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, 'The mobile exhibit intentionally uses a lightweight 2D scene.');
+  await page.goto('./#projet/colas-scan-epi');
+  const demo = page.getByRole('dialog').locator('[data-demo="scan"]');
+  const canvas = demo.locator('canvas[data-context="ready"]');
+  await expect(canvas).toBeVisible({ timeout: 20000 });
+  await expect(demo).toHaveAttribute('data-running', 'true');
+  const original = Number(await canvas.getAttribute('data-scene-time'));
+  await expect.poll(async () => Number(await canvas.getAttribute('data-scene-time'))).toBeGreaterThan(original);
+
+  await demo.getByRole('button', { name: /Mettre en pause/ }).click();
+  await expect(demo).toHaveAttribute('data-running', 'false');
+  const stopped = await canvas.getAttribute('data-scene-time');
+  await page.waitForTimeout(250);
+  expect(await canvas.getAttribute('data-scene-time')).toBe(stopped);
+
+  await demo.getByRole('button', { name: /Reprendre/ }).click();
+  await expect(demo).toHaveAttribute('data-running', 'true');
+  await expect.poll(async () => Number(await canvas.getAttribute('data-scene-time'))).toBeGreaterThan(Number(stopped));
+});
+
 test('physical scan controls seek coherently, preserve pause and show comparison scope', async ({
   page,
   isMobile,
