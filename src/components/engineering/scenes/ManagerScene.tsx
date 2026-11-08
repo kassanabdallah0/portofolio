@@ -428,6 +428,7 @@ export default function ManagerScene({
             </div>
           )}
           <div
+            role="group"
             className="eng-request-route"
             aria-label="Configuration : React, requête REST, Flask, Jetson, confirmation"
             data-pending={pending}
