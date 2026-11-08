@@ -79,6 +79,20 @@ test('manager visual follows the edited value and the last applied configuration
 test('simulation, active diagram and pause share one persistent clock', async ({
   page,
 }) => {
+  // A fake-clock test is for domain timing, not software-GPU throughput.
+  // Disable WebGL only in this test; the dedicated live-3D test verifies
+  // the real Three.js canvas clock, pause and resume without fake timers.
+  await page.addInitScript(() => {
+    const native = HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext = function (
+      this: HTMLCanvasElement,
+      kind: string,
+      ...args: unknown[]
+    ) {
+      if (kind.includes('webgl')) return null;
+      return native.apply(this, [kind, ...args] as Parameters<typeof native>);
+    } as typeof native;
+  });
   await page.clock.install();
   await page.goto('./#projet/jetson-vision');
   const demo = page.getByRole('dialog').locator('[data-demo="vision"]');
