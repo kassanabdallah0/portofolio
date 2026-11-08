@@ -291,6 +291,7 @@ export default function EngineeringDemo({ type }: { type: DemoType }) {
       )}
 
       <div
+        role="group"
         className="architecture"
         aria-label={`Architecture : ${definition.title}`}
       >
