@@ -279,6 +279,7 @@ export default function DeliveryScene({
         <span className="eng-simulation-tag">SCÉNARIO ILLUSTRATIF</span>
       </header>
       <div
+        role="group"
         className="eng-ci-lane"
         aria-label="Préparation automatique en intégration continue"
       >
