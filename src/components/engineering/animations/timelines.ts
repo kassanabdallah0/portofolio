@@ -11,7 +11,7 @@ export type WorkerPose = {
   interaction: boolean;
 };
 export const SCAN_DURATION = 32;
-export const VISION_DURATION = 30;
+export { VISION_DURATION, visionState } from '../vision/visionTimeline';
 const TAU = Math.PI * 2;
 const clamp = (v: number) => Math.max(0, Math.min(1, v));
 
@@ -52,8 +52,7 @@ function ellipseDistance(rx: number, rz: number) {
     },
   };
 }
-const scanArc = ellipseDistance(1.45, 1.5),
-  visionArc = ellipseDistance(3.1, 1.45);
+const scanArc = ellipseDistance(1.45, 1.5);
 export function scanState(seconds: number) {
   const t = ((seconds % SCAN_DURATION) + SCAN_DURATION) % SCAN_DURATION;
   const phase =
@@ -109,46 +108,6 @@ export function scanState(seconds: number) {
             : phase === 'result'
               ? 1
               : 0,
-  };
-}
-export function visionState(seconds: number) {
-  const t = ((seconds % VISION_DURATION) + VISION_DURATION) % VISION_DURATION;
-  const angle = (t / VISION_DURATION) * TAU;
-  const x = -3.1 * Math.cos(angle),
-    z = 1.45 * Math.sin(angle);
-  const dx = 3.1 * Math.sin(angle),
-    dz = 1.45 * Math.cos(angle);
-  const inside = x > -0.9 && z > 0.05;
-  const enteredAt = (Math.acos(0.9 / 3.1) / TAU) * VISION_DURATION;
-  const dwell = inside ? Math.max(0, t - enteredAt) : 0;
-  const stage = !inside
-    ? 0
-    : dwell < 1
-      ? 1
-      : dwell < 2.3
-        ? 2
-        : dwell < 4
-          ? 3
-          : 4;
-  const pose: WorkerPose = {
-    x,
-    z,
-    yaw: Math.atan2(dx, dz),
-    speed: (Math.hypot(dx, dz) * TAU) / VISION_DURATION,
-    distance:
-      Math.floor(seconds / VISION_DURATION) * visionArc.length +
-      visionArc.at(t / VISION_DURATION),
-    walking: true,
-    interaction: false,
-  };
-  return {
-    t,
-    stage,
-    inside,
-    dwell,
-    confirmed: inside && dwell >= 4,
-    observations: inside ? Math.min(10, Math.floor(dwell * 2.5)) : 0,
-    pose,
   };
 }
 export const stageTimes: Record<string, number[]> = {

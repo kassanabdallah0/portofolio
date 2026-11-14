@@ -7,6 +7,7 @@ export function useSimulation(
   root: RefObject<HTMLElement | null>,
   paused: boolean,
   draw: (seconds: number) => void,
+  initialViewportCheck = false,
 ) {
   const time = useRef(0);
   const callback = useRef(draw);
@@ -42,7 +43,29 @@ export function useSimulation(
       },
       { threshold: 0.02 },
     );
-    if (root.current) observer.observe(root.current);
+    if (root.current) {
+      observer.observe(root.current);
+      if (initialViewportCheck) {
+        // Vision initializes a substantial scene. Establish its initial viewport
+        // state before GPU setup can delay the first native observer delivery.
+        // Later transitions remain owned by IntersectionObserver.
+        const measure = () => {
+          const rect = root.current?.getBoundingClientRect();
+          const inView = Boolean(
+            rect &&
+            rect.width > 0 &&
+            rect.height > 0 &&
+            rect.bottom > 0 &&
+            rect.top < innerHeight &&
+            rect.right > 0 &&
+            rect.left < innerWidth,
+          );
+          setVisible(inView);
+          if (inView) setEntered(true);
+        };
+        measure();
+      }
+    }
     callback.current(time.current);
     return () => {
       media.removeEventListener('change', preference);
@@ -50,7 +73,7 @@ export function useSimulation(
       document.removeEventListener('portfolio:dialog', visibility);
       observer.disconnect();
     };
-  }, [root]);
+  }, [root, initialViewportCheck]);
   const running = visible && pageVisible && !paused && !reduced;
   useEffect(() => {
     if (!running) return;

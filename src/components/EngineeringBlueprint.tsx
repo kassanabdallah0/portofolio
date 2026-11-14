@@ -8,9 +8,14 @@ import Delivery, {
   JetsonIllustration,
 } from './engineering/scenes/DeliveryScene';
 import Observability from './engineering/scenes/ObservabilityScene';
+import VisionFallback from './engineering/vision/VisionFallback';
 
 type Props = {
   type: DemoType;
+  visionScenario?: import('./engineering/vision/visionTimeline').VisionScenario;
+  onVisionScenarioChange?: (
+    scenario: import('./engineering/vision/visionTimeline').VisionScenario,
+  ) => void;
   stage: number;
   running: boolean;
   sensitivity: number;
@@ -246,58 +251,8 @@ function IndustrialView({
   );
 }
 
-function Vision({ stage, running }: Props) {
-  return (
-    <div className="lab-vision-layout">
-      <IndustrialView stage={stage} running={running} />
-      <div className="lab-analysis-panel">
-        <div className="lab-panel-title">
-          <span>PIPELINE EDGE</span>
-          <b>JETSON ORIN</b>
-        </div>
-        <div className="lab-pipeline-chips">
-          <span>RealSense</span>
-          <span>OpenCV</span>
-          <span>YOLO / TensorRT</span>
-        </div>
-        <div className="lab-code-label">MÉTADONNÉES / INTERPROCESSUS</div>
-        <div className="lab-code-lines">
-          <span>
-            frame_id <b>01847</b>
-          </span>
-          <span>
-            class <b>person</b>
-          </span>
-          <span>
-            track_id <b>01</b>
-          </span>
-          <span>
-            bbox <b>[x, y, w, h]</b>
-          </span>
-        </div>
-        <div className="lab-code-label">VALIDATION TEMPORELLE</div>
-        <div
-          className="lab-observations"
-          role="img"
-          aria-label="Illustration des observations de suivi"
-        >
-          {Array.from({ length: 10 }, (_, i) => (
-            <span
-              key={i}
-              className={i < (stage + 1) * 2 ? 'is-confirmed' : ''}
-            />
-          ))}
-        </div>
-        <p className="lab-explainer">
-          {stage < 3
-            ? 'Les images sont traitées sur Jetson. Les processus échangent surtout des identifiants et des boîtes.'
-            : stage === 3
-              ? 'Une fenêtre glissante (≈ 30 frames) et des seuils configurables limitent les alertes intempestives.'
-              : 'Une condition confirmée produit un événement exploitable par le dispositif d’alerte.'}
-        </p>
-      </div>
-    </div>
-  );
+function Vision(props: Props) {
+  return <VisionFallback {...props} />;
 }
 
 function TopologyNode({
@@ -513,6 +468,8 @@ export default function EngineeringBlueprint(props: Props) {
           <EngineeringStory3D
             mode={type as 'vision' | 'scan' | 'cloud'}
             stage={stage}
+            visionScenario={props.visionScenario}
+            onVisionScenarioChange={props.onVisionScenarioChange}
             running={running}
             selectedBus={props.selectedBus}
             time={props.time}

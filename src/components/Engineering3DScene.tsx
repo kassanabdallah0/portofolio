@@ -5,21 +5,27 @@ import { Studio, CameraDirector } from './engineering/core/Studio';
 import type { PhysicalScene, SceneProps } from './engineering/core/types';
 import ScanScene from './engineering/scenes/ScanScene';
 import VisionScene from './engineering/scenes/VisionScene';
+import VisionCamera from './engineering/vision/VisionCamera';
+import VisionLighting from './engineering/vision/VisionLighting';
 import FleetScene from './engineering/scenes/FleetScene';
 import { Enclosure, Jetson } from './engineering/models/IndustrialEquipment';
 export type { PhysicalScene } from './engineering/core/types';
 
-function RenderStatus({ time }: Pick<SceneProps, 'time'>) {
+function RenderStatus({
+  time,
+  onUnavailable,
+}: Pick<SceneProps, 'time'> & { onUnavailable?: () => void }) {
   const { gl } = useThree();
   useEffect(() => {
     const canvas = gl.domElement;
     const lost = () => {
       canvas.setAttribute('data-context', 'lost');
+      onUnavailable?.();
     };
     canvas.setAttribute('data-context', 'ready');
     canvas.addEventListener('webglcontextlost', lost);
     return () => canvas.removeEventListener('webglcontextlost', lost);
-  }, [gl]);
+  }, [gl, onUnavailable]);
   useFrame(() => {
     gl.domElement.setAttribute('data-scene-time', time.current.toFixed(2));
   });
@@ -27,8 +33,9 @@ function RenderStatus({ time }: Pick<SceneProps, 'time'>) {
 }
 export default function Engineering3DScene({
   mode,
+  onUnavailable,
   ...props
-}: SceneProps & { mode: PhysicalScene }) {
+}: SceneProps & { mode: PhysicalScene; onUnavailable?: () => void }) {
   return (
     <Canvas
       className="lab-physical-canvas"
@@ -39,8 +46,8 @@ export default function Engineering3DScene({
         near: 0.1,
         far: 100,
       }}
-      shadows="soft"
-      dpr={[1, 1.5]}
+      shadows={mode === 'vision' && props.lowPower ? false : 'soft'}
+      dpr={[1, mode === 'vision' ? (props.lowPower ? 1 : 1.25) : 1.5]}
       frameloop={props.running ? 'always' : 'demand'}
       gl={{ alpha: false, antialias: true, powerPreference: 'low-power' }}
       role="img"
@@ -54,8 +61,17 @@ export default function Engineering3DScene({
               : 'Atelier industriel et détection par caméra'
       }
     >
-      <Studio mode={mode} />
-      <CameraDirector mode={mode} view={props.view} />
+      {mode === 'vision' ? (
+        <>
+          <VisionLighting lowPower={props.lowPower} />
+          <VisionCamera view={props.view} />
+        </>
+      ) : (
+        <>
+          <Studio mode={mode} />
+          <CameraDirector mode={mode} view={props.view} />
+        </>
+      )}
       <Suspense fallback={null}>
         {mode === 'scan' && <ScanScene {...props} />}
         {mode === 'vision' && <VisionScene {...props} />}
@@ -76,7 +92,7 @@ export default function Engineering3DScene({
             <Jetson scale={2.2} active={props.stage !== 2} />
           </group>
         )}
-        <RenderStatus time={props.time} />
+        <RenderStatus time={props.time} onUnavailable={onUnavailable} />
       </Suspense>
     </Canvas>
   );

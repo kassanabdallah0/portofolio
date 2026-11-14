@@ -5,6 +5,7 @@ import { ArrowRight, Check, Pause, Play, RotateCcw } from 'lucide-react';
 import { simulations, type DemoType } from '@/data/simulations';
 import EngineeringBlueprint from './EngineeringBlueprint';
 import { useSimulation } from './useSimulation';
+import type { VisionScenario } from './engineering/vision/visionTimeline';
 import {
   scanState,
   visionState,
@@ -40,6 +41,8 @@ export default function EngineeringDemo({ type }: { type: DemoType }) {
   const [releaseCycle, setReleaseCycle] = useState(0);
   const releaseCycleRef = useRef(0);
   const [desktop3D, setDesktop3D] = useState(false);
+  const [visionScenario, setVisionScenario] =
+    useState<VisionScenario>('normal');
 
   useEffect(() => {
     const media = window.matchMedia('(min-width: 760px)');
@@ -66,7 +69,7 @@ export default function EngineeringDemo({ type }: { type: DemoType }) {
       let next = Math.min(stages - 1, Math.floor(phase * stages));
       let progress = (phase * stages) % 1;
       if (type === 'scan') next = scanState(seconds).stage;
-      if (type === 'vision') next = visionState(seconds).stage;
+      if (type === 'vision') next = visionState(seconds, visionScenario).stage;
       if (type === 'delivery') next = deliveryState(seconds, rollback).stage;
 
       if (type === 'interface') {
@@ -119,14 +122,18 @@ export default function EngineeringDemo({ type }: { type: DemoType }) {
         );
       }
     },
-    [type, rollback],
+    [type, rollback, visionScenario],
   );
 
   const { running, reduced, visible, pageVisible, time, seek } = useSimulation(
     root,
     paused || inspected !== null,
     draw,
+    type === 'vision',
   );
+  useEffect(() => {
+    if (type === 'vision') draw(time.current);
+  }, [draw, time, type]);
   // Only a visible desktop exhibit owns a GPU context. A paused foreground
   // scene keeps its last frame; offscreen/dialog-obscured scenes are disposed.
   const active3D =
@@ -208,6 +215,8 @@ export default function EngineeringDemo({ type }: { type: DemoType }) {
       <div className="demo-world demo-world--blueprint">
         <EngineeringBlueprint
           type={type}
+          visionScenario={visionScenario}
+          onVisionScenarioChange={setVisionScenario}
           stage={displayStage}
           running={running && inspected === null}
           sensitivity={sensitivity}
@@ -302,6 +311,7 @@ export default function EngineeringDemo({ type }: { type: DemoType }) {
               type="button"
               className={`${stage === index ? 'is-active' : ''} ${focus === index ? 'is-inspected' : ''}`}
               aria-pressed={inspected === index}
+              aria-label={`${String(index + 1).padStart(2, '0')} ${item.name}`}
               onMouseEnter={() => setHovered(index)}
               onMouseLeave={() => setHovered(null)}
               onFocus={() => setHovered(index)}

@@ -8,6 +8,7 @@ import './engineering-lab.css';
 import './engineering-3d.css';
 import './engineering-fleet.css';
 import './engineering-software.css';
+import './vision.css';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://kassanabdallah0.github.io'),

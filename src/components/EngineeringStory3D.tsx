@@ -8,6 +8,7 @@ import type {
   SceneView,
 } from './engineering/core/types';
 import { FleetOverlay } from './engineering/overlays/FleetOverlay';
+import VisionExperience from './engineering/vision/VisionExperience';
 const Scene3D = dynamic(() => import('./Engineering3DScene'), {
   ssr: false,
   loading: () => (
@@ -187,16 +188,23 @@ export default function EngineeringStory3D({
   onReplay?: () => void;
 }) {
   const [view, setView] = useState<SceneView>('physical');
-  const [supported] = useState(() => {
-    if (typeof document === 'undefined') return false;
+  const [support] = useState(() => {
+    if (typeof document === 'undefined')
+      return { available: false, software: false };
     try {
       const probe = document.createElement('canvas'),
         gl = probe.getContext('webgl2');
-      const ok = Boolean(gl);
+      const info = gl?.getExtension('WEBGL_debug_renderer_info');
+      const renderer =
+        gl && info ? String(gl.getParameter(info.UNMASKED_RENDERER_WEBGL)) : '';
+      const result = {
+        available: Boolean(gl),
+        software: /swiftshader|llvmpipe|softpipe|software/i.test(renderer),
+      };
       gl?.getExtension('WEBGL_lose_context')?.loseContext();
-      return ok;
+      return result;
     } catch {
-      return false;
+      return { available: false, software: false };
     }
   });
   const fallbackView = (
@@ -209,7 +217,18 @@ export default function EngineeringStory3D({
       {fallback}
     </div>
   );
-  if (!supported) return fallbackView;
+  if (!support.available) return fallbackView;
+  if (mode === 'vision')
+    return (
+      <SceneBoundary fallback={fallbackView}>
+        <VisionExperience
+          {...props}
+          lowPower={support.software}
+          fallback={fallback}
+          onReplay={onReplay}
+        />
+      </SceneBoundary>
+    );
   const item = spec[mode];
   return (
     <SceneBoundary fallback={fallbackView}>
@@ -229,7 +248,7 @@ export default function EngineeringStory3D({
                 ...(mode !== 'delivery'
                   ? [{ id: 'architecture', label: 'Architecture', icon: Boxes }]
                   : []),
-                ...(mode === 'scan' || mode === 'vision'
+                ...(mode === 'scan'
                   ? [{ id: 'comparison', label: 'Comparer', icon: Gauge }]
                   : []),
               ] as const
@@ -269,16 +288,6 @@ export default function EngineeringStory3D({
             <span>{item.chip}</span>
             <strong>{item.metric}</strong>
           </div>
-          {mode === 'vision' && (
-            <div
-              data-tracking-box="true"
-              className="eng-tracking-box"
-              aria-hidden="true"
-            >
-              <span>PERSONNE · ID 01</span>
-              <i>suivi temporel</i>
-            </div>
-          )}
           {mode === 'cloud' && (
             <FleetOverlay
               stage={props.stage}
