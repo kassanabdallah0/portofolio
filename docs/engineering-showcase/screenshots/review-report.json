@@ -1,0 +1,293 @@
+{
+  "errors": [],
+  "captures": [
+    {
+      "name": "after-1440-scan-initial",
+      "viewport": {
+        "width": 1440,
+        "height": 1100
+      },
+      "horizontalOverflow": false
+    },
+    {
+      "name": "after-1440-scan-stage-2",
+      "viewport": {
+        "width": 1440,
+        "height": 1100
+      },
+      "horizontalOverflow": false
+    },
+    {
+      "name": "after-1440-scan-stage-3",
+      "viewport": {
+        "width": 1440,
+        "height": 1100
+      },
+      "horizontalOverflow": false
+    },
+    {
+      "name": "after-1440-scan-stage-4",
+      "viewport": {
+        "width": 1440,
+        "height": 1100
+      },
+      "horizontalOverflow": false
+    },
+    {
+      "name": "after-1440-scan-detail",
+      "viewport": {
+        "width": 1440,
+        "height": 1100
+      },
+      "horizontalOverflow": false
+    },
+    {
+      "name": "after-1440-scan-architecture",
+      "viewport": {
+        "width": 1440,
+        "height": 1100
+      },
+      "horizontalOverflow": false
+    },
+    {
+      "name": "after-1440-scan-comparison",
+      "viewport": {
+        "width": 1440,
+        "height": 1100
+      },
+      "horizontalOverflow": false
+    },
+    {
+      "name": "after-1440-cloud-initial",
+      "viewport": {
+        "width": 1440,
+        "height": 1100
+      },
+      "horizontalOverflow": false
+    },
+    {
+      "name": "after-1440-cloud-detail",
+      "viewport": {
+        "width": 1440,
+        "height": 1100
+      },
+      "horizontalOverflow": false
+    },
+    {
+      "name": "after-1440-cloud-architecture",
+      "viewport": {
+        "width": 1440,
+        "height": 1100
+      },
+      "horizontalOverflow": false
+    },
+    {
+      "name": "after-1440-vision-initial",
+      "viewport": {
+        "width": 1440,
+        "height": 1100
+      },
+      "horizontalOverflow": false
+    },
+    {
+      "name": "after-1440-vision-stage-2",
+      "viewport": {
+        "width": 1440,
+        "height": 1100
+      },
+      "horizontalOverflow": false
+    },
+    {
+      "name": "after-1440-vision-stage-3",
+      "viewport": {
+        "width": 1440,
+        "height": 1100
+      },
+      "horizontalOverflow": false
+    },
+    {
+      "name": "after-1440-vision-stage-5",
+      "viewport": {
+        "width": 1440,
+        "height": 1100
+      },
+      "horizontalOverflow": false
+    },
+    {
+      "name": "after-1440-vision-detail",
+      "viewport": {
+        "width": 1440,
+        "height": 1100
+      },
+      "horizontalOverflow": false
+    },
+    {
+      "name": "after-1440-vision-architecture",
+      "viewport": {
+        "width": 1440,
+        "height": 1100
+      },
+      "horizontalOverflow": false
+    },
+    {
+      "name": "after-1440-vision-comparison",
+      "viewport": {
+        "width": 1440,
+        "height": 1100
+      },
+      "horizontalOverflow": false
+    },
+    {
+      "name": "after-1440-interface-initial",
+      "viewport": {
+        "width": 1440,
+        "height": 1100
+      },
+      "horizontalOverflow": false
+    },
+    {
+      "name": "after-1440-delivery-initial",
+      "viewport": {
+        "width": 1440,
+        "height": 1100
+      },
+      "horizontalOverflow": false
+    },
+    {
+      "name": "after-1440-observability-initial",
+      "viewport": {
+        "width": 1440,
+        "height": 1100
+      },
+      "horizontalOverflow": false
+    },
+    {
+      "name": "after-320-scan",
+      "viewport": {
+        "width": 320,
+        "height": 1000
+      },
+      "horizontalOverflow": false
+    },
+    {
+      "name": "after-320-cloud",
+      "viewport": {
+        "width": 320,
+        "height": 1000
+      },
+      "horizontalOverflow": false
+    },
+    {
+      "name": "after-320-vision",
+      "viewport": {
+        "width": 320,
+        "height": 1000
+      },
+      "horizontalOverflow": false
+    },
+    {
+      "name": "after-320-interface",
+      "viewport": {
+        "width": 320,
+        "height": 1000
+      },
+      "horizontalOverflow": false
+    },
+    {
+      "name": "after-320-delivery",
+      "viewport": {
+        "width": 320,
+        "height": 1000
+      },
+      "horizontalOverflow": false
+    },
+    {
+      "name": "after-320-observability",
+      "viewport": {
+        "width": 320,
+        "height": 1000
+      },
+      "horizontalOverflow": false
+    },
+    {
+      "name": "after-393-scan",
+      "viewport": {
+        "width": 393,
+        "height": 1000
+      },
+      "horizontalOverflow": false
+    },
+    {
+      "name": "after-393-cloud",
+      "viewport": {
+        "width": 393,
+        "height": 1000
+      },
+      "horizontalOverflow": false
+    },
+    {
+      "name": "after-393-vision",
+      "viewport": {
+        "width": 393,
+        "height": 1000
+      },
+      "horizontalOverflow": false
+    },
+    {
+      "name": "after-393-interface",
+      "viewport": {
+        "width": 393,
+        "height": 1000
+      },
+      "horizontalOverflow": false
+    },
+    {
+      "name": "after-393-delivery",
+      "viewport": {
+        "width": 393,
+        "height": 1000
+      },
+      "horizontalOverflow": false
+    },
+    {
+      "name": "after-393-observability",
+      "viewport": {
+        "width": 393,
+        "height": 1000
+      },
+      "horizontalOverflow": false
+    },
+    {
+      "name": "after-360-portfolio",
+      "viewport": {
+        "width": 360,
+        "height": 1000
+      },
+      "horizontalOverflow": false
+    },
+    {
+      "name": "after-768-portfolio",
+      "viewport": {
+        "width": 768,
+        "height": 1000
+      },
+      "horizontalOverflow": false
+    },
+    {
+      "name": "after-1024-portfolio",
+      "viewport": {
+        "width": 1024,
+        "height": 1000
+      },
+      "horizontalOverflow": false
+    },
+    {
+      "name": "after-1440-portfolio",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "horizontalOverflow": false
+    }
+  ]
+}

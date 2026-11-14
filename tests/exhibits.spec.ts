@@ -1,36 +1,114 @@
 import { test, expect } from '@playwright/test';
-import { orbit } from '../src/data/simulations';
 
-test('vehicle paths remain continuous across their period boundary', () => {
-  const period = (Math.PI * 2) / 0.23;
-  for (const offset of [0, (Math.PI * 2) / 3, (Math.PI * 4) / 3]) {
-    const before = orbit(period - 0.001, offset),
-      after = orbit(period + 0.001, offset);
-    expect(Math.hypot(before.x - after.x, before.y - after.y)).toBeLessThan(
-      0.1,
-    );
+test('project illustrations remain usable when WebGL is unavailable', async ({ page }) => {
+  await page.addInitScript(() => {
+    const getContext = HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext = function (this: HTMLCanvasElement, kind: string, ...args: unknown[]) {
+      if (kind.includes('webgl')) return null;
+      return getContext.apply(this, [kind, ...args] as Parameters<typeof getContext>);
+    } as typeof getContext;
+  });
+  await page.goto('./#projet/colas-scan-epi');
+  const scan = page.getByRole('dialog').locator('[data-demo="scan"]');
+  await expect(scan.locator('.lab-scan-layout')).toBeVisible();
+  await expect(scan.locator('canvas')).toHaveCount(0);
+  await expect(scan).toContainText('GStreamer / WebRTC');
+});
+
+test('3D exhibits represent different systems and label FPS scopes correctly', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'The mobile experience deliberately uses the lightweight 2D alternative');
+  await page.goto('./#projet/colas-scan-epi');
+  const scan = page.getByRole('dialog').locator('[data-demo="scan"]');
+  await expect(scan.locator('[data-three-scene="scan"]')).toBeVisible();
+  await expect(scan.locator('canvas')).toBeVisible();
+  await expect(scan).toContainText('AFFICHAGE · TV');
+  await expect(scan).toContainText('≈ 2–3 → 10 FPS');
+  await expect(scan).toContainText('pas FPS d’inférence');
+
+  await page.goto('./#projet/mediaspot');
+  const cloud = page.getByRole('dialog').locator('[data-demo="cloud"]');
+  await expect(cloud.locator('[data-three-scene="cloud"]')).toBeVisible();
+  await expect(cloud).toContainText('Wi-Fi local');
+  await expect(cloud).toContainText('RUTX11 + cellulaire');
+  await expect(cloud).toContainText('OpenVPN sur EC2');
+
+  await page.goto('./#projet/jetson-vision');
+  const vision = page.getByRole('dialog').locator('[data-demo="vision"]');
+  await expect(vision.locator('[data-three-scene="vision"]')).toBeVisible();
+  await expect(vision).toContainText('TRAITEMENT SUR JETSON');
+  await expect(vision).toContainText('≈ 5 → 30 FPS');
+  await expect(vision).toContainText('pas cadence d’affichage');
+});
+
+test('six genuine engineering exhibits render without invisible legacy SVGs', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('./#projets');
+  for (const name of [
+    'vision',
+    'interface',
+    'cloud',
+    'delivery',
+    'scan',
+    'observability',
+  ]) {
+    await expect(page.locator(`[data-demo="${name}"] [data-lab="${name}"]`)).toHaveCount(1);
   }
+  await expect(page.locator('.lab-compatibility-scene')).toHaveCount(0);
+  await expect(page.locator('.lab-blueprint')).toHaveCount(6);
+});
+
+test('manager visual follows the edited value and the last applied configuration', async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('./#projet/securispot');
+  const dialog = page.getByRole('dialog');
+  const demo = dialog.locator('[data-demo="interface"]');
+  const slider = demo.getByRole('slider', { name: 'Taille de la zone' });
+  await slider.fill('80');
+  await expect(demo.locator('.lab-manager-feed')).toContainText('ROI 01 · 80%');
+  await expect(demo.locator('.lab-config-state')).toContainText(
+    'Modification non appliquée',
+  );
+  await demo.getByRole('button', { name: 'Appliquer', exact: true }).click();
+  await expect(demo.locator('.lab-config-state')).toContainText(
+    'Configuration active : 80%',
+  );
 });
 
 test('simulation, active diagram and pause share one persistent clock', async ({
   page,
 }) => {
+  // A fake-clock test is for domain timing, not software-GPU throughput.
+  // Disable WebGL only in this test; the dedicated live-3D test verifies
+  // the real Three.js canvas clock, pause and resume without fake timers.
+  await page.addInitScript(() => {
+    const native = HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext = function (
+      this: HTMLCanvasElement,
+      kind: string,
+      ...args: unknown[]
+    ) {
+      if (kind.includes('webgl')) return null;
+      return native.apply(this, [kind, ...args] as Parameters<typeof native>);
+    } as typeof native;
+  });
   await page.clock.install();
   await page.goto('./#projet/jetson-vision');
   const demo = page.getByRole('dialog').locator('[data-demo="vision"]');
   await expect(demo).toHaveAttribute('data-running', 'true');
-  const person = demo.locator('[data-person]');
-  const initial = await person.getAttribute('transform');
+  const initial = Number(await demo.getAttribute('data-simulation-ms'));
   await page.clock.runFor(1100);
-  expect(await person.getAttribute('transform')).not.toBe(initial);
+  const advanced = Number(await demo.getAttribute('data-simulation-ms'));
+  expect(advanced).toBeGreaterThan(initial);
   await demo.getByRole('button', { name: /Mettre en pause/ }).click();
   await expect(demo).toHaveAttribute('data-running', 'false');
-  const frozen = await person.getAttribute('transform');
+  const frozen = await demo.getAttribute('data-simulation-ms');
   await page.clock.runFor(1400);
-  expect(await person.getAttribute('transform')).toBe(frozen);
+  expect(await demo.getAttribute('data-simulation-ms')).toBe(frozen);
   await demo.getByRole('button', { name: /Reprendre/ }).click();
   await page.clock.runFor(4000);
-  expect(await person.getAttribute('transform')).not.toBe(frozen);
+  expect(Number(await demo.getAttribute('data-simulation-ms'))).toBeGreaterThan(Number(frozen));
   const index = Number(await demo.getAttribute('data-stage'));
   await expect(
     demo.locator('.architecture-stages button').nth(index),
@@ -131,13 +209,9 @@ test('offscreen and obscured exhibits stop, and repeated dialogs release their s
   }
   await page.locator('#contact').scrollIntoViewIfNeeded();
   await expect(background).toHaveAttribute('data-running', 'false');
-  const position = await background
-    .locator('[data-person]')
-    .getAttribute('transform');
+  const frozen = await background.getAttribute('data-simulation-ms');
   await page.waitForTimeout(250);
-  expect(
-    await background.locator('[data-person]').getAttribute('transform'),
-  ).toBe(position);
+  expect(await background.getAttribute('data-simulation-ms')).toBe(frozen);
   expect(errors).toEqual([]);
 });
 
@@ -192,16 +266,15 @@ test('batched viewport transitions use the latest visibility state', async ({
   const dialog = page.getByRole('dialog');
   const demo = dialog.locator('[data-demo="vision"]');
   await expect(demo).toHaveAttribute('data-running', 'true');
-  const person = demo.locator('[data-person]');
-  const initial = await person.getAttribute('transform');
-  await expect.poll(() => person.getAttribute('transform')).not.toBe(initial);
+  const initial = demo.getAttribute('data-simulation-ms');
+  await expect.poll(() => demo.getAttribute('data-simulation-ms')).not.toBe(await initial);
   await dialog.locator('.dialog-bottom').scrollIntoViewIfNeeded();
   await expect(demo).not.toBeInViewport();
   await expect(demo).toHaveAttribute('data-running', 'false');
-  const frozen = await person.getAttribute('transform');
+  const frozen = await demo.getAttribute('data-simulation-ms');
   await page.waitForTimeout(200);
-  expect(await person.getAttribute('transform')).toBe(frozen);
+  expect(await demo.getAttribute('data-simulation-ms')).toBe(frozen);
   await demo.scrollIntoViewIfNeeded();
   await expect(demo).toHaveAttribute('data-running', 'true');
-  await expect.poll(() => person.getAttribute('transform')).not.toBe(frozen);
+  await expect.poll(() => demo.getAttribute('data-simulation-ms')).not.toBe(frozen);
 });

@@ -1,0 +1,413 @@
+/* SecuriSPOT only: quiet controls around an operating miniature workshop. */
+.vision-experience {
+  background: #17313f;
+}
+.vision-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 14px;
+  border-bottom: 1px solid #7895a34d;
+}
+.vision-toolbar > span {
+  font: 8px var(--font-mono, monospace);
+  color: #c5dce6;
+  letter-spacing: 0.07em;
+  white-space: nowrap;
+}
+.vision-toolbar > span > i {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  background: #a2cbb8;
+  border-radius: 50%;
+  margin-right: 4px;
+}
+.vision-toolbar > div {
+  display: flex;
+  gap: 3px;
+  flex-wrap: wrap;
+}
+.vision-toolbar button {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px;
+  border-radius: 5px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #c9dce4;
+  font-size: 9px;
+}
+.vision-toolbar button:hover,
+.vision-toolbar button[aria-pressed='true'] {
+  border-color: #738e9d;
+  background: #344f60;
+  color: #f7fbff;
+}
+.vision-toolbar button:focus-visible,
+.vision-footer button:focus-visible {
+  outline: 2px solid #c2e9ff;
+  outline-offset: 3px;
+}
+.vision-experience .vision-stage {
+  height: 460px;
+}
+.dialog-content .vision-experience .vision-stage {
+  height: 590px;
+}
+.vision-experience[data-view='camera'] .vision-stage {
+  height: auto;
+  aspect-ratio: 16/9;
+}
+.vision-track {
+  z-index: 2;
+  border-color: #549a87;
+  box-shadow: none;
+}
+.vision-track > span {
+  font-size: 7px;
+  background: #d3eae0;
+  color: #244a40;
+}
+.vision-track > i {
+  font-size: 7px;
+}
+.vision-statusbar {
+  position: absolute;
+  left: 13px;
+  right: 13px;
+  bottom: 12px;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  align-items: center;
+  background: #15313fe8;
+  color: #e1eef2;
+  padding: 10px 12px;
+  border: 1px solid #809aa64d;
+  border-radius: 7px;
+  pointer-events: none;
+}
+.vision-statusbar > span {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 10px;
+}
+.vision-statusbar > span > i {
+  width: 5px;
+  height: 5px;
+  background: #a8d2bd;
+  border-radius: 50%;
+}
+.vision-statusbar strong {
+  font-weight: 500;
+}
+.vision-evidence {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.vision-evidence > span {
+  display: flex;
+  gap: 3px;
+}
+.vision-evidence i {
+  width: 4px;
+  height: 9px;
+  border: 1px solid #7897a6;
+  border-radius: 1px;
+}
+.vision-evidence i[data-active='true'] {
+  background: #a7d6bf;
+  border-color: #a7d6bf;
+}
+.vision-evidence small {
+  font: 8px var(--font-mono, monospace);
+  color: #c1d6df;
+  white-space: nowrap;
+}
+.vision-event {
+  position: absolute;
+  right: 16px;
+  top: 16px;
+  display: grid;
+  gap: 4px;
+  padding: 11px 14px;
+  border-radius: 7px;
+  background: #f1e0bfef;
+  border: 1px solid #bca675;
+  color: #4d432b;
+  opacity: 0;
+  transform: translateY(-5px);
+  transition:
+    opacity 0.25s,
+    transform 0.25s;
+  pointer-events: none;
+}
+.vision-event > span,
+.vision-event > small {
+  font: 7px var(--font-mono, monospace);
+  letter-spacing: 0.06em;
+}
+.vision-event strong {
+  font-size: 12px;
+  font-weight: 600;
+}
+.vision-experience[data-vision-confirmed='true'] .vision-event {
+  opacity: 1;
+  transform: none;
+}
+.vision-experience[data-vision-confirmed='true'] .vision-statusbar > span > i {
+  background: #e5bd73;
+}
+.vision-camera-label {
+  position: absolute;
+  top: 13px;
+  left: 14px;
+  right: 14px;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  font: 8px var(--font-mono, monospace);
+  color: #e1edf1;
+  background: #17313fdb;
+  border-radius: 4px;
+  padding: 8px 10px;
+}
+.vision-camera-label > span {
+  margin-left: auto;
+  font-size: 7px;
+  color: #bbd0da;
+}
+.vision-camera-label > i {
+  height: 5px;
+  width: 5px;
+  border-radius: 50%;
+  background: #b6ddca;
+}
+.vision-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-top: 1px solid #718d9b4a;
+}
+.vision-footer button {
+  padding: 5px 0;
+  border: 0;
+  background: transparent;
+  color: #e3eff4;
+  font-size: 9px;
+  text-align: left;
+}
+.vision-footer button[aria-pressed='true'] {
+  color: #e3ca99;
+}
+.vision-footer > span {
+  font: 7px var(--font-mono, monospace);
+  color: #b4cbd6;
+  text-align: right;
+}
+.vision-scope {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 5px 10px;
+  padding: 0 14px 13px;
+  margin: 0;
+  font-size: 8px;
+  line-height: 1.6;
+  color: #bdd2dc;
+}
+.vision-scope b {
+  font: 8px/1.6 var(--font-mono, monospace);
+  color: #dce9ee;
+}
+.vision-pipeline,
+.vision-throughput {
+  position: absolute;
+  right: 15px;
+  top: 15px;
+  width: min(245px, 43%);
+  background: #17313ff5;
+  color: #e1eef4;
+  border: 1px solid #8aabb9;
+  border-radius: 9px;
+  padding: 15px;
+  box-shadow: 0 8px 25px #29495824;
+}
+.vision-pipeline > span,
+.vision-throughput > span {
+  display: block;
+  font: 7px/1.7 var(--font-mono, monospace);
+  color: #bad1dc;
+  letter-spacing: 0.045em;
+}
+.vision-pipeline ol {
+  list-style: none;
+  margin: 10px 0;
+  padding: 0;
+}
+.vision-pipeline li {
+  position: relative;
+  border-left: 1px solid #658493;
+  padding: 8px 0 8px 14px;
+  font-size: 10px;
+  color: #acc4d0;
+}
+.vision-pipeline li > i {
+  position: absolute;
+  left: -3px;
+  top: 11px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #7c99a8;
+}
+.vision-pipeline li.is-lit {
+  color: #f1f7fa;
+}
+.vision-pipeline li.is-lit > i {
+  background: #b4dbc4;
+}
+.vision-pipeline p,
+.vision-throughput p {
+  margin: 10px 0 0;
+  font-size: 9px;
+  line-height: 1.75;
+  color: #bed1db;
+}
+.vision-throughput h4 {
+  margin: 8px 0 15px;
+  font-size: 17px;
+  letter-spacing: -0.04em;
+  font-weight: 500;
+}
+.vision-throughput > div {
+  padding: 9px 0;
+}
+.vision-throughput > div > span {
+  display: flex;
+  justify-content: space-between;
+  gap: 5px;
+  font-size: 9px;
+}
+.vision-throughput b {
+  color: #d5e9f0;
+}
+.vision-frame-stream {
+  display: flex;
+  gap: 4px;
+  padding: 12px 0;
+  overflow: hidden;
+  border-bottom: 1px solid #809caa;
+}
+.vision-frame-stream i {
+  flex: 0 0 22px;
+  height: 18px;
+  border-radius: 2px;
+  border: 1px solid #729ba9;
+  background: linear-gradient(
+    150deg,
+    #8eb2bd 35%,
+    #3f6678 36% 55%,
+    #6f919b 56%
+  );
+  transform: translateX(calc(var(--processed, 0) * 26px));
+}
+.vision-throughput small {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  font: 7px var(--font-mono, monospace);
+  color: #b3ccd7;
+}
+.vision-fallback {
+  background: #17313f;
+  color: #dceaf1;
+}
+.vision-fallback-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px;
+  font: 8px var(--font-mono, monospace);
+}
+.vision-fallback svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.vision-fallback-zone {
+  fill: #8caeb982;
+  stroke: #527c8d;
+}
+.vision-fallback[data-vision-confirmed='true'] .vision-fallback-zone {
+  fill: #e0b4568c;
+  stroke: #9a773c;
+}
+.vision-fallback-status {
+  padding: 11px 12px;
+  font-size: 10px;
+  color: #e2eef3;
+}
+.vision-fallback .vision-scope {
+  padding-top: 5px;
+}
+@media (max-width: 1100px) {
+  .vision-toolbar {
+    flex-wrap: wrap;
+  }
+  .vision-experience .vision-stage {
+    height: 410px;
+  }
+  .vision-experience[data-view='camera'] .vision-stage {
+    height: auto;
+  }
+}
+@media (max-width: 600px) {
+  .vision-footer {
+    align-items: flex-start;
+  }
+  .vision-footer > span {
+    max-width: 90px;
+    line-height: 1.6;
+  }
+  .vision-fallback-label {
+    font-size: 7px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vision-experience * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+.vision-experience[data-view='architecture'] .vision-event,
+.vision-experience[data-view='comparison'] .vision-event {
+  display: none;
+}
+.vision-experience[data-view='camera'] .vision-event {
+  top: 52px;
+}
+.vision-loading-preview {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: #c1cdd2;
+  pointer-events: none;
+}
+.vision-loading-preview .vision-fallback {
+  width: 100%;
+}
+.vision-loading-preview .vision-footer,
+.vision-loading-preview .vision-scope,
+.vision-loading-preview .vision-fallback-label,
+.vision-loading-preview .vision-fallback-status {
+  display: none;
+}

@@ -1,0 +1,18 @@
+Engineering showcase asset notices
+
+worker-rigged.glb
+Worker by Quaternius, Public Domain / CC0 1.0 Universal.
+Source and license: https://poly.pizza/m/Yg2bQZO6Hj
+Author's pack: https://quaternius.com/packs/ultimatedanimatedcharacter
+Modified: retained walk, idle and interact animation clips; optimized GLB export.
+
+transit-bus.glb
+3D Bus by ajanhallinta, Public Domain / CC0 1.0 Universal.
+Source and license: https://opengameart.org/content/3d-bus
+Modified: FBX to GLB, normalized coordinate system and scale, PBR materials,
+vertex welding, grouped material draws and wheel pivot hierarchy.
+
+CC0 1.0: https://creativecommons.org/publicdomain/zero/1.0/
+Attribution is voluntary. Neither generic model represents certified equipment.
+Complete source hashes, modifications and limitations:
+docs/engineering-showcase/ASSETS.md in the portfolio repository.

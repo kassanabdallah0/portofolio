@@ -1,0 +1,325 @@
+/* Crisp physical exhibitions inside the existing Liquid Glass shell. */
+.lab-blueprint-content:has(.lab-three-story) {
+  padding: 0;
+  min-height: 0;
+}
+.lab-three-story {
+  background: #152b39;
+  color: #e5f0f4;
+  min-width: 0;
+  width: 100%;
+}
+.eng-scene-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 15px;
+  border-bottom: 1px solid #8ca8b433;
+}
+.eng-scene-toolbar > span {
+  font: 9px var(--font-mono, monospace);
+  letter-spacing: 0.045em;
+  color: #c3d8e2;
+}
+.eng-scene-toolbar > div {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.eng-scene-toolbar button {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: #c1d5df;
+  padding: 7px;
+  font-size: 9px;
+}
+.eng-scene-toolbar button:hover,
+.eng-scene-toolbar button[aria-pressed='true'] {
+  background: #345365;
+  border-color: #6b8a9c;
+  color: #f4fbff;
+}
+.eng-scene-toolbar button:focus-visible {
+  outline: 2px solid #b6e6fc;
+  outline-offset: 3px;
+}
+.lab-three-stage {
+  position: relative;
+  height: 430px;
+  overflow: hidden;
+  isolation: isolate;
+}
+.dialog-content .lab-three-stage {
+  height: 540px;
+}
+.lab-physical-canvas {
+  display: block !important;
+  position: absolute !important;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  touch-action: pan-y !important;
+}
+.lab-three-stage canvas {
+  display: block;
+}
+.eng-scene-badge {
+  position: absolute;
+  left: 17px;
+  top: 17px;
+  display: grid;
+  gap: 4px;
+  pointer-events: none;
+  padding: 9px 12px;
+  border: 1px solid #d8e5e8b8;
+  background: #e7f0f1e8;
+  border-radius: 8px;
+  color: #304d5c;
+  box-shadow: 0 6px 20px #1b344e12;
+}
+.eng-scene-badge span {
+  font: 8px var(--font-mono, monospace);
+  letter-spacing: 0.06em;
+}
+.eng-scene-badge strong {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.045em;
+}
+.eng-scene-caption {
+  position: absolute;
+  inset: auto 14px 13px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  border-radius: 7px;
+  background: #132e3ce8;
+  color: #e8f3f7;
+  font-size: 11px;
+  pointer-events: none;
+}
+.eng-scene-caption i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #a7cfbc;
+}
+.eng-scene-caption small {
+  font: 7px var(--font-mono, monospace);
+  letter-spacing: 0.05em;
+  color: #c1d3db;
+  margin-left: auto;
+}
+.lab-three-footnote {
+  color: #becfd7;
+  font-size: 10px;
+  line-height: 1.7;
+  margin: 0;
+  padding: 12px 17px;
+  border-top: 1px solid #67818e55;
+}
+.eng-architecture-panel,
+.eng-comparison {
+  position: absolute;
+  right: 16px;
+  top: 16px;
+  width: min(280px, 45%);
+  padding: 16px;
+  background: #132e3cf5;
+  border: 1px solid #88aeba;
+  border-radius: 10px;
+  box-shadow: 0 15px 35px #10202d24;
+  color: #e8f3f8;
+}
+.eng-panel-kicker {
+  display: block;
+  font: 8px/1.7 var(--font-mono, monospace);
+  color: #aecad7;
+  letter-spacing: 0.06em;
+  margin-bottom: 12px;
+}
+.eng-architecture-panel ol {
+  list-style: none;
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+}
+.eng-architecture-panel li {
+  position: relative;
+  padding: 9px 0 9px 19px;
+  font-size: 11px;
+  color: #b6c9d1;
+  border-left: 1px solid #6b8e9d;
+}
+.eng-architecture-panel li.is-lit {
+  color: #edf9fc;
+}
+.eng-architecture-panel li i {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  left: -3px;
+  top: 14px;
+  background: #6c8a95;
+  border-radius: 50%;
+}
+.eng-architecture-panel li.is-lit i {
+  background: #b4e2cf;
+  box-shadow: 0 0 0 3px #b4e2cf18;
+}
+.eng-architecture-panel p {
+  color: #bed2dc;
+  font-size: 10px;
+  line-height: 1.7;
+  margin: 12px 0 0;
+}
+.eng-rate {
+  padding: 9px 0;
+}
+.eng-rate > span {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: #cadde5;
+  font-size: 10px;
+}
+.eng-rate b {
+  color: #e9f4f8;
+}
+.eng-rate > div {
+  height: 36px;
+  background: repeating-linear-gradient(
+    90deg,
+    #7593a61f 0 1px,
+    transparent 1px 17px
+  );
+  border-bottom: 1px solid #819daa;
+  margin: 9px 0;
+  overflow: hidden;
+}
+.eng-rate i {
+  display: block;
+  height: 25px;
+  width: 22px;
+  margin-top: 4px;
+  border: 1px solid #a7d9e4;
+  border-radius: 4px;
+  background: #77abbc;
+}
+.eng-comparison small {
+  display: block;
+  font-size: 10px;
+  line-height: 1.6;
+  color: #b7ced8;
+}
+.eng-tracking-box {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border: 1px solid #b4f6dc;
+  box-shadow: 0 0 0 1px #183e42;
+  opacity: 0;
+  pointer-events: none;
+  color: #153d3c;
+}
+.eng-tracking-box > span {
+  position: absolute;
+  top: -18px;
+  left: -1px;
+  white-space: nowrap;
+  background: #b4e9d7;
+  padding: 3px 5px;
+  font: 8px var(--font-mono, monospace);
+}
+.eng-tracking-box > i {
+  position: absolute;
+  bottom: -17px;
+  left: -1px;
+  white-space: nowrap;
+  background: #193c47;
+  color: #d0e6ec;
+  padding: 3px 5px;
+  font: 7px var(--font-mono, monospace);
+}
+.eng-tracking-box[data-confirmed='true'] {
+  border-color: #f2d38c;
+}
+.eng-tracking-box[data-confirmed='true'] > span {
+  background: #f2d38c;
+}
+.lab-3d-loading {
+  height: 100%;
+  display: grid;
+  place-items: center;
+  background: #213a49;
+  color: #cadfe8;
+  font-size: 12px;
+}
+.lab-3d-unsupported {
+  width: 100%;
+  padding: 16px;
+}
+.lab-network-separator {
+  color: #b4cbd8;
+  font-size: 8px;
+  padding: 6px;
+}
+.lab-three-story--delivery .eng-scene-toolbar,
+.lab-three-story--delivery .eng-scene-badge,
+.lab-three-story--delivery .eng-scene-caption,
+.lab-three-story--delivery .lab-three-footnote {
+  display: none;
+}
+.lab-three-story--delivery .lab-three-stage,
+.dialog-content .lab-three-story--delivery .lab-three-stage {
+  height: 230px;
+}
+@media (max-width: 1100px) {
+  .eng-scene-toolbar {
+    flex-wrap: wrap;
+  }
+  .eng-scene-toolbar > div {
+    justify-content: flex-start;
+  }
+  .lab-three-stage {
+    height: 390px;
+  }
+}
+@media (max-width: 760px) {
+  .lab-blueprint-heading {
+    padding: 11px 12px;
+    gap: 10px;
+    font-size: 8px;
+  }
+  .lab-blueprint-heading > span:last-child {
+    display: none;
+  }
+  .lab-blueprint-content {
+    padding: 12px;
+  }
+  .lab-three-stage {
+    height: 340px;
+  }
+  .eng-scene-caption small {
+    display: none;
+  }
+  .eng-architecture-panel,
+  .eng-comparison {
+    width: 52%;
+    padding: 12px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lab-three-story * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
