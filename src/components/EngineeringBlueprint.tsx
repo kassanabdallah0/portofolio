@@ -468,6 +468,7 @@ export default function EngineeringBlueprint(props: Props) {
       <div className="lab-blueprint-content">
         {physical && (
           <EngineeringStory3D
+            key={type}
             mode={type as 'vision' | 'scan' | 'cloud'}
             active={props.active3D}
             stage={stage}

@@ -1035,6 +1035,7 @@ export default function Portfolio() {
       <ProjectDialog
         project={selectedProject}
         onClose={() => {
+          setSelected(null);
           window.location.hash = 'projets';
         }}
       />

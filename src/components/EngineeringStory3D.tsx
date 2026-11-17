@@ -193,7 +193,9 @@ export default function EngineeringStory3D({
   const [view, setView] = useState<SceneView>('physical');
   const [support, setSupport] = useState<ReturnType<
     typeof getWebGLSupport
-  > | null>(() => (mode === 'vision' ? null : getWebGLSupport()));
+  > | null>(() =>
+    mode === 'vision' ? null : { available: true, software: false },
+  );
   useEffect(() => {
     if (!active || support !== null) return;
     // Vision's shell commits before feature detection. A transient visit cannot
@@ -273,6 +275,7 @@ export default function EngineeringStory3D({
         <div className="lab-three-stage">
           <Scene3D
             {...props}
+            lowPower={support.software}
             mode={mode}
             view={view}
             onSelectBus={(index) => {

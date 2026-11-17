@@ -6,6 +6,22 @@ type WebGLSupport = Readonly<{ available: boolean; software: boolean }>;
 // including documents whose browser or test setup deliberately disables WebGL.
 const supportByDocument = new WeakMap<Document, WebGLSupport>();
 
+/** Inspect a renderer that already exists; never create a feature-probe context. */
+export function isSoftwareWebGLContext(
+  gl: WebGLRenderingContext | WebGL2RenderingContext,
+): boolean {
+  try {
+    const info = gl.getExtension('WEBGL_debug_renderer_info');
+    const renderer = info
+      ? String(gl.getParameter(info.UNMASKED_RENDERER_WEBGL))
+      : '';
+    return /swiftshader|llvmpipe|softpipe|software/i.test(renderer);
+  } catch {
+    // Missing renderer metadata does not make an existing context unavailable.
+    return false;
+  }
+}
+
 export function getWebGLSupport(): WebGLSupport {
   if (typeof document === 'undefined')
     return { available: false, software: false };

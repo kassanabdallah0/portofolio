@@ -13,32 +13,39 @@ Environment: Node 20.19.4, Next.js static export, Chrome.
 | --- | --- |
 | ESLint | Passed |
 | TypeScript / production static build | Passed |
-| Dialog history, CV content, actual pause, camera projection and context disposal | 5 desktop checks passed |
-| Visibility / repeated-dialog regression | Desktop passed (21.4 s); mobile passed (10.6 s) |
+| Affected desktop startup, pause, history, visibility and context-disposal regressions | 7 passed with original timeouts |
+| Unsupported WebGL fallback | Existing regression passed (3.0 s) |
 | Complete CI workflow | [Current PR #7 checks](https://github.com/kassanabdallah0/portofolio/pull/7/checks) |
 | Actual rendered cycle and screenshots | 26 reviewed captures; no page errors or horizontal overflow in capture reports |
 
-A [previous CI run](https://github.com/kassanabdallah0/portofolio/actions/runs/43594423512)
-exposed desktop rendering stalls during dialog transitions. The corrections keep
-Vision's presentation mounted at a stable height while releasing its Canvas when
-obscured or offscreen. Its visibility check also samples current viewport geometry
-during rapid anchor scrolling. The other exhibits retain their observer behavior.
-The new context-disposal test additionally checks that suspension preserves height;
-existing browser assertions, timeouts and intentional skips are unchanged.
+The [complete workflow for `14935a6`](https://github.com/kassanabdallah0/portofolio/actions/runs/44101527481)
+reported 79 passes, 6 retry passes, 4 failures and 9 intentional skips. The follow-up
+restores the native IntersectionObserver's latest entry as the authoritative
+visibility state, including dialog clipping. Vision keeps its presentation mounted
+at a stable height while its Canvas is released when obscured or offscreen. The
+context-disposal test also verifies that suspension preserves height; existing
+assertions, timeouts and intentional skips are unchanged.
 
-Vision's software-GPU tier uses demand rendering, an 80 ms steady-state scheduling
-interval and an asynchronous completion fence before the next automatic frame.
-Explicit stage/view/resize invalidations can still render promptly. This tier uses
-DPR 0.75, no multisample antialiasing, vertex-lit materials and contact shadows.
-Hardware PBR rendering is unchanged. These rendering settings do not represent the
-5 → 30 FPS vision-processing improvement.
+The Projects hash destination settles immediately instead of continuing a native
+smooth scroll while exhibit layouts initialize. Other section anchors retain their
+existing behavior. Dialog close clears the selected project immediately while
+preserving hash history and focus restoration.
 
-Capability detection is cached once per document; its temporary 1×1 context is
-released even if a renderer query throws. The hero requests that capability only
-when visible, avoiding unused GPU startup on direct exhibit links. Matching cloned
+Vision's software-GPU tier uses demand rendering, an 80 ms steady-state interval
+and an asynchronous completion fence before the next automatic frame. Explicit
+stage/view/resize invalidations can still render promptly. It uses DPR 0.75,
+vertex-lit materials, contact shadows and no multisample antialiasing. Other 3D
+exhibits classify their actual Canvas renderer before loading models, avoiding an
+extra probing context. Each case study owns its renderer state when switching projects. Their software tier uses DPR 1, disabled real-time shadows
+and a 64px PBR environment, while retaining the original frame loop and pause
+behavior. Hardware rendering is unchanged. These rendering settings do not
+represent the 5 → 30 FPS vision-processing improvement.
+
+Capability probing for Vision/hero is cached once per document and released even
+if a renderer query throws; the hero requests it only when visible. Matching cloned
 worker skeletons share their bone data within each Vision actor: 13 skeletons become
 one, with zero skinning-position difference across 1,252 sampled vertices. Source
-assets and the scan worker's default behavior remain unchanged.
+assets and the scan worker's default animation behavior remain unchanged.
 
 `tests/vision.spec.ts` checks:
 

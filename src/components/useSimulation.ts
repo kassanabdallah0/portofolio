@@ -32,35 +32,12 @@ export function useSimulation(
     media.addEventListener('change', preference);
     document.addEventListener('visibilitychange', visibility);
     document.addEventListener('portfolio:dialog', visibility);
-    let viewportFrame = 0;
-    const measure = () => {
-      const rect = root.current?.getBoundingClientRect();
-      const inView = Boolean(
-        rect &&
-        rect.width > 0 &&
-        rect.height > 0 &&
-        rect.bottom > 0 &&
-        rect.top < innerHeight &&
-        rect.right > 0 &&
-        rect.left < innerWidth,
-      );
-      setVisible(inView);
-      if (inView) setEntered(true);
-    };
-    const requestMeasure = () => {
-      cancelAnimationFrame(viewportFrame);
-      viewportFrame = requestAnimationFrame(measure);
-    };
     const observer = new IntersectionObserver(
       (entries) => {
         // Several transitions can queue before delivery (e.g. anchor scrolling
         // during layout). The last entry is the current state, not the first.
         const entry = entries[entries.length - 1];
         if (!entry) return;
-        if (initialViewportCheck) {
-          requestMeasure();
-          return;
-        }
         setVisible(entry.isIntersecting);
         if (entry.isIntersecting) setEntered(true);
       },
@@ -69,15 +46,24 @@ export function useSimulation(
     if (root.current) {
       observer.observe(root.current);
       if (initialViewportCheck) {
-        // Rapid anchor scrolling can precede native observer delivery. Keep
-        // Vision's viewport state current without waiting for another crossing.
+        // Vision initializes a substantial scene. Establish its initial viewport
+        // state before GPU setup can delay the first native observer delivery.
+        // Later transitions remain owned by IntersectionObserver.
+        const measure = () => {
+          const rect = root.current?.getBoundingClientRect();
+          const inView = Boolean(
+            rect &&
+            rect.width > 0 &&
+            rect.height > 0 &&
+            rect.bottom > 0 &&
+            rect.top < innerHeight &&
+            rect.right > 0 &&
+            rect.left < innerWidth,
+          );
+          setVisible(inView);
+          if (inView) setEntered(true);
+        };
         measure();
-        requestMeasure();
-        document.addEventListener('scroll', requestMeasure, {
-          passive: true,
-          capture: true,
-        });
-        window.addEventListener('resize', requestMeasure);
       }
     }
     callback.current(time.current);
@@ -85,9 +71,6 @@ export function useSimulation(
       media.removeEventListener('change', preference);
       document.removeEventListener('visibilitychange', visibility);
       document.removeEventListener('portfolio:dialog', visibility);
-      cancelAnimationFrame(viewportFrame);
-      document.removeEventListener('scroll', requestMeasure, true);
-      window.removeEventListener('resize', requestMeasure);
       observer.disconnect();
     };
   }, [root, initialViewportCheck]);

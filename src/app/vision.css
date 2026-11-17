@@ -1,4 +1,9 @@
 /* SecuriSPOT only: quiet controls around an operating miniature workshop. */
+/* Native smooth anchor scrolling can keep moving the document while exhibits
+   change height. Settle the projects destination before loading its scenes. */
+html:has(#projets:target) {
+  scroll-behavior: auto;
+}
 .vision-experience {
   background: #17313f;
 }

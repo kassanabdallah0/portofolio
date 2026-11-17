@@ -4,12 +4,20 @@ import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import type { PhysicalScene, SceneView } from './types';
-export function Studio({ mode }: { mode: PhysicalScene }) {
+export function Studio({
+  mode,
+  lowPower = false,
+}: {
+  mode: PhysicalScene;
+  lowPower?: boolean;
+}) {
   const { gl, scene } = useThree();
   useEffect(() => {
     const generator = new THREE.PMREMGenerator(gl),
       room = new RoomEnvironment(),
-      target = generator.fromScene(room, 0.045);
+      target = lowPower
+        ? generator.fromScene(room, 0.045, 0.1, 100, { size: 64 })
+        : generator.fromScene(room, 0.045);
     // Imperative mutation of a Three.js-owned scene, not React props or state.
     // eslint-disable-next-line react-hooks/immutability
     scene.environment = target.texture;
@@ -19,7 +27,7 @@ export function Studio({ mode }: { mode: PhysicalScene }) {
       scene.environment = null;
       target.dispose();
     };
-  }, [gl, scene]);
+  }, [gl, scene, lowPower]);
   return (
     <>
       <color
@@ -38,7 +46,7 @@ export function Studio({ mode }: { mode: PhysicalScene }) {
         position={[2, 9, 6]}
         color="#fff7e6"
         intensity={1.8}
-        castShadow
+        castShadow={!lowPower}
         shadow-mapSize={[1024, 1024]}
         shadow-camera-left={-10}
         shadow-camera-right={10}

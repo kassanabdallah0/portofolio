@@ -1,7 +1,8 @@
 'use client';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Suspense, useEffect } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { Studio, CameraDirector } from './engineering/core/Studio';
+import { isSoftwareWebGLContext } from './engineering/core/webglSupport';
 import type { PhysicalScene, SceneProps } from './engineering/core/types';
 import ScanScene from './engineering/scenes/ScanScene';
 import VisionScene from './engineering/scenes/VisionScene';
@@ -37,6 +38,12 @@ export default function Engineering3DScene({
   onUnavailable,
   ...props
 }: SceneProps & { mode: PhysicalScene; onUnavailable?: () => void }) {
+  const [softwareRenderer, setSoftwareRenderer] = useState<boolean | null>(
+    null,
+  );
+  const lowPower =
+    mode === 'vision' ? props.lowPower : softwareRenderer === true;
+  const classified = mode === 'vision' || softwareRenderer !== null;
   return (
     <Canvas
       className="lab-physical-canvas"
@@ -47,14 +54,16 @@ export default function Engineering3DScene({
         near: 0.1,
         far: 100,
       }}
-      shadows={mode === 'vision' && props.lowPower ? false : 'soft'}
+      shadows={lowPower ? false : 'soft'}
       dpr={
-        mode === 'vision' && props.lowPower
-          ? 0.75
+        lowPower
+          ? mode === 'vision'
+            ? 0.75
+            : 1
           : [1, mode === 'vision' ? 1.25 : 1.5]
       }
       frameloop={
-        mode === 'vision' && props.lowPower
+        mode === 'vision' && lowPower
           ? 'demand'
           : props.running
             ? 'always'
@@ -62,8 +71,12 @@ export default function Engineering3DScene({
       }
       gl={{
         alpha: false,
-        antialias: !(mode === 'vision' && props.lowPower),
+        antialias: mode !== 'vision' || !lowPower,
         powerPreference: 'low-power',
+      }}
+      onCreated={({ gl }) => {
+        if (mode !== 'vision')
+          setSoftwareRenderer(isSoftwareWebGLContext(gl.getContext()));
       }}
       role="img"
       aria-label={
@@ -76,40 +89,46 @@ export default function Engineering3DScene({
               : 'Atelier industriel et détection par caméra'
       }
     >
-      {mode === 'vision' ? (
+      {classified && (
         <>
-          <VisionLighting lowPower={props.lowPower} />
-          <VisionCamera view={props.view} />
-          {props.lowPower && <VisionRenderBudget running={props.running} />}
-        </>
-      ) : (
-        <>
-          <Studio mode={mode} />
-          <CameraDirector mode={mode} view={props.view} />
+          {mode === 'vision' ? (
+            <>
+              <VisionLighting lowPower={props.lowPower} />
+              <VisionCamera view={props.view} />
+            </>
+          ) : (
+            <>
+              <Studio mode={mode} lowPower={lowPower} />
+              <CameraDirector mode={mode} view={props.view} />
+            </>
+          )}
+          {mode === 'vision' && lowPower && (
+            <VisionRenderBudget running={props.running} />
+          )}
+          <Suspense fallback={null}>
+            {mode === 'scan' && <ScanScene {...props} />}
+            {mode === 'vision' && <VisionScene {...props} />}
+            {mode === 'cloud' && (
+              <FleetScene
+                {...props}
+                view={props.view === 'comparison' ? 'physical' : props.view}
+              />
+            )}
+            {mode === 'delivery' && (
+              <group>
+                <Enclosure
+                  size={[2, 0.12, 1.65]}
+                  position={[0, -0.1, 0]}
+                  color="#526d7a"
+                  radius={0.1}
+                />
+                <Jetson scale={2.2} active={props.stage !== 2} />
+              </group>
+            )}
+            <RenderStatus time={props.time} onUnavailable={onUnavailable} />
+          </Suspense>
         </>
       )}
-      <Suspense fallback={null}>
-        {mode === 'scan' && <ScanScene {...props} />}
-        {mode === 'vision' && <VisionScene {...props} />}
-        {mode === 'cloud' && (
-          <FleetScene
-            {...props}
-            view={props.view === 'comparison' ? 'physical' : props.view}
-          />
-        )}
-        {mode === 'delivery' && (
-          <group>
-            <Enclosure
-              size={[2, 0.12, 1.65]}
-              position={[0, -0.1, 0]}
-              color="#526d7a"
-              radius={0.1}
-            />
-            <Jetson scale={2.2} active={props.stage !== 2} />
-          </group>
-        )}
-        <RenderStatus time={props.time} onUnavailable={onUnavailable} />
-      </Suspense>
     </Canvas>
   );
 }
