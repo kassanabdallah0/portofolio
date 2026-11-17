@@ -1,0 +1,59 @@
+/* Context stays outside the camera's primary subject. The network itself is 3D. */
+.lab-three-story--cloud .eng-scene-caption {
+  display: none;
+}
+.fleet-context {
+  position: absolute;
+  left: 18px;
+  bottom: 18px;
+  z-index: 3;
+  display: grid;
+  gap: 5px;
+  max-width: min(440px, calc(100% - 36px));
+  padding: 11px 14px;
+  border-left: 2px solid #9cc4d4;
+  border-radius: 0 8px 8px 0;
+  background: #102432ed;
+  color: #d5e6ef;
+  pointer-events: none;
+  box-shadow: 0 6px 18px #05121c25;
+}
+.fleet-context .fleet-context-identity {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #bdced7;
+  font: 9px var(--font-mono, monospace);
+  letter-spacing: 0.07em;
+}
+.fleet-context-identity i {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #b5d4c7;
+}
+.fleet-context strong {
+  color: #f3f8fb;
+  font-size: 16px;
+  font-weight: 550;
+  letter-spacing: -0.025em;
+}
+.fleet-context > span:not(.fleet-context-identity) {
+  font-size: 11px;
+  line-height: 1.45;
+}
+.fleet-context small {
+  color: #bacbd4;
+  font-size: 10px;
+  line-height: 1.45;
+}
+@media (max-width: 900px) {
+  .fleet-context {
+    left: 12px;
+    bottom: 12px;
+    padding: 8px 11px;
+  }
+  .fleet-context strong {
+    font-size: 14px;
+  }
+}

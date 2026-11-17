@@ -207,32 +207,34 @@ export default function CoreVisual({
       el.setAttribute('opacity', `${Math.sin(p * Math.PI) ** 2}`);
     });
   }, []);
-  const { running, reduced, time, entered } = useSimulation(root, paused, draw);
+  const { running, reduced, time, entered, visible } = useSimulation(
+    root,
+    paused,
+    draw,
+  );
   useEffect(() => {
     const media = matchMedia(
       '(min-width: 900px) and (prefers-reduced-motion: no-preference)',
     );
-    let supported: boolean | undefined;
     const update = () => {
-      if (media.matches && supported === undefined) {
-        const canvas = document.createElement('canvas');
-        try {
-          const gl = canvas.getContext('webgl2');
-          supported = !!gl;
-          gl?.getExtension('WEBGL_lose_context')?.loseContext();
-        } catch {
-          supported = false;
-        }
-      }
-      setEnabled(media.matches && !!supported);
-      setReady(false);
+      // The real renderer reports availability through SceneBoundary; do not
+      // start a separate GPU context just to decide whether it can be created.
+      setEnabled(media.matches);
+      if (!media.matches) setReady(false);
     };
     update();
     media.addEventListener('change', update);
-    return () => media.removeEventListener('change', update);
+    return () => {
+      media.removeEventListener('change', update);
+    };
   }, []);
   // Direct links to a case study do not need to initialize a WebGL studio behind it.
-  const live = enabled && entered && !failed && (!suspended || ready);
+  const live =
+    enabled &&
+    entered &&
+    (visible || ready) &&
+    !failed &&
+    (!suspended || ready);
   return (
     <div
       className="core-visual glass glass--raised glass--optical"

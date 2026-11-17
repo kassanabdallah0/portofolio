@@ -1,10 +1,15 @@
 'use client';
 
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { useEffect, useMemo, useRef, type RefObject } from 'react';
+import { useEffect, useMemo, useRef, useState, type RefObject } from 'react';
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import {
+  readSoftwareRenderer,
+  recordSoftwareRenderer,
+} from './engineering/core/webglSupport';
+import SoftwareRenderBudget from './engineering/core/SoftwareRenderBudget';
 
 function SceneStatus({
   onReady,
@@ -24,12 +29,14 @@ function SceneStatus({
   return null;
 }
 
-function Studio() {
+function Studio({ lowPower }: { lowPower: boolean }) {
   const { gl, scene } = useThree();
   useEffect(() => {
     const generator = new THREE.PMREMGenerator(gl);
     const room = new RoomEnvironment();
-    const target = generator.fromScene(room, 0.04);
+    const target = lowPower
+      ? generator.fromScene(room, 0.04, 0.1, 100, { size: 64 })
+      : generator.fromScene(room, 0.04);
     // Three owns this mutable scene; it is not React state.
     // eslint-disable-next-line react-hooks/immutability
     scene.environment = target.texture;
@@ -39,7 +46,7 @@ function Studio() {
       scene.environment = null;
       target.dispose();
     };
-  }, [gl, scene]);
+  }, [gl, scene, lowPower]);
   return null;
 }
 
@@ -419,42 +426,55 @@ export default function HardwareScene({
   onReady: () => void;
   onUnavailable: () => void;
 }) {
+  const [softwareRenderer, setSoftwareRenderer] =
+    useState(readSoftwareRenderer);
+  const lowPower = softwareRenderer === true;
   return (
     <Canvas
-      dpr={[1, 1.5]}
-      frameloop={paused ? 'demand' : 'always'}
-      shadows
+      dpr={lowPower ? 1 : [1, 1.5]}
+      frameloop={lowPower || paused ? 'demand' : 'always'}
+      shadows={!lowPower}
       camera={{ position: [3.9, 2.5, 7.6], fov: 30 }}
       gl={{ alpha: true, antialias: true, powerPreference: 'low-power' }}
-      onCreated={({ camera }) => {
+      onCreated={({ camera, gl }) => {
         camera.lookAt(0, 0.2, 0);
+        setSoftwareRenderer(recordSoftwareRenderer(gl.getContext()));
       }}
     >
-      <SceneStatus onReady={onReady} onUnavailable={onUnavailable} />
-      <Studio />
-      <ambientLight intensity={0.55} />
-      <directionalLight
-        position={[-3, 8, 5]}
-        intensity={2.6}
-        castShadow
-        shadow-mapSize={[1024, 1024]}
-        shadow-camera-left={-4}
-        shadow-camera-right={4}
-        shadow-camera-top={4}
-        shadow-camera-bottom={-4}
-        shadow-normalBias={0.025}
-        shadow-radius={5}
-      />
-      <directionalLight position={[4, 2, -3]} intensity={2} color="#c4d9e8" />
-      <Hardware paused={paused} time={time} />
-      <mesh
-        rotation={[-Math.PI / 2, 0, 0]}
-        position={[0, -1.13, 0]}
-        receiveShadow
-      >
-        <planeGeometry args={[200, 200]} />
-        <shadowMaterial transparent opacity={0.13} />
-      </mesh>
+      {softwareRenderer !== undefined && (
+        <>
+          <SceneStatus onReady={onReady} onUnavailable={onUnavailable} />
+          <Studio lowPower={lowPower} />
+          <ambientLight intensity={0.55} />
+          <directionalLight
+            position={[-3, 8, 5]}
+            intensity={2.6}
+            castShadow={!lowPower}
+            shadow-mapSize={[1024, 1024]}
+            shadow-camera-left={-4}
+            shadow-camera-right={4}
+            shadow-camera-top={4}
+            shadow-camera-bottom={-4}
+            shadow-normalBias={0.025}
+            shadow-radius={5}
+          />
+          <directionalLight
+            position={[4, 2, -3]}
+            intensity={2}
+            color="#c4d9e8"
+          />
+          <Hardware paused={paused} time={time} />
+          <mesh
+            rotation={[-Math.PI / 2, 0, 0]}
+            position={[0, -1.13, 0]}
+            receiveShadow
+          >
+            <planeGeometry args={[200, 200]} />
+            <shadowMaterial transparent opacity={0.13} />
+          </mesh>
+          {lowPower && <SoftwareRenderBudget running={!paused} />}
+        </>
+      )}
     </Canvas>
   );
 }

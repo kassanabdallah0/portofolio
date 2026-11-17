@@ -1,0 +1,161 @@
+{
+  "renderer": "ANGLE (AMD, Vulkan 1.3.255 (AMD Unknown (RADV RENOIR) (0x0000164C)), radv)",
+  "errors": [],
+  "captures": [
+    {
+      "name": "desktop-normal",
+      "time": "1000",
+      "overflow": false
+    },
+    {
+      "name": "desktop-entry",
+      "time": "6300",
+      "overflow": false
+    },
+    {
+      "name": "desktop-tracking",
+      "time": "7300",
+      "overflow": false
+    },
+    {
+      "name": "desktop-confirmation",
+      "time": "8500",
+      "overflow": false
+    },
+    {
+      "name": "desktop-alert",
+      "time": "11000",
+      "overflow": false
+    },
+    {
+      "name": "desktop-camera",
+      "time": "11000",
+      "overflow": false
+    },
+    {
+      "name": "desktop-pipeline",
+      "time": "11000",
+      "overflow": false
+    },
+    {
+      "name": "desktop-throughput",
+      "time": "8500",
+      "overflow": false
+    },
+    {
+      "name": "desktop-brief-passage",
+      "time": "7300",
+      "overflow": false
+    },
+    {
+      "name": "cycle-14",
+      "time": "14367",
+      "overflow": false
+    },
+    {
+      "name": "cycle-29-85",
+      "time": "30216",
+      "overflow": false
+    },
+    {
+      "name": "cycle-30-15",
+      "time": "30666",
+      "overflow": false
+    },
+    {
+      "name": "desktop-dialog",
+      "time": "33183",
+      "overflow": false
+    },
+    {
+      "name": "desktop-card",
+      "time": null,
+      "overflow": false
+    },
+    {
+      "name": "fallback-320",
+      "time": "8500",
+      "overflow": false
+    },
+    {
+      "name": "fallback-360",
+      "time": "8500",
+      "overflow": false
+    },
+    {
+      "name": "fallback-393",
+      "time": "8500",
+      "overflow": false
+    },
+    {
+      "name": "fallback-768",
+      "time": "8500",
+      "overflow": false
+    },
+    {
+      "name": "fallback-1024",
+      "time": "8500",
+      "overflow": false
+    }
+  ],
+  "cycle": {
+    "complete": true,
+    "sequence": [
+      {
+        "target": 3,
+        "actual": 3,
+        "phase": "approach"
+      },
+      {
+        "target": 6.3,
+        "actual": 6.317,
+        "phase": "detection"
+      },
+      {
+        "target": 8.5,
+        "actual": 8.517,
+        "phase": "confirmation"
+      },
+      {
+        "target": 11,
+        "actual": 11.017,
+        "phase": "alert"
+      },
+      {
+        "target": 14,
+        "actual": 14.05,
+        "phase": "departure"
+      },
+      {
+        "target": 18,
+        "actual": 18.033,
+        "phase": "approach"
+      },
+      {
+        "target": 24,
+        "actual": 24.083,
+        "phase": "approach"
+      },
+      {
+        "target": 29.85,
+        "actual": 29.866,
+        "phase": "normal"
+      },
+      {
+        "target": 30.15,
+        "actual": 30.316,
+        "phase": "normal"
+      },
+      {
+        "target": 33,
+        "actual": 33.033,
+        "phase": "approach"
+      }
+    ],
+    "reviewWorkflowElapsedMs": 124156
+  },
+  "postReviewRecaptures": [
+    "Throughput at 8.5 s to show distinct frame counters",
+    "Card after the event opacity transition completed"
+  ]
+}

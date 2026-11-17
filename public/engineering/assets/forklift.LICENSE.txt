@@ -1,0 +1,6 @@
+Electric counterbalance forklift — Innerscene Corp
+Source: https://www.innerscene.com/tools/library/3d-parts/electric-counterbalance-forklift-7acc0547
+CC0 1.0 Universal: https://creativecommons.org/publicdomain/zero/1.0/
+Public domain; free to use, modify and redistribute for any purpose.
+Adapted for this portfolio by consolidating geometry and adding runtime wheel/carriage pivots.
+See docs/vision/ASSETS.md for hashes, dimensions, adaptations and limitations.
