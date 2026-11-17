@@ -16,7 +16,13 @@ export default defineConfig({
         ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH }
         : {}),
       // Exercise the WebGL path on CI runners without a physical GPU.
-      args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader'],
+      args: [
+        '--use-angle=swiftshader',
+        '--enable-unsafe-swiftshader',
+        // Use Skia's CPU page compositor alongside real SwiftShader WebGL.
+        // Forcing glass/backdrop compositing through the software GPU stalls CI.
+        '--disable-gpu-compositing',
+      ],
     },
   },
   projects: [

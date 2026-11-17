@@ -13,18 +13,30 @@ Environment: Node 20.19.4, Next.js static export, Chrome.
 | --- | --- |
 | ESLint | Passed |
 | TypeScript / production static build | Passed |
-| Affected desktop startup, pause, camera, visibility and context-disposal regressions | 9 passed with original timeouts |
+| Affected desktop startup, motion, camera and context-disposal regressions | 10 passed on two CPU cores, original timeouts |
 | Unsupported WebGL fallback | Existing regression passed (3.0 s) |
 | Complete CI workflow | [Current PR #7 checks](https://github.com/kassanabdallah0/portofolio/pull/7/checks) |
 | Actual rendered cycle and screenshots | 26 reviewed captures; no page errors or horizontal overflow in capture reports |
 
-The [complete workflow for `66f8b70`](https://github.com/kassanabdallah0/portofolio/actions/runs/44109731562)
-reported 79 passes, 8 retry passes, 2 startup failures and 9 intentional skips.
-Hero and Vision now create only the context that actually renders the scene;
-there are no disposable WebGL feature probes. Renderer metadata is recorded from
-that real context before scene content mounts. A failed renderer is handled by the
-existing scene boundary and lightweight fallback. The affected startup, fallback,
-pause, camera and actual-context cleanup cases subsequently passed locally.
+The [workflow for `22c1dcd`](https://github.com/kassanabdallah0/portofolio/actions/runs/44187567955)
+reported 81 passes, 6 retry passes, 2 failures and 9 intentional skips. Its traces
+showed multi-second gaps in browser responses, including a Manager dialog with no
+Canvas. That dialog reached the correct completed state after the assertion timed
+out. A controlled two-core run using CPU page compositing passed all ten targeted
+cases while retaining real SwiftShader WebGL, actual pause/projection checks and
+held-context disposal assertions.
+
+The test browser now uses `--disable-gpu-compositing` alongside the existing
+SwiftShader flags. This changes page compositing, not WebGL availability; Chromium
+supports [software page rendering with SwiftShader WebGL](https://chromium.googlesource.com/chromium/src/+/main/docs/gpu/swiftshader.md).
+The original tests, timeouts, retry policy and skips are preserved. Native GPU
+screenshots remain the visual reference, because compositors can differ in filter
+edge details.
+
+Hero and Vision create only the context that actually renders the scene; there
+are no disposable WebGL feature probes. Renderer metadata is recorded from that
+real context before scene content mounts. A failed renderer is handled by the
+existing scene boundary and lightweight fallback.
 
 The native IntersectionObserver's latest entry remains authoritative, including
 dialog clipping. Vision retains a stable presentation height while its Canvas is
