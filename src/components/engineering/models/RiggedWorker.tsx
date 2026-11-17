@@ -5,6 +5,7 @@ import { useFrame, useLoader } from '@react-three/fiber';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { clone } from 'three/examples/jsm/utils/SkeletonUtils.js';
+import { shareIdenticalSkeletons } from '../vision/shareIdenticalSkeletons';
 
 export type WorkerMotion = {
   walking: boolean;
@@ -19,6 +20,8 @@ type Props = {
   motion: RefObject<WorkerMotion>;
   height?: number;
   vestColor?: string;
+  /** Vision's multi-actor scene shares matching skeletons within each clone. */
+  shareSkeletons?: boolean;
 };
 
 const SOURCE_HEIGHT = 1.83403;
@@ -33,6 +36,7 @@ export function RiggedWorker({
   motion,
   height = 1.8,
   vestColor = '#e59739',
+  shareSkeletons = false,
 }: Props) {
   const source = useLoader(
     GLTFLoader,
@@ -50,6 +54,7 @@ export function RiggedWorker({
   } | null>(null);
   const instance = useMemo(() => {
     const scene = clone(source.scene);
+    if (shareSkeletons) shareIdenticalSkeletons(scene);
     const materials: THREE.Material[] = [];
     scene.traverse((object) => {
       if (!(object instanceof THREE.Mesh)) return;
@@ -73,7 +78,7 @@ export function RiggedWorker({
         : customize(object.material);
     });
     return { scene, materials };
-  }, [source.scene, vestColor]);
+  }, [source.scene, vestColor, shareSkeletons]);
 
   useEffect(() => {
     const mixer = new THREE.AnimationMixer(instance.scene);

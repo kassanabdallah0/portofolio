@@ -13,26 +13,32 @@ Environment: Node 20.19.4, Next.js static export, Chrome.
 | --- | --- |
 | ESLint | Passed |
 | TypeScript / production static build | Passed |
-| Initial complete desktop/mobile run | 86 passed, 9 intentional skips, 3 failures diagnosed below |
-| Corrected regressions, unchanged assertions/timeouts | 5 passed, 1 intentional mobile skip |
-| Final complete workflow | [Current PR #7 checks](https://github.com/kassanabdallah0/portofolio/pull/7/checks) |
-| Actual rendered cycle and screenshots | 19 primary captures; no page errors or horizontal overflow; full cycle observed |
-| Full PBR reference views | 3 captures on the native hardware tier; no page errors |
+| Dialog history, CV content, actual pause, camera projection and context disposal | 5 desktop checks passed |
+| Visibility / repeated-dialog regression | Desktop passed (21.4 s); mobile passed (10.6 s) |
+| Complete CI workflow | [Current PR #7 checks](https://github.com/kassanabdallah0/portofolio/pull/7/checks) |
+| Actual rendered cycle and screenshots | 26 reviewed captures; no page errors or horizontal overflow in capture reports |
 
-The full run identified a rapid-dialog GPU-initialization timeout and a repeated
-stage-selection failure on desktop/mobile. The latter came from a CSS decorative
-dot entering the button's accessible name after selection. The shared control now
-has a stable explicit accessible label; its visual appearance is preserved. No
-existing test was removed or weakened. The original failing cases were rerun with
-their existing timeouts and passed after the corrections.
+A [previous CI run](https://github.com/kassanabdallah0/portofolio/actions/runs/43594423512)
+exposed desktop rendering stalls during dialog transitions. The corrections keep
+Vision's presentation mounted at a stable height while releasing its Canvas when
+obscured or offscreen. Its visibility check also samples current viewport geometry
+during rapid anchor scrolling. The other exhibits retain their observer behavior.
+The new context-disposal test additionally checks that suspension preserves height;
+existing browser assertions, timeouts and intentional skips are unchanged.
 
-Vision now establishes its initial viewport state before GPU setup can delay the
-first observer delivery. Later transitions retain the existing newest-entry
-IntersectionObserver handling. GPU creation is deferred briefly on hardware and
-until a stable visit on software renderers; the lightweight live illustration
-appears during loading. Software material selection happens before the first GPU
-frame, so it does not first compile the expensive material tier. Original cached
-materials are preserved and restored on cleanup.
+Vision's software-GPU tier uses demand rendering, an 80 ms steady-state scheduling
+interval and an asynchronous completion fence before the next automatic frame.
+Explicit stage/view/resize invalidations can still render promptly. This tier uses
+DPR 0.75, no multisample antialiasing, vertex-lit materials and contact shadows.
+Hardware PBR rendering is unchanged. These rendering settings do not represent the
+5 → 30 FPS vision-processing improvement.
+
+Capability detection is cached once per document; its temporary 1×1 context is
+released even if a renderer query throws. The hero requests that capability only
+when visible, avoiding unused GPU startup on direct exhibit links. Matching cloned
+worker skeletons share their bone data within each Vision actor: 13 skeletons become
+one, with zero skinning-position difference across 1,252 sampled vertices. Source
+assets and the scan worker's default behavior remain unchanged.
 
 `tests/vision.spec.ts` checks:
 

@@ -9,6 +9,7 @@ import type {
 } from './engineering/core/types';
 import { FleetOverlay } from './engineering/overlays/FleetOverlay';
 import VisionExperience from './engineering/vision/VisionExperience';
+import { getWebGLSupport } from './engineering/core/webglSupport';
 const Scene3D = dynamic(() => import('./Engineering3DScene'), {
   ssr: false,
   loading: () => (
@@ -181,32 +182,25 @@ export default function EngineeringStory3D({
   mode,
   fallback,
   onReplay,
+  active = true,
   ...props
 }: SceneProps & {
   mode: PhysicalScene;
   fallback: ReactNode;
   onReplay?: () => void;
+  active?: boolean;
 }) {
   const [view, setView] = useState<SceneView>('physical');
-  const [support] = useState(() => {
-    if (typeof document === 'undefined')
-      return { available: false, software: false };
-    try {
-      const probe = document.createElement('canvas'),
-        gl = probe.getContext('webgl2');
-      const info = gl?.getExtension('WEBGL_debug_renderer_info');
-      const renderer =
-        gl && info ? String(gl.getParameter(info.UNMASKED_RENDERER_WEBGL)) : '';
-      const result = {
-        available: Boolean(gl),
-        software: /swiftshader|llvmpipe|softpipe|software/i.test(renderer),
-      };
-      gl?.getExtension('WEBGL_lose_context')?.loseContext();
-      return result;
-    } catch {
-      return { available: false, software: false };
-    }
-  });
+  const [support, setSupport] = useState<ReturnType<
+    typeof getWebGLSupport
+  > | null>(() => (mode === 'vision' ? null : getWebGLSupport()));
+  useEffect(() => {
+    if (!active || support !== null) return;
+    // Vision's shell commits before feature detection. A transient visit cannot
+    // synchronously create a probe while a modal is opening or closing.
+    const id = setTimeout(() => setSupport(getWebGLSupport()), 180);
+    return () => clearTimeout(id);
+  }, [active, support]);
   const fallbackView = (
     <div
       className="lab-3d-unsupported"
@@ -217,18 +211,20 @@ export default function EngineeringStory3D({
       {fallback}
     </div>
   );
-  if (!support.available) return fallbackView;
   if (mode === 'vision')
     return (
       <SceneBoundary fallback={fallbackView}>
         <VisionExperience
           {...props}
-          lowPower={support.software}
+          active={active}
+          available={support?.available}
+          lowPower={support?.software}
           fallback={fallback}
           onReplay={onReplay}
         />
       </SceneBoundary>
     );
+  if (!support?.available) return fallbackView;
   const item = spec[mode];
   return (
     <SceneBoundary fallback={fallbackView}>

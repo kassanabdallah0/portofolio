@@ -26,6 +26,7 @@ type Props = {
   cycle: number;
   pending: boolean;
   active3D: boolean;
+  vision3DShell?: boolean;
   time: RefObject<number>;
   onZoneChange: (value: number) => void;
   onSelectBus: (value: number) => void;
@@ -445,8 +446,9 @@ export default function EngineeringBlueprint(props: Props) {
     '--lab-progress': ((stage + 1) / steps[type].length) * 100 + '%',
   } as CSSProperties;
   const physical =
-    (type === 'scan' || type === 'vision' || type === 'cloud') &&
-    props.active3D;
+    type === 'vision'
+      ? (props.vision3DShell ?? props.active3D)
+      : (type === 'scan' || type === 'cloud') && props.active3D;
   return (
     <div
       className={'lab-blueprint lab-blueprint--' + type}
@@ -467,6 +469,7 @@ export default function EngineeringBlueprint(props: Props) {
         {physical && (
           <EngineeringStory3D
             mode={type as 'vision' | 'scan' | 'cloud'}
+            active={props.active3D}
             stage={stage}
             visionScenario={props.visionScenario}
             onVisionScenarioChange={props.onVisionScenarioChange}

@@ -142,6 +142,9 @@ export default function EngineeringDemo({ type }: { type: DemoType }) {
     pageVisible &&
     !reduced &&
     (running || paused || inspected !== null);
+  // Keep Vision's viewport and controls stable when its GPU scene is suspended.
+  // Only the renderer changes on visibility/modal transitions, not card height.
+  const vision3DShell = type === 'vision' && desktop3D && !reduced;
   useEffect(() => {
     trackedPerson.current =
       root.current?.querySelector<SVGGElement>('[data-person]') ?? null;
@@ -192,6 +195,9 @@ export default function EngineeringDemo({ type }: { type: DemoType }) {
       className={`engineering-demo glass-instrument demo-${type}`}
       data-demo={type}
       data-running={running}
+      data-viewport-visible={visible}
+      data-page-visible={pageVisible}
+      data-reduced-motion={reduced}
       data-stage={stage}
     >
       <div className="demo-heading">
@@ -227,6 +233,7 @@ export default function EngineeringDemo({ type }: { type: DemoType }) {
           cycle={releaseCycle}
           pending={pending}
           active3D={active3D}
+          vision3DShell={vision3DShell}
           time={time}
           onZoneChange={setSensitivity}
           onSelectBus={setSelectedBus}

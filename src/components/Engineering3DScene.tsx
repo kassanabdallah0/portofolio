@@ -7,6 +7,7 @@ import ScanScene from './engineering/scenes/ScanScene';
 import VisionScene from './engineering/scenes/VisionScene';
 import VisionCamera from './engineering/vision/VisionCamera';
 import VisionLighting from './engineering/vision/VisionLighting';
+import VisionRenderBudget from './engineering/vision/VisionRenderBudget';
 import FleetScene from './engineering/scenes/FleetScene';
 import { Enclosure, Jetson } from './engineering/models/IndustrialEquipment';
 export type { PhysicalScene } from './engineering/core/types';
@@ -47,9 +48,23 @@ export default function Engineering3DScene({
         far: 100,
       }}
       shadows={mode === 'vision' && props.lowPower ? false : 'soft'}
-      dpr={[1, mode === 'vision' ? (props.lowPower ? 1 : 1.25) : 1.5]}
-      frameloop={props.running ? 'always' : 'demand'}
-      gl={{ alpha: false, antialias: true, powerPreference: 'low-power' }}
+      dpr={
+        mode === 'vision' && props.lowPower
+          ? 0.75
+          : [1, mode === 'vision' ? 1.25 : 1.5]
+      }
+      frameloop={
+        mode === 'vision' && props.lowPower
+          ? 'demand'
+          : props.running
+            ? 'always'
+            : 'demand'
+      }
+      gl={{
+        alpha: false,
+        antialias: !(mode === 'vision' && props.lowPower),
+        powerPreference: 'low-power',
+      }}
       role="img"
       aria-label={
         mode === 'scan'
@@ -65,6 +80,7 @@ export default function Engineering3DScene({
         <>
           <VisionLighting lowPower={props.lowPower} />
           <VisionCamera view={props.view} />
+          {props.lowPower && <VisionRenderBudget running={props.running} />}
         </>
       ) : (
         <>

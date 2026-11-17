@@ -93,6 +93,7 @@ function Actor({
       <RiggedWorker
         time={time}
         motion={motion}
+        shareSkeletons
         vestColor={
           index === 1 ? '#d6c35f' : index === 2 ? '#b8c4af' : '#dca44c'
         }

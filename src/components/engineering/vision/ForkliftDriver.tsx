@@ -5,6 +5,7 @@ import { useLoader } from '@react-three/fiber';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { clone } from 'three/examples/jsm/utils/SkeletonUtils.js';
+import { shareIdenticalSkeletons } from './shareIdenticalSkeletons';
 
 /** Reuse the licensed human's actual skeleton for a fixed driving pose.
  * This is a locally authored seated pose, not an invented source animation clip.
@@ -16,6 +17,7 @@ export function ForkliftDriver() {
   );
   const scene = useMemo(() => {
     const model = clone(source.scene);
+    shareIdenticalSkeletons(model);
     const idle = source.animations.find((clip) => clip.name === 'idle');
     if (idle) {
       const mixer = new THREE.AnimationMixer(model);

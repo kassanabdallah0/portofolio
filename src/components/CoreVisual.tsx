@@ -12,6 +12,7 @@ import {
 } from 'react';
 import { Pause, Play } from 'lucide-react';
 import { useSimulation } from './useSimulation';
+import { getWebGLSupport } from './engineering/core/webglSupport';
 
 const HardwareScene = dynamic(() => import('./HardwareScene'), { ssr: false });
 const stages = [
@@ -184,6 +185,7 @@ export default function CoreVisual({
   const [stage, setStage] = useState(0);
   const [inspect, setInspect] = useState<number | null>(null);
   const previous = useRef(0);
+  const supported = useRef<boolean | undefined>(undefined);
   const onReady = useCallback(() => setReady(true), []);
   const onUnavailable = useCallback(() => {
     setFailed(true);
@@ -207,32 +209,50 @@ export default function CoreVisual({
       el.setAttribute('opacity', `${Math.sin(p * Math.PI) ** 2}`);
     });
   }, []);
-  const { running, reduced, time, entered } = useSimulation(root, paused, draw);
+  const { running, reduced, time, entered, visible } = useSimulation(
+    root,
+    paused,
+    draw,
+  );
   useEffect(() => {
     const media = matchMedia(
       '(min-width: 900px) and (prefers-reduced-motion: no-preference)',
     );
-    let supported: boolean | undefined;
+    let probeTimer: ReturnType<typeof setTimeout> | undefined;
     const update = () => {
-      if (media.matches && supported === undefined) {
-        const canvas = document.createElement('canvas');
-        try {
-          const gl = canvas.getContext('webgl2');
-          supported = !!gl;
-          gl?.getExtension('WEBGL_lose_context')?.loseContext();
-        } catch {
-          supported = false;
-        }
+      // Direct exhibit links should not synchronously start a GPU process for
+      // a hero outside the viewport. Share the small document capability cache.
+      if (
+        media.matches &&
+        visible &&
+        !suspended &&
+        supported.current === undefined
+      ) {
+        clearTimeout(probeTimer);
+        probeTimer = setTimeout(() => {
+          const rect = root.current?.getBoundingClientRect();
+          if (!rect || rect.bottom <= 0 || rect.top >= innerHeight) return;
+          supported.current = getWebGLSupport().available;
+          setEnabled(media.matches && supported.current);
+        }, 180);
       }
-      setEnabled(media.matches && !!supported);
-      setReady(false);
+      setEnabled(media.matches && !!supported.current);
+      if (!media.matches) setReady(false);
     };
     update();
     media.addEventListener('change', update);
-    return () => media.removeEventListener('change', update);
-  }, []);
+    return () => {
+      clearTimeout(probeTimer);
+      media.removeEventListener('change', update);
+    };
+  }, [visible, suspended]);
   // Direct links to a case study do not need to initialize a WebGL studio behind it.
-  const live = enabled && entered && !failed && (!suspended || ready);
+  const live =
+    enabled &&
+    entered &&
+    (visible || ready) &&
+    !failed &&
+    (!suspended || ready);
   return (
     <div
       className="core-visual glass glass--raised glass--optical"

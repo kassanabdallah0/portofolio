@@ -338,6 +338,9 @@ test('Vision releases real WebGL contexts when obscured, closed and scrolled off
     .toBe('true');
   const backgroundCanvas = background.locator('canvas[data-context="ready"]');
   await expect(backgroundCanvas).toBeVisible({ timeout: 20000 });
+  const backgroundHeight = () =>
+    background.evaluate((element) => element.getBoundingClientRect().height);
+  const mountedHeight = await backgroundHeight();
   const first = await retainContext(backgroundCanvas);
   await page
     .getByRole('button', {
@@ -351,19 +354,33 @@ test('Vision releases real WebGL contexts when obscured, closed and scrolled off
   );
   await expect(dialogCanvas).toBeVisible({ timeout: 20000 });
   await expect(background.locator('canvas')).toHaveCount(0);
+  // Suspending GPU ownership must not replace the viewport with a differently
+  // sized fallback, move the reopening trigger, or restart anchor scrolling.
+  expect(
+    Math.abs((await backgroundHeight()) - mountedHeight),
+  ).toBeLessThanOrEqual(1);
   await expectReleased(page, first);
   const second = await retainContext(dialogCanvas);
   await page.keyboard.press('Escape');
   await expect(dialog).not.toBeVisible();
+  expect(
+    Math.abs((await backgroundHeight()) - mountedHeight),
+  ).toBeLessThanOrEqual(1);
   await expectReleased(page, second);
   await background.evaluate((element) =>
     element.scrollIntoView({ behavior: 'instant', block: 'center' }),
   );
   await expect(backgroundCanvas).toBeVisible({ timeout: 20000 });
+  expect(
+    Math.abs((await backgroundHeight()) - mountedHeight),
+  ).toBeLessThanOrEqual(1);
   const third = await retainContext(backgroundCanvas);
   await page.locator('#contact').scrollIntoViewIfNeeded();
   await expect(background).toHaveAttribute('data-running', 'false');
   await expect(background.locator('canvas')).toHaveCount(0);
+  expect(
+    Math.abs((await backgroundHeight()) - mountedHeight),
+  ).toBeLessThanOrEqual(1);
   await expectReleased(page, third);
   expect(errors).toEqual([]);
 });

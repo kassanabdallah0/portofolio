@@ -22,17 +22,17 @@ const names = {
 export default function VisionExperience({
   fallback,
   onReplay,
+  active = true,
+  available,
   ...props
-}: SceneProps & { fallback: ReactNode; onReplay?: () => void }) {
+}: SceneProps & {
+  fallback: ReactNode;
+  onReplay?: () => void;
+  active?: boolean;
+  available?: boolean;
+}) {
   const [view, setView] = useState<SceneView>('physical');
   const [failed, setFailed] = useState(false);
-  const [ready, setReady] = useState(false);
-  useEffect(() => {
-    // Paint the exhibit controls before initializing GPU resources. Debounce transient visibility
-    // while dialogs open/close to avoid creating short-lived GPU contexts.
-    const id = setTimeout(() => setReady(true), props.lowPower ? 2500 : 180);
-    return () => clearTimeout(id);
-  }, [props.lowPower]);
   const root = useRef<HTMLElement>(null),
     last = useRef('');
   const scenario = props.visionScenario ?? 'normal';
@@ -61,23 +61,20 @@ export default function VisionExperience({
     draw();
     return () => cancelAnimationFrame(id);
   }, [props.time, props.running, props.stage, scenario]);
-  if (failed)
-    return (
-      <div
-        className="lab-3d-unsupported"
-        role="group"
-        data-renderer="2d"
-        aria-label="Illustration de secours"
-      >
-        {fallback}
-      </div>
-    );
   return (
     <section
       ref={root}
       className="lab-three-story lab-three-story--vision vision-experience"
       data-three-scene="vision"
-      data-render-tier={props.lowPower ? 'software' : 'hardware'}
+      data-render-tier={
+        failed || available === false
+          ? 'fallback'
+          : available === undefined
+            ? 'pending'
+            : props.lowPower
+              ? 'software'
+              : 'hardware'
+      }
       data-view={view}
       aria-label="SecuriSPOT · atelier surveillé"
     >
@@ -116,31 +113,24 @@ export default function VisionExperience({
         </div>
       </div>
       <div className="lab-three-stage vision-stage">
-        {ready ? (
-          <Scene
+        {active && available && !failed ? (
+          <VisionViewport
             {...props}
-            mode="vision"
             view={view}
+            fallback={fallback}
             onUnavailable={() => setFailed(true)}
           />
         ) : (
-          <div className="vision-loading-preview" aria-hidden="true" inert>
-            {fallback}
-          </div>
+          <VisionPreview
+            fallback={fallback}
+            unavailable={failed || available === false}
+          />
         )}
         {view === 'camera' && (
           <div className="vision-camera-label">
             <i /> REALSENSE · CAM-01 <span>IMAGE SYNTHÉTIQUE</span>
           </div>
         )}
-        <div
-          data-tracking-box="true"
-          className="eng-tracking-box vision-track"
-          aria-hidden="true"
-        >
-          <span>PERSONNE · ID 01</span>
-          <i>observation directe</i>
-        </div>
         {view === 'architecture' && <VisionPipeline stage={props.stage} />}
         {view === 'comparison' && (
           <Throughput time={props.time} running={props.running} />
@@ -190,6 +180,57 @@ export default function VisionExperience({
         <span>Débit observé sur le terrain, pas cadence d’affichage.</span>
       </p>
     </section>
+  );
+}
+
+function VisionPreview({
+  fallback,
+  unavailable = false,
+}: {
+  fallback: ReactNode;
+  unavailable?: boolean;
+}) {
+  return (
+    <div
+      className="vision-loading-preview"
+      aria-hidden={unavailable ? undefined : true}
+      inert={!unavailable}
+    >
+      {fallback}
+    </div>
+  );
+}
+
+/** This small child owns readiness. Suspending it cancels the pending startup
+ * and disposes an existing Canvas; the surrounding presentation stays mounted.
+ * A later activation always begins a fresh debounce with no stale ready frame.
+ */
+function VisionViewport({
+  fallback,
+  onUnavailable,
+  ...props
+}: SceneProps & {
+  fallback: ReactNode;
+  onUnavailable: () => void;
+}) {
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    const id = setTimeout(() => setReady(true), props.lowPower ? 2500 : 180);
+    return () => clearTimeout(id);
+  }, [props.lowPower]);
+  if (!ready) return <VisionPreview fallback={fallback} />;
+  return (
+    <>
+      <Scene {...props} mode="vision" onUnavailable={onUnavailable} />
+      <div
+        data-tracking-box="true"
+        className="eng-tracking-box vision-track"
+        aria-hidden="true"
+      >
+        <span>PERSONNE · ID 01</span>
+        <i>observation directe</i>
+      </div>
+    </>
   );
 }
 function VisionPipeline({ stage }: { stage: number }) {
