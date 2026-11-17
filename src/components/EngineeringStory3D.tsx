@@ -9,7 +9,6 @@ import type {
 } from './engineering/core/types';
 import { FleetOverlay } from './engineering/overlays/FleetOverlay';
 import VisionExperience from './engineering/vision/VisionExperience';
-import { getWebGLSupport } from './engineering/core/webglSupport';
 const Scene3D = dynamic(() => import('./Engineering3DScene'), {
   ssr: false,
   loading: () => (
@@ -191,18 +190,6 @@ export default function EngineeringStory3D({
   active?: boolean;
 }) {
   const [view, setView] = useState<SceneView>('physical');
-  const [support, setSupport] = useState<ReturnType<
-    typeof getWebGLSupport
-  > | null>(() =>
-    mode === 'vision' ? null : { available: true, software: false },
-  );
-  useEffect(() => {
-    if (!active || support !== null) return;
-    // Vision's shell commits before feature detection. A transient visit cannot
-    // synchronously create a probe while a modal is opening or closing.
-    const id = setTimeout(() => setSupport(getWebGLSupport()), 180);
-    return () => clearTimeout(id);
-  }, [active, support]);
   const fallbackView = (
     <div
       className="lab-3d-unsupported"
@@ -219,14 +206,11 @@ export default function EngineeringStory3D({
         <VisionExperience
           {...props}
           active={active}
-          available={support?.available}
-          lowPower={support?.software}
           fallback={fallback}
           onReplay={onReplay}
         />
       </SceneBoundary>
     );
-  if (!support?.available) return fallbackView;
   const item = spec[mode];
   return (
     <SceneBoundary fallback={fallbackView}>
@@ -275,7 +259,6 @@ export default function EngineeringStory3D({
         <div className="lab-three-stage">
           <Scene3D
             {...props}
-            lowPower={support.software}
             mode={mode}
             view={view}
             onSelectBus={(index) => {

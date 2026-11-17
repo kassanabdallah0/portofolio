@@ -2,13 +2,16 @@
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Suspense, useEffect, useState } from 'react';
 import { Studio, CameraDirector } from './engineering/core/Studio';
-import { isSoftwareWebGLContext } from './engineering/core/webglSupport';
+import {
+  readSoftwareRenderer,
+  recordSoftwareRenderer,
+} from './engineering/core/webglSupport';
 import type { PhysicalScene, SceneProps } from './engineering/core/types';
 import ScanScene from './engineering/scenes/ScanScene';
 import VisionScene from './engineering/scenes/VisionScene';
 import VisionCamera from './engineering/vision/VisionCamera';
 import VisionLighting from './engineering/vision/VisionLighting';
-import VisionRenderBudget from './engineering/vision/VisionRenderBudget';
+import SoftwareRenderBudget from './engineering/core/SoftwareRenderBudget';
 import FleetScene from './engineering/scenes/FleetScene';
 import { Enclosure, Jetson } from './engineering/models/IndustrialEquipment';
 export type { PhysicalScene } from './engineering/core/types';
@@ -36,14 +39,19 @@ function RenderStatus({
 export default function Engineering3DScene({
   mode,
   onUnavailable,
+  onRendererReady,
   ...props
-}: SceneProps & { mode: PhysicalScene; onUnavailable?: () => void }) {
+}: SceneProps & {
+  mode: PhysicalScene;
+  onUnavailable?: () => void;
+  onRendererReady?: (software: boolean) => void;
+}) {
   const [softwareRenderer, setSoftwareRenderer] = useState<boolean | null>(
     null,
   );
-  const lowPower =
-    mode === 'vision' ? props.lowPower : softwareRenderer === true;
-  const classified = mode === 'vision' || softwareRenderer !== null;
+  const knownSoftware = props.lowPower ?? readSoftwareRenderer();
+  const lowPower = softwareRenderer ?? knownSoftware ?? true;
+  const classified = softwareRenderer !== null;
   return (
     <Canvas
       className="lab-physical-canvas"
@@ -71,12 +79,13 @@ export default function Engineering3DScene({
       }
       gl={{
         alpha: false,
-        antialias: mode !== 'vision' || !lowPower,
+        antialias: mode !== 'vision' || knownSoftware !== true,
         powerPreference: 'low-power',
       }}
       onCreated={({ gl }) => {
-        if (mode !== 'vision')
-          setSoftwareRenderer(isSoftwareWebGLContext(gl.getContext()));
+        const software = recordSoftwareRenderer(gl.getContext());
+        setSoftwareRenderer(software);
+        onRendererReady?.(software);
       }}
       role="img"
       aria-label={
@@ -93,7 +102,7 @@ export default function Engineering3DScene({
         <>
           {mode === 'vision' ? (
             <>
-              <VisionLighting lowPower={props.lowPower} />
+              <VisionLighting lowPower={lowPower} />
               <VisionCamera view={props.view} />
             </>
           ) : (
@@ -103,11 +112,13 @@ export default function Engineering3DScene({
             </>
           )}
           {mode === 'vision' && lowPower && (
-            <VisionRenderBudget running={props.running} />
+            <SoftwareRenderBudget running={props.running} />
           )}
           <Suspense fallback={null}>
             {mode === 'scan' && <ScanScene {...props} />}
-            {mode === 'vision' && <VisionScene {...props} />}
+            {mode === 'vision' && (
+              <VisionScene {...props} lowPower={lowPower} />
+            )}
             {mode === 'cloud' && (
               <FleetScene
                 {...props}

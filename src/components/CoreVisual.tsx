@@ -12,7 +12,6 @@ import {
 } from 'react';
 import { Pause, Play } from 'lucide-react';
 import { useSimulation } from './useSimulation';
-import { getWebGLSupport } from './engineering/core/webglSupport';
 
 const HardwareScene = dynamic(() => import('./HardwareScene'), { ssr: false });
 const stages = [
@@ -185,7 +184,6 @@ export default function CoreVisual({
   const [stage, setStage] = useState(0);
   const [inspect, setInspect] = useState<number | null>(null);
   const previous = useRef(0);
-  const supported = useRef<boolean | undefined>(undefined);
   const onReady = useCallback(() => setReady(true), []);
   const onUnavailable = useCallback(() => {
     setFailed(true);
@@ -218,34 +216,18 @@ export default function CoreVisual({
     const media = matchMedia(
       '(min-width: 900px) and (prefers-reduced-motion: no-preference)',
     );
-    let probeTimer: ReturnType<typeof setTimeout> | undefined;
     const update = () => {
-      // Direct exhibit links should not synchronously start a GPU process for
-      // a hero outside the viewport. Share the small document capability cache.
-      if (
-        media.matches &&
-        visible &&
-        !suspended &&
-        supported.current === undefined
-      ) {
-        clearTimeout(probeTimer);
-        probeTimer = setTimeout(() => {
-          const rect = root.current?.getBoundingClientRect();
-          if (!rect || rect.bottom <= 0 || rect.top >= innerHeight) return;
-          supported.current = getWebGLSupport().available;
-          setEnabled(media.matches && supported.current);
-        }, 180);
-      }
-      setEnabled(media.matches && !!supported.current);
+      // The real renderer reports availability through SceneBoundary; do not
+      // start a separate GPU context just to decide whether it can be created.
+      setEnabled(media.matches);
       if (!media.matches) setReady(false);
     };
     update();
     media.addEventListener('change', update);
     return () => {
-      clearTimeout(probeTimer);
       media.removeEventListener('change', update);
     };
-  }, [visible, suspended]);
+  }, []);
   // Direct links to a case study do not need to initialize a WebGL studio behind it.
   const live =
     enabled &&

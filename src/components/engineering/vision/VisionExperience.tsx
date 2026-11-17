@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Boxes, Camera, Gauge, RotateCcw, ScanEye } from 'lucide-react';
 import type { SceneProps, SceneView } from '../core/types';
 import { visionState } from './visionTimeline';
+import { readSoftwareRenderer } from '../core/webglSupport';
 const Scene = dynamic(() => import('../../Engineering3DScene'), {
   ssr: false,
   loading: () => (
@@ -23,16 +24,15 @@ export default function VisionExperience({
   fallback,
   onReplay,
   active = true,
-  available,
   ...props
 }: SceneProps & {
   fallback: ReactNode;
   onReplay?: () => void;
   active?: boolean;
-  available?: boolean;
 }) {
   const [view, setView] = useState<SceneView>('physical');
   const [failed, setFailed] = useState(false);
+  const [software, setSoftware] = useState(readSoftwareRenderer);
   const root = useRef<HTMLElement>(null),
     last = useRef('');
   const scenario = props.visionScenario ?? 'normal';
@@ -67,11 +67,11 @@ export default function VisionExperience({
       className="lab-three-story lab-three-story--vision vision-experience"
       data-three-scene="vision"
       data-render-tier={
-        failed || available === false
+        failed
           ? 'fallback'
-          : available === undefined
+          : software === undefined
             ? 'pending'
-            : props.lowPower
+            : software
               ? 'software'
               : 'hardware'
       }
@@ -113,18 +113,17 @@ export default function VisionExperience({
         </div>
       </div>
       <div className="lab-three-stage vision-stage">
-        {active && available && !failed ? (
+        {active && !failed ? (
           <VisionViewport
             {...props}
             view={view}
+            lowPower={software}
+            onRendererReady={setSoftware}
             fallback={fallback}
             onUnavailable={() => setFailed(true)}
           />
         ) : (
-          <VisionPreview
-            fallback={fallback}
-            unavailable={failed || available === false}
-          />
+          <VisionPreview fallback={fallback} unavailable={failed} />
         )}
         {view === 'camera' && (
           <div className="vision-camera-label">
@@ -208,20 +207,30 @@ function VisionPreview({
 function VisionViewport({
   fallback,
   onUnavailable,
+  onRendererReady,
   ...props
 }: SceneProps & {
   fallback: ReactNode;
   onUnavailable: () => void;
+  onRendererReady: (software: boolean) => void;
 }) {
   const [ready, setReady] = useState(false);
+  const startupDelay = useRef(
+    (props.lowPower ?? readSoftwareRenderer()) === false ? 180 : 2500,
+  );
   useEffect(() => {
-    const id = setTimeout(() => setReady(true), props.lowPower ? 2500 : 180);
+    const id = setTimeout(() => setReady(true), startupDelay.current);
     return () => clearTimeout(id);
-  }, [props.lowPower]);
+  }, []);
   if (!ready) return <VisionPreview fallback={fallback} />;
   return (
     <>
-      <Scene {...props} mode="vision" onUnavailable={onUnavailable} />
+      <Scene
+        {...props}
+        mode="vision"
+        onUnavailable={onUnavailable}
+        onRendererReady={onRendererReady}
+      />
       <div
         data-tracking-box="true"
         className="eng-tracking-box vision-track"

@@ -7,7 +7,11 @@ import { useFrame, useThree } from '@react-three/fiber';
  * clock. Explicit stage/view invalidation can still render promptly. Hardware
  * rendering never uses this scheduler.
  */
-export default function VisionRenderBudget({ running }: { running: boolean }) {
+export default function SoftwareRenderBudget({
+  running,
+}: {
+  running: boolean;
+}) {
   const { gl, invalidate } = useThree();
   const pending = useRef<{
     timer: ReturnType<typeof setTimeout> | null;
