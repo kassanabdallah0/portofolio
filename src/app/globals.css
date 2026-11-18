@@ -1101,7 +1101,7 @@ img {
   border-color: #34414a;
 }
 .project-delivery .demo-world {
-  max-height: 380px;
+  max-height: none;
 }
 .project-delivery .exhibit-scene {
   max-height: 380px;

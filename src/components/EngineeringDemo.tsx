@@ -294,7 +294,22 @@ export default function EngineeringDemo({ type }: { type: DemoType }) {
 
       {type === 'delivery' && (
         <div className="demo-interaction delivery-controls">
-          <span>Scénario illustratif</span>
+          <span>
+            Une étape à la fois · cliquez sur le parcours pour l’inspecter.
+          </span>
+          <button
+            type="button"
+            onClick={() => {
+              seek(0);
+              setInspected(null);
+              setPaused(false);
+              setRestored(false);
+              restoredRef.current = false;
+            }}
+          >
+            <RotateCcw size={15} />
+            Rejouer le déploiement
+          </button>
           <button
             type="button"
             aria-pressed={rollback}

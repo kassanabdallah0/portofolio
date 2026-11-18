@@ -3,6 +3,7 @@
 import { useId, type ReactNode } from 'react';
 import {
   ArrowDown,
+  ArrowRight,
   Check,
   CheckCheck,
   Circle,
@@ -207,6 +208,50 @@ export default function DeliveryScene({
     : stage === 2 || stage === 3
       ? 'updating'
       : 'stable';
+  const story = failure
+    ? {
+        title: 'Un contrôle échoue. Retour en cours.',
+        detail: `${candidateVersion} ne passe pas le contrôle de santé. Le Jetson restaure ${previousVersion}.`,
+      }
+    : recovered
+      ? {
+          title: 'La version stable est restaurée.',
+          detail: `${previousVersion} fonctionne à nouveau. Le retour est terminé et les contrôles sont validés.`,
+        }
+      : [
+          {
+            title: 'Une nouvelle version est créée.',
+            detail: `Le tag ${candidateVersion} identifie le code à livrer. Le Jetson continue de fonctionner avec ${previousVersion}.`,
+          },
+          {
+            title: 'Le code est testé, puis empaqueté.',
+            detail:
+              'GitLab CI exécute les tests et publie une image Docker. Rien ne change encore sur le Jetson.',
+          },
+          {
+            title: 'Le Jetson est vérifié avant installation.',
+            detail: `Une commande locale vérifie la caméra et les images Docker. ${previousVersion} reste la version active.`,
+          },
+          {
+            title: 'La nouvelle version prend le relais.',
+            detail: `Le service passe de ${previousVersion} à ${candidateVersion}. La version précédente reste disponible en secours.`,
+          },
+          {
+            title: 'La mise à jour fonctionne.',
+            detail: `${candidateVersion} est active et les contrôles de santé sont validés. Le Jetson est prêt.`,
+          },
+        ][stage];
+  const checks = [
+    { label: 'Caméra et connexions', ready: stage >= 2 },
+    { label: 'Images Docker vérifiées', ready: stage >= 2 },
+    {
+      label: recovered
+        ? `${previousVersion} restaurée`
+        : `${candidateVersion} activée`,
+      ready: stage >= 3,
+    },
+    { label: 'Contrôle de santé du service', ready: stage === 4 && !failure },
+  ];
   const lines = [
     {
       visible: true,
@@ -274,10 +319,40 @@ export default function DeliveryScene({
       <header className="eng-delivery-heading">
         <div>
           <span className="eng-eyebrow">DE LA RELEASE AU TERRAIN</span>
-          <h4>Préparer. Vérifier. Activer.</h4>
+          <h4>Du code au Jetson.</h4>
         </div>
         <span className="eng-simulation-tag">SCÉNARIO ILLUSTRATIF</span>
       </header>
+      <div className="eng-release-story" data-delivery-step={stage + 1}>
+        <span className="eng-release-number" aria-hidden="true">
+          {String(stage + 1).padStart(2, '0')}
+          <small>/ 05</small>
+        </span>
+        <div>
+          <span className="eng-release-location">
+            {stage < 2
+              ? 'DANS GITLAB · PRÉPARATION'
+              : 'SUR LE JETSON · DÉPLOIEMENT LOCAL'}
+          </span>
+          <h5>{story.title}</h5>
+          <p>{story.detail}</p>
+        </div>
+      </div>
+      <div className="eng-release-progress" aria-hidden="true">
+        {['Code', 'Tests', 'Jetson', 'Activer', 'État'].map(
+          (name, i) => (
+            <span
+              key={name}
+              data-state={
+                i < stage ? 'complete' : i === stage ? 'current' : 'pending'
+              }
+            >
+              <i />
+              {name}
+            </span>
+          ),
+        )}
+      </div>
       <div
         role="group"
         className="eng-ci-lane"
@@ -290,6 +365,7 @@ export default function DeliveryScene({
             className={
               'eng-ci-step ' + (stage >= (i === 0 ? 0 : 1) ? 'is-ready' : '')
             }
+            data-current={stage === (i === 0 ? 0 : 1)}
           >
             <span className="eng-ci-icon">
               <Icon size={19} />
@@ -340,28 +416,39 @@ export default function DeliveryScene({
           </div>
         </div>
         <div className="eng-deploy-terminal">
-          <div className="eng-terminal-chrome">
-            <Terminal size={14} />
-            <span>jetson / déploiement local</span>
-            <span>EXEMPLE</span>
+          <div className="eng-jetson-checks-heading">
+            <ShieldCheck size={19} />
+            <strong>Ce qui change sur le Jetson</strong>
           </div>
-          <div
-            className="eng-terminal-lines"
-            role="group"
-            aria-label="Journal de déploiement simulé"
+          <ol
+            className="eng-device-checks"
+            aria-label="État des vérifications du Jetson"
           >
-            {lines
-              .filter((line) => line.visible)
-              .map((line) => (
-                <div
-                  key={line.text}
-                  className={'eng-terminal-line is-' + line.kind}
-                >
-                  <span>{line.prefix}</span>
-                  <code>{line.text}</code>
-                </div>
-              ))}
-          </div>
+            {checks.map((item, i) => (
+              <li
+                key={i}
+                data-state={
+                  failure && i === 3
+                    ? 'warning'
+                    : item.ready
+                      ? 'complete'
+                      : 'pending'
+                }
+              >
+                {failure && i === 3 ? (
+                  <Undo2 size={17} />
+                ) : item.ready ? (
+                  <Check size={17} />
+                ) : (
+                  <Circle size={17} />
+                )}
+                <span>{item.label}</span>
+                <small>
+                  {failure && i === 3 ? 'Échec' : item.ready ? 'OK' : 'À venir'}
+                </small>
+              </li>
+            ))}
+          </ol>
           <div
             className={
               'eng-terminal-result ' +
@@ -404,6 +491,34 @@ export default function DeliveryScene({
               </span>
             </div>
           </div>
+          <details className="eng-release-log">
+            <summary>
+              <Terminal size={15} />
+              Voir le journal technique
+              <ArrowRight size={14} />
+            </summary>
+            <div className="eng-terminal-chrome">
+              <span>jetson / déploiement local</span>
+              <span>EXEMPLE</span>
+            </div>
+            <div
+              className="eng-terminal-lines"
+              role="group"
+              aria-label="Journal de déploiement simulé"
+            >
+              {lines
+                .filter((line) => line.visible)
+                .map((line) => (
+                  <div
+                    key={line.text}
+                    className={'eng-terminal-line is-' + line.kind}
+                  >
+                    <span>{line.prefix}</span>
+                    <code>{line.text}</code>
+                  </div>
+                ))}
+            </div>
+          </details>
         </div>
       </div>
     </section>

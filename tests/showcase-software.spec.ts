@@ -1,5 +1,49 @@
 import { test, expect } from '@playwright/test';
 
+test('delivery explains the active change and keeps the device visible in its card', async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('./#projets');
+  const card = page.locator('.project-delivery');
+  const world = card.locator('.demo-world');
+  const slots = card.locator('.eng-release-slots');
+  await slots.scrollIntoViewIfNeeded();
+  const frame = await world.boundingBox();
+  const versions = await slots.boundingBox();
+  expect(frame).not.toBeNull();
+  expect(versions).not.toBeNull();
+  expect(versions!.y + versions!.height).toBeLessThanOrEqual(
+    frame!.y + frame!.height,
+  );
+  await page.goto('./#projet/edge-delivery');
+  const demo = page.getByRole('dialog').locator('[data-demo="delivery"]');
+  const story = demo.locator('.eng-release-story');
+  await demo
+    .getByRole('button', { name: '03 Validation Jetson', exact: true })
+    .click();
+  await expect(story).toContainText('vérifié avant installation');
+  await expect(story).toContainText('v1.2.3 reste la version active');
+  await demo
+    .getByRole('button', { name: '04 Activation', exact: true })
+    .click();
+  await expect(story).toContainText('de v1.2.3 à v1.2.4');
+  await expect(demo.locator('.eng-release-slots>div').first()).toContainText(
+    'v1.2.4',
+  );
+  await demo
+    .getByRole('button', { name: 'Rejouer le déploiement', exact: true })
+    .click();
+  await expect(story).toHaveAttribute('data-delivery-step', '1');
+  await expect(story).toContainText('Une nouvelle version est créée');
+  const log = demo.locator('.eng-release-log summary');
+  await log.focus();
+  await page.keyboard.press('Enter');
+  await expect(
+    demo.getByRole('group', { name: 'Journal de déploiement simulé' }),
+  ).toBeVisible();
+});
+
 test('Manager zone can be resized with pointer and keyboard and applied independently', async ({
   page,
 }) => {
@@ -120,10 +164,15 @@ test('real 3D Jetson hardware is present in the release console on desktop', asy
   page,
   isMobile,
 }) => {
-  test.skip(isMobile, 'Mobile intentionally uses a lightweight technical illustration.');
+  test.skip(
+    isMobile,
+    'Mobile intentionally uses a lightweight technical illustration.',
+  );
   await page.goto('./#projet/edge-delivery');
   const demo = page.getByRole('dialog').locator('[data-demo="delivery"]');
-  await expect(demo.locator('.eng-delivery canvas[data-context="ready"]')).toBeVisible({
+  await expect(
+    demo.locator('.eng-delivery canvas[data-context="ready"]'),
+  ).toBeVisible({
     timeout: 20000,
   });
   await expect(demo).toContainText('ACTIVATION LOCALE');
