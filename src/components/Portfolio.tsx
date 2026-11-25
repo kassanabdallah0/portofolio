@@ -5,7 +5,6 @@ import type { ReactNode } from 'react';
 import { motion, MotionConfig, useReducedMotion } from 'motion/react';
 import {
   ArrowDown,
-  ArrowRight,
   ArrowUpRight,
   BrainCircuit,
   Check,
@@ -200,7 +199,7 @@ function Navigation() {
           </a>
         </nav>
         <a href="#contact" className="nav-contact">
-          Parlons de votre projet <ArrowUpRight size={15} />
+          Me contacter <ArrowUpRight size={15} />
         </a>
         <button
           ref={toggle}
@@ -559,47 +558,57 @@ export default function Portfolio() {
             <div className="hero-copy">
               <p className="eyebrow hero-eyebrow">
                 <span className="eyebrow-line" />
-                ABDALLAH KASSAN / INGÉNIEUR UTT
+                Abdallah Kassan · Ingénieur diplômé de l’UTT
               </p>
               <motion.h1 initial={{ opacity: 1 }} animate={{ opacity: 1 }}>
-                <span>Ingénieur Logiciel.</span>
-                <span>
-                  Systèmes
-                  <br className="medium-break" /> Intelligents.
+                <span>Ingénieur logiciel</span>
+                <span className="accent-text">
+                  <span className="sr-only"> — </span>Full Stack &amp; Backend
                 </span>
-                <span className="accent-text">IA Embarquée.</span>
               </motion.h1>
-              <p className="hero-specialties">
-                Full Stack <span>/</span> Backend <span>/</span> Cloud{' '}
-                <span>/</span> Edge AI
-              </p>
               <p className="hero-description">
-                Des interfaces React aux services AWS, jusqu’à la vision sur
-                NVIDIA Jetson : je conçois, livre et maintiens des logiciels qui
-                fonctionnent sur le terrain.
+                Je conçois les interfaces, développe les API et assure le
+                déploiement et la maintenance des logiciels en production.
+              </p>
+              <p className="hero-specialties">
+                React <span>·</span> TypeScript <span>·</span> Node.js{' '}
+                <span>·</span> Python <span>·</span> AWS
+              </p>
+              <p className="hero-credibility">
+                Plus de 2 ans d’expérience chez Fastpoint · Caen · Mobilité
+                France
               </p>
               <div className="hero-actions">
                 <MagneticLink href="#projets" className="button button-primary">
-                  Explorer mes projets
+                  Voir mes réalisations
                   <ArrowUpRight size={18} />
                 </MagneticLink>
-                <MagneticLink href="#contact" className="button button-quiet">
-                  Me contacter
-                  <ArrowRight size={16} />
-                </MagneticLink>
+                <a
+                  href={profile.cv}
+                  download={profile.cvFilename}
+                  className="button button-quiet"
+                >
+                  <Download size={16} />
+                  Télécharger mon CV
+                </a>
               </div>
               <p className="availability">
                 <span className="status-dot" />
                 Disponible pour de nouvelles opportunités
               </p>
             </div>
-            <CoreVisual suspended={Boolean(selectedProject)} />
+            <CoreVisual
+              suspended={Boolean(selectedProject)}
+              onExploreProject={(slug) => {
+                window.location.hash = `projet/${slug}`;
+              }}
+            />
             <div className="hero-bottom">
               <a href="#a-propos" className="scroll-link">
                 <span className="scroll-icon">
                   <ArrowDown size={15} />
                 </span>
-                DÉCOUVRIR MON UNIVERS
+                MON PARCOURS & MON APPROCHE
               </a>
               <span className="hero-location">
                 <MapPin size={13} />

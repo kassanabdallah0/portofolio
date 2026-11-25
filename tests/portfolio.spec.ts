@@ -12,13 +12,13 @@ test('French content, metadata and navigation targets are present', async ({
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto('./');
-  await expect(page).toHaveTitle(/Abdallah Kassan.*IA embarquée/);
+  await expect(page).toHaveTitle(/Abdallah Kassan.*Full Stack.*Backend/);
   await expect(page.locator('html')).toHaveAttribute('lang', 'fr');
   await expect(page.getByRole('heading', { level: 1 })).toContainText(
-    'Ingénieur Logiciel.',
+    'Ingénieur logiciel',
   );
   await expect(page.getByRole('heading', { level: 1 })).toContainText(
-    'IA Embarquée.',
+    'Full Stack & Backend',
   );
   const ids = await page
     .locator('a[href^="#"]')
@@ -158,7 +158,7 @@ test('CV download is a real PDF with current content', async ({
   request,
 }) => {
   await page.goto('./#contact');
-  const link = page.getByRole('link', {
+  const link = page.locator('.resume-card').getByRole('link', {
     name: 'Télécharger mon CV',
     exact: true,
   });
@@ -315,7 +315,9 @@ test('server-rendered content remains readable without JavaScript', async ({
     page.getByRole('heading', { name: 'La vision au plus près du terrain.' }),
   ).toBeVisible();
   await expect(
-    page.getByRole('link', { name: 'Télécharger mon CV' }),
+    page
+      .locator('.resume-card')
+      .getByRole('link', { name: 'Télécharger mon CV' }),
   ).toHaveAttribute(
     'href',
     '/portofolio/bucket/CV_Reference_Abdallah_Kassan_2026.pdf',
