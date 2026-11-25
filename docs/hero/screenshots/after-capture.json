@@ -1,0 +1,23 @@
+{
+  "capturedAt": "2026-11-25T10:26:05.144Z",
+  "report": [
+    {
+      "name": "desktop",
+      "width": 1440,
+      "height": 900,
+      "url": "http://127.0.0.1:4173/portofolio/",
+      "title": "Abdallah Kassan — Ingénieur logiciel Full Stack & Backend",
+      "heading": "Ingénieur logiciel\n—\nFull Stack & Backend",
+      "errors": []
+    },
+    {
+      "name": "mobile",
+      "width": 393,
+      "height": 852,
+      "url": "http://127.0.0.1:4173/portofolio/",
+      "title": "Abdallah Kassan — Ingénieur logiciel Full Stack & Backend",
+      "heading": "Ingénieur logiciel\n—\nFull Stack & Backend",
+      "errors": []
+    }
+  ]
+}

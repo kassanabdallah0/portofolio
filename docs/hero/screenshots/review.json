@@ -1,0 +1,43 @@
+{
+  "base": "http://127.0.0.1:4173/portofolio/",
+  "renderer": "ANGLE (AMD, Vulkan 1.3.255 (AMD Unknown (RADV RENOIR) (0x0000164C)), radv)",
+  "errors": [],
+  "results": [
+    {
+      "width": 320,
+      "height": 900,
+      "overflow": false,
+      "actionsBottom": 498
+    },
+    {
+      "width": 360,
+      "height": 900,
+      "overflow": false,
+      "actionsBottom": 462
+    },
+    {
+      "width": 393,
+      "height": 852,
+      "overflow": false,
+      "actionsBottom": 457
+    },
+    {
+      "width": 768,
+      "height": 900,
+      "overflow": false,
+      "actionsBottom": 503
+    },
+    {
+      "width": 1024,
+      "height": 900,
+      "overflow": false,
+      "actionsBottom": 527
+    },
+    {
+      "width": 1440,
+      "height": 900,
+      "overflow": false,
+      "actionsBottom": 646
+    }
+  ]
+}

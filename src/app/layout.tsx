@@ -9,17 +9,18 @@ import './engineering-3d.css';
 import './engineering-fleet.css';
 import './engineering-software.css';
 import './vision.css';
+import './hero.css';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://kassanabdallah0.github.io'),
-  title: 'Abdallah Kassan — Ingénieur logiciel & IA embarquée',
+  title: 'Abdallah Kassan — Ingénieur logiciel Full Stack & Backend',
   description:
-    'Abdallah Kassan, ingénieur logiciel UTT à Caen. Full Stack, backend, AWS et Edge AI : six réalisations Fastpoint, de React et Node.js à la vision NVIDIA Jetson. CV de référence disponible.',
+    'Ingénieur logiciel Full Stack et Backend à Caen, diplômé de l’UTT. Interfaces React, API Node.js et Python, déploiement et maintenance sur AWS et NVIDIA Jetson. Réalisations professionnelles et CV de référence.',
   alternates: { canonical: '/portofolio/' },
   openGraph: {
-    title: 'Abdallah Kassan — Ingénieur logiciel & IA embarquée',
+    title: 'Abdallah Kassan — Ingénieur logiciel Full Stack & Backend',
     description:
-      'De l’algorithme au monde réel. Logiciel, vision par ordinateur et systèmes embarqués.',
+      'Interfaces React, API Node.js et Python, logiciels en production sur AWS et Jetson. Découvrez mes réalisations chez Fastpoint.',
     url: '/portofolio/',
     siteName: 'Abdallah Kassan · Ingénierie logicielle',
     locale: 'fr_FR',

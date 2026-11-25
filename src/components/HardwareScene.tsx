@@ -10,6 +10,7 @@ import {
   recordSoftwareRenderer,
 } from './engineering/core/webglSupport';
 import SoftwareRenderBudget from './engineering/core/SoftwareRenderBudget';
+import type { HeroLayer } from '@/data/hero';
 
 function SceneStatus({
   onReady,
@@ -53,362 +54,208 @@ function Studio({ lowPower }: { lowPower: boolean }) {
 function Hardware({
   time,
   paused,
+  activeLayer,
 }: {
   time: RefObject<number>;
   paused: boolean;
+  activeLayer: HeroLayer;
 }) {
   const group = useRef<THREE.Group>(null);
   const packets = useRef<THREE.Mesh[]>([]);
+  const { gl } = useThree();
   const resources = useMemo(() => {
-    const box = new RoundedBoxGeometry(1, 1, 1, 3, 0.055);
-    const canvas = document.createElement('canvas');
-    canvas.width = 576;
-    canvas.height = 320;
-    const texture = new THREE.CanvasTexture(canvas);
-    texture.colorSpace = THREE.SRGBColorSpace;
-    const paths = [
-      new THREE.CubicBezierCurve3(
-        new THREE.Vector3(-1.55, 0.38, -0.15),
-        new THREE.Vector3(-1.4, 0.7, -1.05),
-        new THREE.Vector3(0.7, 0.4, -1),
-        new THREE.Vector3(0.9, -0.14, 0.1),
-      ),
-      new THREE.CubicBezierCurve3(
-        new THREE.Vector3(0.85, 0.15, 0.2),
-        new THREE.Vector3(1.2, 0.7, 0.2),
-        new THREE.Vector3(0.8, 1.05, -0.7),
-        new THREE.Vector3(0.2, 1.23, -0.65),
-      ),
-    ];
+    // Independent product lanes, matching the two readable HTML paths above.
+    const paths = [-0.46, 0.46].flatMap((z) => [
+      new THREE.CatmullRomCurve3([
+        new THREE.Vector3(-2.28, 0.12, z - 0.06),
+        new THREE.Vector3(-0.8, 0.12, z - 0.06),
+        new THREE.Vector3(0.8, 0.12, z - 0.06),
+        new THREE.Vector3(2.28, 0.12, z - 0.06),
+      ]),
+      new THREE.CatmullRomCurve3([
+        new THREE.Vector3(2.28, 0.1, z + 0.06),
+        new THREE.Vector3(0.8, 0.1, z + 0.06),
+        new THREE.Vector3(-0.8, 0.1, z + 0.06),
+        new THREE.Vector3(-2.28, 0.1, z + 0.06),
+      ]),
+    ]);
     return {
-      box,
-      canvas,
-      texture,
+      box: new RoundedBoxGeometry(1, 1, 1, 2, 0.055),
+      sphere: new THREE.SphereGeometry(0.032, 8, 8),
       paths,
       tubes: paths.map(
-        (path) => new THREE.TubeGeometry(path, 40, 0.009, 6, false),
+        (path) => new THREE.TubeGeometry(path, 12, 0.008, 4, false),
       ),
-      sphere: new THREE.SphereGeometry(0.027, 8, 8),
     };
   }, []);
   useEffect(
     () => () => {
       resources.box.dispose();
-      resources.texture.dispose();
-      resources.tubes.forEach((t) => t.dispose());
       resources.sphere.dispose();
+      resources.tubes.forEach((tube) => tube.dispose());
     },
     [resources],
   );
-  const lastScreen = useRef(-1);
+  useEffect(() => {
+    gl.domElement.setAttribute('data-hero-layer', activeLayer);
+  }, [activeLayer, gl]);
   useFrame(({ pointer }, delta) => {
-    const t = time.current;
     if (group.current && !paused) {
       group.current.rotation.y = THREE.MathUtils.damp(
         group.current.rotation.y,
-        pointer.x * 0.1,
-        3,
-        Math.min(delta, 0.05),
-      );
-      group.current.rotation.x = THREE.MathUtils.damp(
-        group.current.rotation.x,
-        -pointer.y * 0.035,
+        pointer.x * 0.045,
         3,
         Math.min(delta, 0.05),
       );
     }
     packets.current.forEach((mesh, i) => {
       if (!mesh) return;
-      const phase = (t * 0.18 + (i % 4) / 4) % 1;
-      resources.paths[Math.floor(i / 4)].getPoint(phase, mesh.position);
-      mesh.scale.setScalar(Math.sin(Math.PI * phase));
+      const phase = (time.current / 3 + Math.floor(i / 2) * 0.2) % 1;
+      resources.paths[i].getPoint(phase, mesh.position);
+      mesh.scale.setScalar(0.55 + Math.sin(phase * Math.PI) * 0.45);
     });
-    if (t - lastScreen.current < 1 / 18 && lastScreen.current >= 0) return;
-    lastScreen.current = t;
-    const ctx = resources.canvas.getContext('2d');
-    if (!ctx) return;
-    const w = 576,
-      h = 320;
-    ctx.fillStyle = '#152029';
-    ctx.fillRect(0, 0, w, h);
-    const gradient = ctx.createLinearGradient(0, 0, w, h);
-    gradient.addColorStop(0, '#364a57');
-    gradient.addColorStop(1, '#1a2630');
-    ctx.fillStyle = gradient;
-    ctx.fillRect(12, 12, w - 24, h - 24);
-    ctx.strokeStyle = '#4a5f6c';
-    ctx.lineWidth = 1;
-    for (let i = 0; i < 7; i++) {
-      ctx.beginPath();
-      ctx.moveTo(0, 100 + i * 38);
-      ctx.lineTo(576, 40 + i * 38);
-      ctx.stroke();
-    }
-    for (let i = 0; i < 9; i++) {
-      ctx.beginPath();
-      ctx.moveTo(i * 85 - 90, 320);
-      ctx.lineTo(i * 65 + 50, 48);
-      ctx.stroke();
-    }
-    ctx.fillStyle = '#526470';
-    ctx.fillRect(40, 56, 106, 117);
-    ctx.fillStyle = '#273c48';
-    ctx.fillRect(48, 69, 88, 76);
-    ctx.fillStyle = '#4a5d69';
-    ctx.fillRect(426, 99, 109, 117);
-    ctx.fillStyle = '#6b7f8c';
-    ctx.fillRect(426, 99, 109, 18);
-    ctx.strokeStyle = '#9bb9c8';
-    ctx.fillStyle = '#8baabb22';
-    ctx.beginPath();
-    ctx.moveTo(284, 154);
-    ctx.lineTo(431, 191);
-    ctx.lineTo(389, 286);
-    ctx.lineTo(247, 229);
-    ctx.closePath();
-    ctx.fill();
-    ctx.setLineDash([5, 6]);
-    ctx.stroke();
-    ctx.setLineDash([]);
-    const p = (t % 18) / 18;
-    const x = 275 - Math.sin(p * Math.PI * 2) * 116;
-    const y = 204 + Math.cos(p * Math.PI * 2) * 12;
-    ctx.fillStyle = '#17232e55';
-    ctx.beginPath();
-    ctx.ellipse(x, y + 29, 28, 8, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#ced7dc';
-    ctx.beginPath();
-    ctx.arc(x, y - 49, 12, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#c1ac8d';
-    ctx.fillRect(x - 16, y - 33, 32, 40);
-    ctx.strokeStyle = '#b0bdc5';
-    ctx.lineWidth = 9;
-    ctx.beginPath();
-    ctx.moveTo(x - 9, y + 7);
-    ctx.lineTo(x - 12, y + 28);
-    ctx.moveTo(x + 9, y + 7);
-    ctx.lineTo(x + 12, y + 28);
-    ctx.stroke();
-    ctx.strokeStyle = '#bad7e3';
-    ctx.lineWidth = 1.5;
-    ctx.strokeRect(x - 29, y - 66, 58, 100);
-    ctx.fillStyle = '#c2dce7';
-    ctx.fillRect(x - 29, y - 85, 95, 19);
-    ctx.fillStyle = '#1b2c36';
-    ctx.font = '12px sans-serif';
-    ctx.fillText('personne · 01', x - 24, y - 71);
-    ctx.fillStyle = '#e1ebf1';
-    ctx.font = '12px sans-serif';
-    ctx.fillText('VISION EMBARQUÉE', 27, 34);
-    ctx.fillStyle = '#abbfcb';
-    ctx.fillText('Scène illustrative', 425, 34);
-    const stage = Math.floor(p * 5);
-    ctx.fillStyle = '#0f1b24';
-    ctx.fillRect(20, 279, 536, 26);
-    ctx.fillStyle = stage === 4 ? '#b9d6c5' : '#bfd2de';
-    ctx.font = '13px sans-serif';
-    ctx.fillText(
-      [
-        'Acquisition vidéo',
-        'Détection · YOLO / TensorRT',
-        'Suivi · identité conservée',
-        'Règle temporelle · présence confirmée',
-        'Événement · condition satisfaite',
-      ][stage],
-      32,
-      297,
-    );
-    // Upload the imperative canvas buffer without a React render per frame.
-    // eslint-disable-next-line react-hooks/immutability
-    resources.texture.needsUpdate = true;
   });
   const box = (
     key: string,
     position: [number, number, number],
     scale: [number, number, number],
     color: string,
-    metalness = 0.7,
-    roughness = 0.3,
+    layer: HeroLayer,
   ) => (
     <mesh
       key={key}
+      geometry={resources.box}
       position={position}
       scale={scale}
-      geometry={resources.box}
       castShadow
       receiveShadow
     >
       <meshStandardMaterial
         color={color}
-        metalness={metalness}
-        roughness={roughness}
+        metalness={0.48}
+        roughness={0.34}
+        emissive={activeLayer === layer ? '#47758b' : '#000000'}
+        emissiveIntensity={activeLayer === layer ? 0.12 : 0}
       />
     </mesh>
   );
   return (
-    <group ref={group} position={[0, -0.15, 0]}>
-      <group position={[-1.55, 0.17, 0.35]} rotation={[0, -0.22, 0]}>
-        {box('body', [0, 0, 0], [1.02, 0.82, 0.73], '#b7c1ca')}
-        {box('front', [0, 0, 0.39], [0.94, 0.74, 0.08], '#26313b')}
-        {box('back', [0, 0, -0.37], [0.89, 0.7, 0.035], '#7f8b95')}
-        <group rotation={[Math.PI / 2, 0, 0]} position={[0, 0, 0.62]}>
-          <mesh castShadow>
-            <cylinderGeometry args={[0.31, 0.32, 0.41, 64]} />
-            <meshStandardMaterial
-              color="#28313b"
-              metalness={0.85}
-              roughness={0.24}
-            />
-          </mesh>
-          {[0, 1, 2, 3].map((i) => (
-            <mesh
-              key={i}
-              position={[0, -0.12 + i * 0.07, 0]}
-              rotation={[Math.PI / 2, 0, 0]}
-            >
-              <torusGeometry args={[0.315, 0.009, 8, 64]} />
-              <meshStandardMaterial
-                color="#8d9da9"
-                metalness={1}
-                roughness={0.2}
-              />
-            </mesh>
-          ))}
-          <mesh position={[0, 0.215, 0]}>
-            <cylinderGeometry args={[0.265, 0.265, 0.025, 64]} />
-            <meshStandardMaterial
-              color="#16252e"
-              metalness={0.7}
-              roughness={0.12}
-            />
-          </mesh>
-          <mesh position={[0, 0.235, 0]} scale={[1, 0.24, 1]}>
-            <sphereGeometry
-              args={[0.258, 48, 24, 0, Math.PI * 2, 0, Math.PI / 2]}
-            />
-            <meshPhysicalMaterial
-              color="#708ba4"
-              metalness={0.05}
-              roughness={0.06}
-              transmission={0.72}
-              thickness={0.32}
-              ior={1.52}
-              clearcoat={1}
-              envMapIntensity={2}
-            />
-          </mesh>
-          <mesh position={[0, 0.23, 0]}>
-            <cylinderGeometry args={[0.12, 0.12, 0.012, 48]} />
-            <meshStandardMaterial
-              color="#080e16"
-              roughness={0.2}
-              metalness={0.3}
-            />
-          </mesh>
-          <mesh position={[0, 0.237, 0]} rotation={[Math.PI / 2, 0, 0]}>
-            <torusGeometry args={[0.252, 0.009, 8, 64]} />
-            <meshStandardMaterial
-              color="#97b5c7"
-              metalness={0.85}
-              roughness={0.18}
-            />
-          </mesh>
+    <group ref={group}>
+      {[-0.46, 0.46].map((z, i) => (
+        <group key={z}>
+          <group position={[-2.3, 0.18, z]} rotation={[-0.16, -0.08, 0]}>
+            {box(
+              `interface-${i}`,
+              [0, 0.17, 0],
+              [0.85, 0.52, 0.09],
+              activeLayer === 'interface' ? '#a9c6d7' : '#c5d2db',
+              'interface',
+            )}
+            {box(
+              `screen-${i}`,
+              [0, 0.17, 0.055],
+              [0.74, 0.39, 0.025],
+              '#34546a',
+              'interface',
+            )}
+            {box(
+              `toolbar-${i}`,
+              [0, 0.31, 0.074],
+              [0.64, 0.035, 0.018],
+              '#b3cfdd',
+              'interface',
+            )}
+            {[0, 1, 2].map((n) =>
+              box(
+                `ui-${i}-${n}`,
+                [-0.21 + n * 0.21, 0.12, 0.074],
+                [0.15, 0.14, 0.018],
+                n === 0 ? '#b0c9d7' : '#759aad',
+                'interface',
+              ),
+            )}
+          </group>
+          <group position={[0, 0.1, z]}>
+            {[0, 1, 2].map((n) =>
+              box(
+                `service-${i}-${n}`,
+                [0, n * 0.12, 0],
+                [0.72, 0.085, 0.39],
+                n === 2 ? '#bccfdc' : '#718fa4',
+                'backend',
+              ),
+            )}
+          </group>
         </group>
-        {[-1, 1].flatMap((x) =>
-          [-1, 1].map((y) => (
-            <mesh
-              key={`${x}-${y}`}
-              position={[x * 0.4, y * 0.3, 0.44]}
-              rotation={[Math.PI / 2, 0, 0]}
-            >
-              <cylinderGeometry args={[0.025, 0.025, 0.012, 12]} />
-              <meshStandardMaterial
-                color="#87929b"
-                metalness={0.95}
-                roughness={0.3}
-              />
-            </mesh>
-          )),
+      ))}
+      <group position={[2.3, 0.12, -0.46]}>
+        {box(
+          'jetson',
+          [0, 0.08, 0],
+          [0.93, 0.27, 0.58],
+          '#516b7d',
+          'production',
         )}
-        {box('mount', [0, -0.59, -0.08], [0.18, 0.4, 0.2], '#71808c')}
-        {box('foot', [0, -0.78, 0], [0.85, 0.08, 0.65], '#9dabb7')}
-      </group>
-      <group position={[0.83, -0.51, 0.52]} rotation={[0, -0.15, 0]}>
-        {box('base', [0, 0, 0], [1.63, 0.48, 1.13], '#727f8a')}
-        {box('top', [0, 0.27, 0], [1.55, 0.07, 1.05], '#29343e')}
-        {Array.from({ length: 13 }, (_, i) =>
+        {Array.from({ length: 9 }, (_, i) =>
           box(
             `fin-${i}`,
-            [-0.69 + i * 0.115, 0.35, 0],
-            [0.035, 0.19, 0.99],
-            '#83919c',
+            [-0.36 + i * 0.09, 0.28, 0],
+            [0.035, 0.14, 0.52],
+            '#a8b9c5',
+            'production',
           ),
         )}
-        {box('port', [0, -0.04, 0.573], [1.42, 0.28, 0.02], '#25313a')}
-        {[-0.5, -0.23, 0.08].map((x, i) =>
+        {[-0.26, -0.04, 0.18].map((x, i) =>
           box(
-            `usb-${i}`,
-            [x, -0.04, 0.59],
-            [0.17, 0.13, 0.025],
-            '#0a1117',
-            0.2,
-            0.7,
-          ),
-        )}
-        <mesh position={[0.55, -0.035, 0.598]}>
-          <sphereGeometry args={[0.021, 12, 12]} />
-          <meshBasicMaterial color="#b8d7be" />
-        </mesh>
-        {[-0.55, 0.55].map((x) =>
-          box(
-            `feet-${x}`,
-            [x, -0.28, 0],
-            [0.25, 0.09, 0.85],
-            '#202932',
-            0.2,
-            0.8,
+            `port-${i}`,
+            [x, 0.07, 0.3],
+            [0.14, 0.1, 0.02],
+            '#172e3d',
+            'production',
           ),
         )}
       </group>
-      <group position={[0.25, 1.43, -0.8]} rotation={[0, -0.06, 0]}>
-        {box('screen', [0, 0, 0], [2.66, 1.51, 0.075], '#8f9da9', 0.9, 0.2)}
-        <mesh position={[0, 0, 0.043]}>
-          <planeGeometry args={[2.54, 1.41]} />
-          <meshBasicMaterial map={resources.texture} toneMapped={false} />
-        </mesh>
-        <mesh position={[0, 0, 0.051]} rotation={[0, 0, 0]}>
-          <planeGeometry args={[2.57, 1.44]} />
-          <meshPhysicalMaterial
-            color="#e6f1f8"
-            transparent
-            opacity={0.035}
-            roughness={0.08}
-            metalness={0.2}
-            clearcoat={1}
-          />
-        </mesh>
-        {box('screen-foot', [0, -0.97, -0.12], [0.1, 0.5, 0.1], '#a0acb6')}
+      <group position={[2.3, 0.25, 0.46]}>
+        {box(
+          'cloud-base',
+          [0, -0.06, 0],
+          [1, 0.13, 0.58],
+          '#7997ac',
+          'production',
+        )}
+        {[-0.28, 0, 0.28].map((x, i) => (
+          <mesh
+            key={i}
+            position={[x, i === 1 ? 0.19 : 0.1, 0]}
+            scale={[0.28, 0.22, 0.24]}
+            castShadow
+          >
+            <sphereGeometry args={[1, 16, 12]} />
+            <meshStandardMaterial
+              color={activeLayer === 'production' ? '#bad7e5' : '#d6e2e9'}
+              metalness={0.25}
+              roughness={0.3}
+            />
+          </mesh>
+        ))}
       </group>
       {resources.tubes.map((tube, i) => (
         <mesh key={i} geometry={tube}>
           <meshStandardMaterial
-            color="#6e92a7"
-            metalness={0.6}
-            roughness={0.3}
+            color={i % 2 ? '#a6bbb2' : '#8baabc'}
+            roughness={0.7}
           />
         </mesh>
       ))}
-      {Array.from({ length: 8 }, (_, i) => (
+      {resources.paths.map((_, i) => (
         <mesh
           key={i}
-          ref={(el) => {
-            if (el) packets.current[i] = el;
-          }}
           geometry={resources.sphere}
+          ref={(mesh) => {
+            if (mesh) packets.current[i] = mesh;
+          }}
         >
-          <meshBasicMaterial color="#b3d4e3" />
+          <meshBasicMaterial color={i % 2 ? '#799e8e' : '#3b6c8a'} />
         </mesh>
       ))}
     </group>
@@ -418,11 +265,13 @@ function Hardware({
 export default function HardwareScene({
   paused,
   time,
+  activeLayer,
   onReady,
   onUnavailable,
 }: {
   paused: boolean;
   time: RefObject<number>;
+  activeLayer: HeroLayer;
   onReady: () => void;
   onUnavailable: () => void;
 }) {
@@ -434,10 +283,10 @@ export default function HardwareScene({
       dpr={lowPower ? 1 : [1, 1.5]}
       frameloop={lowPower || paused ? 'demand' : 'always'}
       shadows={!lowPower}
-      camera={{ position: [3.9, 2.5, 7.6], fov: 30 }}
+      camera={{ position: [0, 2.4, 5.2], fov: 22 }}
       gl={{ alpha: true, antialias: true, powerPreference: 'low-power' }}
       onCreated={({ camera, gl }) => {
-        camera.lookAt(0, 0.2, 0);
+        camera.lookAt(0, 0.15, 0);
         setSoftwareRenderer(recordSoftwareRenderer(gl.getContext()));
       }}
     >
@@ -445,32 +294,31 @@ export default function HardwareScene({
         <>
           <SceneStatus onReady={onReady} onUnavailable={onUnavailable} />
           <Studio lowPower={lowPower} />
-          <ambientLight intensity={0.55} />
+          <ambientLight intensity={0.65} />
           <directionalLight
             position={[-3, 8, 5]}
             intensity={2.6}
             castShadow={!lowPower}
-            shadow-mapSize={[1024, 1024]}
+            shadow-mapSize={[512, 512]}
             shadow-camera-left={-4}
             shadow-camera-right={4}
-            shadow-camera-top={4}
-            shadow-camera-bottom={-4}
+            shadow-camera-top={2}
+            shadow-camera-bottom={-2}
             shadow-normalBias={0.025}
-            shadow-radius={5}
           />
           <directionalLight
             position={[4, 2, -3]}
-            intensity={2}
+            intensity={1.6}
             color="#c4d9e8"
           />
-          <Hardware paused={paused} time={time} />
+          <Hardware paused={paused} time={time} activeLayer={activeLayer} />
           <mesh
             rotation={[-Math.PI / 2, 0, 0]}
-            position={[0, -1.13, 0]}
+            position={[0, -0.04, 0]}
             receiveShadow
           >
-            <planeGeometry args={[200, 200]} />
-            <shadowMaterial transparent opacity={0.13} />
+            <planeGeometry args={[20, 20]} />
+            <shadowMaterial transparent opacity={0.12} />
           </mesh>
           {lowPower && <SoftwareRenderBudget running={!paused} />}
         </>

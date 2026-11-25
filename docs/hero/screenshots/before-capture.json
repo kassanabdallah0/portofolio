@@ -1,0 +1,23 @@
+{
+  "capturedAt": "2026-11-19T14:38:37.043Z",
+  "report": [
+    {
+      "name": "desktop",
+      "width": 1440,
+      "height": 900,
+      "url": "https://kassanabdallah0.github.io/portofolio/",
+      "title": "Abdallah Kassan — Ingénieur logiciel & IA embarquée",
+      "heading": "Ingénieur Logiciel.\nSystèmes Intelligents.\nIA Embarquée.",
+      "errors": []
+    },
+    {
+      "name": "mobile",
+      "width": 393,
+      "height": 852,
+      "url": "https://kassanabdallah0.github.io/portofolio/",
+      "title": "Abdallah Kassan — Ingénieur logiciel & IA embarquée",
+      "heading": "Ingénieur Logiciel.\nSystèmes Intelligents.\nIA Embarquée.",
+      "errors": []
+    }
+  ]
+}
