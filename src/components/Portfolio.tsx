@@ -33,6 +33,7 @@ import {
 } from '@/data/portfolio';
 import type { Project } from '@/data/portfolio';
 import CoreVisual from './CoreVisual';
+import SkillMark, { type Skill } from './SkillMark';
 import EngineeringDemo from './EngineeringDemo';
 import ResumeCard from './ResumeCard';
 
@@ -76,42 +77,6 @@ function SectionLabel({
       <span className="section-label-line" />
       {children}
     </p>
-  );
-}
-
-function MagneticLink({
-  href,
-  className,
-  children,
-}: {
-  href: string;
-  className: string;
-  children: ReactNode;
-}) {
-  const reduced = useReducedMotion();
-  return (
-    <a
-      href={href}
-      className={className}
-      onPointerMove={(event) => {
-        if (reduced || event.pointerType !== 'mouse') return;
-        const rect = event.currentTarget.getBoundingClientRect();
-        event.currentTarget.style.setProperty(
-          '--mx',
-          `${(event.clientX - rect.left - rect.width / 2) * 0.06}px`,
-        );
-        event.currentTarget.style.setProperty(
-          '--my',
-          `${(event.clientY - rect.top - rect.height / 2) * 0.09}px`,
-        );
-      }}
-      onPointerLeave={(event) => {
-        event.currentTarget.style.setProperty('--mx', '0px');
-        event.currentTarget.style.setProperty('--my', '0px');
-      }}
-    >
-      {children}
-    </a>
   );
 }
 
@@ -558,7 +523,7 @@ export default function Portfolio() {
             <div className="hero-copy">
               <p className="eyebrow hero-eyebrow">
                 <span className="eyebrow-line" />
-                Abdallah Kassan · Ingénieur diplômé de l’UTT
+                Abdallah Kassan
               </p>
               <motion.h1 initial={{ opacity: 1 }} animate={{ opacity: 1 }}>
                 <span>Ingénieur logiciel</span>
@@ -566,35 +531,47 @@ export default function Portfolio() {
                   <span className="sr-only"> — </span>Full Stack &amp; Backend
                 </span>
               </motion.h1>
-              <p className="hero-description">
-                Je conçois les interfaces, développe les API et assure le
-                déploiement et la maintenance des logiciels en production.
-              </p>
-              <p className="hero-specialties">
-                React <span>·</span> TypeScript <span>·</span> Node.js{' '}
-                <span>·</span> Python <span>·</span> AWS
-              </p>
-              <p className="hero-credibility">
-                Plus de 2 ans d’expérience chez Fastpoint · Caen · Mobilité
-                France
-              </p>
+              <div
+                className="hero-tech-icons"
+                role="group"
+                aria-label="Technologies : React, TypeScript, Python, AWS et NVIDIA Jetson"
+              >
+                {(
+                  [
+                    ['react', 'React'],
+                    ['typescript', 'TypeScript'],
+                    ['python', 'Python'],
+                    ['cloud', 'AWS'],
+                    ['jetson', 'NVIDIA Jetson'],
+                  ] as [Skill, string][]
+                ).map(([skill, label]) => (
+                  <span key={skill} role="img" aria-label={label} title={label}>
+                    <SkillMark skill={skill} />
+                  </span>
+                ))}
+              </div>
               <div className="hero-actions">
-                <MagneticLink href="#projets" className="button button-primary">
-                  Voir mes réalisations
+                <a
+                  href="#projets"
+                  className="button button-primary"
+                  aria-label="Voir mes projets"
+                >
+                  Projets
                   <ArrowUpRight size={18} />
-                </MagneticLink>
+                </a>
                 <a
                   href={profile.cv}
                   download={profile.cvFilename}
                   className="button button-quiet"
+                  aria-label="Télécharger mon CV"
                 >
                   <Download size={16} />
-                  Télécharger mon CV
+                  CV
                 </a>
               </div>
-              <p className="availability">
+              <p className="availability hero-availability">
                 <span className="status-dot" />
-                Disponible pour de nouvelles opportunités
+                Disponible
               </p>
             </div>
             <CoreVisual
@@ -608,11 +585,11 @@ export default function Portfolio() {
                 <span className="scroll-icon">
                   <ArrowDown size={15} />
                 </span>
-                MON PARCOURS & MON APPROCHE
+                Parcours
               </a>
               <span className="hero-location">
                 <MapPin size={13} />
-                CAEN, FRANCE · MOBILITÉ FRANCE
+                Caen · France
               </span>
             </div>
           </div>

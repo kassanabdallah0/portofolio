@@ -1,0 +1,69 @@
+{
+  "base": "http://127.0.0.1:4173/portofolio/",
+  "errors": [],
+  "motion": [
+    {
+      "time": "0",
+      "zone": "96.00",
+      "cursor": "translate(191 120)",
+      "cards": "translate(0 0)"
+    },
+    {
+      "time": "2533",
+      "zone": "112.91",
+      "cursor": "translate(207.9070051093869 126.91650209020372)",
+      "cards": "translate(-9.096331666310965 0)"
+    },
+    {
+      "time": "5066",
+      "zone": "137.14",
+      "cursor": "translate(232.13581834469386 136.8282893228293)",
+      "cards": "translate(-22.59468472094407 0)"
+    }
+  ],
+  "layouts": [
+    {
+      "width": 320,
+      "height": 900,
+      "overflow": false,
+      "sceneBottom": 651,
+      "actionsBottom": 319
+    },
+    {
+      "width": 360,
+      "height": 900,
+      "overflow": false,
+      "sceneBottom": 681,
+      "actionsBottom": 319
+    },
+    {
+      "width": 393,
+      "height": 852,
+      "overflow": false,
+      "sceneBottom": 711,
+      "actionsBottom": 324
+    },
+    {
+      "width": 768,
+      "height": 900,
+      "overflow": false,
+      "sceneBottom": 1049,
+      "actionsBottom": 395
+    },
+    {
+      "width": 1024,
+      "height": 900,
+      "overflow": false,
+      "sceneBottom": 1117,
+      "actionsBottom": 414
+    },
+    {
+      "width": 1440,
+      "height": 900,
+      "overflow": false,
+      "sceneBottom": 818,
+      "actionsBottom": 583
+    }
+  ],
+  "renderer": "ANGLE (AMD, Vulkan 1.3.255 (AMD Unknown (RADV RENOIR) (0x0000164C)), radv)"
+}
